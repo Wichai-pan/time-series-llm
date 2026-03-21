@@ -1,0 +1,38 @@
+######################################################
+#                   MANDATORY FIELDS
+######################################################
+task_name: time_series/bikesharing_univariate_smoke
+task_description: Smoke test for SDForger time series generation.
+created_by: IBM Research
+
+data_builder: time_series
+
+######################################################
+#                   RESERVED FIELDS
+######################################################
+data:
+  type: default
+  data_path: ${DGT_DATA_DIR}/public/time_series/bikesharing_full.parquet
+
+######################################################
+#                   TASK FIELDS
+######################################################
+data_params:
+  train_length: 1500
+  train_samples: 1
+  augmentation_strategy: univariate
+  train_channels:
+    - cnt
+
+sdforger_params:
+  k_bit: null
+  min_outputs_to_generate: 5
+  max_outputs_to_generate: 10
+  inference_batch: 8
+  norms_diversity_threshold: 0
+  embedding_type: "fica"
+  embedding_dim: auto
+  variance_explained: 0.7
+  min_windows_number: 10
+  min_windows_length: 120
+  input_tokens_precision: 4
