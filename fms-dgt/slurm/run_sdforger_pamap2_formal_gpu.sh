@@ -6,7 +6,7 @@
 #SBATCH --time=03:00:00
 #SBATCH --mem=48G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=/projappl/project_2016517/panh/time-series-llm/fms-dgt/logs/%x_%j.out
+#SBATCH --output=/scratch/project_2016517/panh/time-series-llm/fms-dgt/logs/%x_%j.out
 
 set -eo pipefail
 source /appl/profile/zz-csc-env.sh
@@ -14,9 +14,10 @@ set -u
 module purge
 module load pytorch/2.6
 
-BASE=/projappl/project_2016517/panh/time-series-llm/fms-dgt
+BASE=/scratch/project_2016517/panh/time-series-llm/fms-dgt
 ENV=/projappl/project_2016517/panh/time-series-llm/envs/sdforger-py312
 
+mkdir -p "$BASE/logs"
 source "$ENV/bin/activate"
 cd "$BASE"
 export DGT_DATA_DIR="$BASE/data"
