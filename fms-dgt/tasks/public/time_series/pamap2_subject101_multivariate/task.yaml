@@ -1,0 +1,44 @@
+######################################################
+#                   MANDATORY FIELDS
+######################################################
+task_name: time_series/pamap2_subject101_multivariate
+task_description: Generate synthetic multivariate PAMAP2 time series for subject101.
+created_by: Wichai Pan
+
+data_builder: time_series
+
+######################################################
+#                   RESERVED FIELDS
+######################################################
+data:
+  type: default
+  data_path: ${DGT_DATA_DIR}/public/time_series/pamap2_subject101_multivariate.parquet
+
+######################################################
+#                   TASK FIELDS
+######################################################
+data_params:
+  train_length: 60000
+  train_samples: 1
+  augmentation_strategy: multivariate
+  train_splitting: no-periodicity
+  train_channels:
+    - hand_acc16_x
+    - hand_acc16_y
+    - hand_acc16_z
+    - ankle_acc16_x
+    - ankle_acc16_y
+    - ankle_acc16_z
+
+sdforger_params:
+  k_bit: null
+  min_outputs_to_generate: 50
+  max_outputs_to_generate: 100
+  inference_batch: 64
+  norms_diversity_threshold: 1
+  embedding_type: "fica"
+  embedding_dim: auto
+  variance_explained: 0.7
+  min_windows_number: 20
+  min_windows_length: 800
+  input_tokens_precision: 4
