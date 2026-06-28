@@ -1,0 +1,28 @@
+[
+  {
+    "setting": "clean_unconditioned",
+    "conditional": false,
+    "space": "raw_like",
+    "inverse_protocol": "activity train-window timestamp mean/std, matching old HAR smoke"
+  },
+  {
+    "setting": "raw_unified_label_conditioned",
+    "conditional": true,
+    "space": "raw_like",
+    "inverse_protocol": "activity train-window timestamp mean/std, matching old HAR smoke"
+  },
+  {
+    "setting": "clip_p05_p95",
+    "conditional": true,
+    "space": "raw_like",
+    "inverse_protocol": "activity train-window timestamp mean/std, matching old HAR smoke"
+  },
+  {
+    "setting": "global_series_zscore",
+    "conditional": true,
+    "space": "raw_like",
+    "inverse_protocol": "global scalar inverse z-score from run_metadata",
+    "global_mean": -6.915385894719965,
+    "global_std": 8.359123116027302
+  }
+]

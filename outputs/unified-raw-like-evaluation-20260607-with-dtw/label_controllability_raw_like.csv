@@ -1,0 +1,5 @@
+setting,label_accuracy,note,label_balanced_accuracy,label_macro_f1,walking_requested_accuracy,running_requested_accuracy,label_confusion_matrix
+clean_unconditioned,,not label-conditioned,,,,,
+raw_unified_label_conditioned,0.8211920529801324,,0.8204992967651196,0.820688745217047,0.8055555555555556,0.8354430379746836,"[[58, 14], [13, 66]]"
+clip_p05_p95,0.9867549668874173,,0.9873417721518987,0.9867404285212504,1.0,0.9746835443037974,"[[72, 0], [2, 77]]"
+global_series_zscore,0.45528455284552843,,0.45452141723955575,0.45005005005005005,0.36065573770491804,0.5483870967741935,"[[22, 39], [28, 34]]"

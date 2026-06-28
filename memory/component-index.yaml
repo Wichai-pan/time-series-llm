@@ -1,0 +1,76 @@
+components:
+  root:
+    path: .
+    role: project control root
+    status: active
+  memory:
+    path: memory
+    role: durable project memory
+    status: active
+  reference:
+    path: reference
+    role: local source library and source-processing state
+    status: active
+  docs:
+    path: docs
+    role: project-level design and planning documents
+    status: active
+  code:
+    path: code
+    role: placeholder for future clean code component
+    status: placeholder
+  residual_code:
+    path: legacy/old-project-files/puhti-time-series-llm
+    role: observed local residual repository
+    status: needs-verification
+    notes:
+      - "Git status shows many modified and untracked files under fms-dgt."
+      - "Do not trust as complete implementation evidence."
+  paper:
+    path: paper
+    role: optional future report/paper component
+    status: placeholder
+  reviewer:
+    path: reviewer
+    role: future reviewer simulation state
+    status: placeholder
+  rebuttal:
+    path: rebuttal
+    role: future rebuttal state
+    status: placeholder
+  artifact:
+    path: artifact
+    role: future artifact/release state
+    status: placeholder
+
+worktree_roots:
+  code: code-worktrees
+  paper: paper-worktrees
+
+known_worktrees: []
+
+observed_local_sources:
+  notes:
+    - path: legacy/old-project-files/TS LLM.md
+      status: observed
+      role: old working notes
+    - path: legacy/old-project-files/SESSION_HANDOFF.md
+      status: observed
+      role: old handoff note
+  papers:
+    - path: legacy/old-project-files/Forging Time Series Synthetic Data.pdf
+      status: observed
+      role: seed paper / closest work candidate
+    - path: legacy/old-project-files/ChatTS Time Series Alignment.pdf
+      status: observed
+      role: adjacent LLM-time-series work
+    - path: legacy/old-project-files/AgentSense Virtual Sensor Data.pdf
+      status: observed
+      role: HAR synthetic data adjacent/competitor
+    - path: legacy/old-project-files/ListOfTopics_2026.pdf
+      status: observed
+      role: course/project topic context
+  slides:
+    - path: legacy/old-project-files/meeting.pptx
+      status: observed
+      role: possible old advisor/course material

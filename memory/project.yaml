@@ -1,0 +1,73 @@
+project:
+  name: time-series-llm-synthetic-sensor-data
+  title: Time-Series LLM Synthetic Sensor Data
+  root: .
+  created_or_reset: 2026-05-18
+  phase: positioning
+  status: offline-reset
+  certainty: observed
+
+research:
+  rough_topic: "Generating synthetic sensor time series for HAR using LLM-enabled generative methods."
+  current_candidate_direction: "Revise around SDForger on PAMAP2/HAR with rigorous statistical, temporal, and downstream utility evaluation."
+  target_venue_or_milestone: "Course project / advisor-facing research reset; exact venue unknown."
+  certainty: inferred
+
+constraints:
+  remote_cluster:
+    status: blocked
+    reason: "User stated remote cluster is under maintenance and cannot be checked now."
+    allowed_now: false
+    certainty: user-stated
+  local_code:
+    status: incomplete
+    policy: "Do not treat old implementation as reliable without verification."
+    certainty: user-stated
+  old_results:
+    status: needs-verification
+    policy: "Old experiment counts and summaries may guide planning but are not paper evidence."
+    certainty: user-stated
+
+components:
+  memory:
+    path: memory
+    role: cross-session project coordination
+  reference:
+    path: reference
+    role: source library, cards, project-use notes, processing status
+  docs:
+    path: docs
+    role: project-level designs, literature plans, experiment plans, updates
+  code_placeholder:
+    path: code
+    role: placeholder and policy surface for code component
+  observed_residual_code:
+    path: legacy/old-project-files/puhti-time-series-llm
+    role: unverified local residual code repository
+    status: needs-verification
+  paper:
+    path: paper
+    role: optional future report or paper component
+    status: placeholder
+
+toolchain_gates:
+  remote_execution:
+    required: false
+    status: blocked
+    command_policy: "No SSH, SLURM, RunAI, or remote sync during offline reset."
+  local_validation:
+    required: false
+    status: not-started
+    command_policy: "Only inspect local files and organize memory/reference docs."
+
+github_project:
+  enabled: false
+
+memory_policy:
+  certainty_labels:
+    - observed
+    - user-stated
+    - inferred
+    - stale
+    - needs-verification
+  result_policy: "No result is trusted until source outputs, configs, commits, and logs are reverified."

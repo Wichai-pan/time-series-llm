@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "channel": "hand_acc16_x",
+    "train_length": 5000,
+    "window_length": 300,
+    "walking_real_train_windows": 31,
+    "running_real_train_windows": 31,
+    "walking_real_test_windows": 57,
+    "running_real_test_windows": 54,
+    "walking_synthetic_all": 35,
+    "running_synthetic_all": 43,
+    "walking_synthetic_good": 8,
+    "running_synthetic_good": 17,
+    "synthetic_space_handling": "inverse_transformed_from_sdforger_scaled_space_using_activity_train_window_mean_std"
+  },
+  "results": [
+    {
+      "condition": "majority",
+      "train_samples": 62,
+      "test_samples": 111,
+      "accuracy": 0.5135135135135135,
+      "balanced_accuracy": 0.5,
+      "macro_f1": 0.3392857142857143,
+      "confusion_matrix": [
+        [
+          57,
+          0
+        ],
+        [
+          54,
+          0
+        ]
+      ]
+    },
+    {
+      "condition": "real-only",
+      "train_samples": 62,
+      "test_samples": 111,
+      "accuracy": 0.6126126126126126,
+      "balanced_accuracy": 0.6086744639376218,
+      "macro_f1": 0.6021505376344085,
+      "confusion_matrix": [
+        [
+          43,
+          14
+        ],
+        [
+          29,
+          25
+        ]
+      ]
+    },
+    {
+      "condition": "synthetic-only-all",
+      "train_samples": 78,
+      "test_samples": 111,
+      "accuracy": 0.6576576576576577,
+      "balanced_accuracy": 0.6515594541910331,
+      "macro_f1": 0.6361283643892339,
+      "confusion_matrix": [
+        [
+          50,
+          7
+        ],
+        [
+          31,
+          23
+        ]
+      ]
+    },
+    {
+      "condition": "real+synthetic-all",
+      "train_samples": 140,
+      "test_samples": 111,
+      "accuracy": 0.6486486486486487,
+      "balanced_accuracy": 0.6471734892787524,
+      "macro_f1": 0.646814065431998,
+      "confusion_matrix": [
+        [
+          40,
+          17
+        ],
+        [
+          22,
+          32
+        ]
+      ]
+    },
+    {
+      "condition": "synthetic-only-good",
+      "train_samples": 25,
+      "test_samples": 111,
+      "accuracy": 0.6486486486486487,
+      "balanced_accuracy": 0.6403508771929824,
+      "macro_f1": 0.6073469387755102,
+      "confusion_matrix": [
+        [
+          54,
+          3
+        ],
+        [
+          36,
+          18
+        ]
+      ]
+    },
+    {
+      "condition": "real+synthetic-good",
+      "train_samples": 87,
+      "test_samples": 111,
+      "accuracy": 0.6756756756756757,
+      "balanced_accuracy": 0.6734892787524367,
+      "macro_f1": 0.6724590163934426,
+      "confusion_matrix": [
+        [
+          43,
+          14
+        ],
+        [
+          22,
+          32
+        ]
+      ]
+    }
+  ]
+}

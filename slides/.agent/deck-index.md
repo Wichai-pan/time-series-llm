@@ -1,0 +1,6 @@
+# Deck Index
+
+| Deck id | Path | Audience | Date | Purpose | Source evidence | Validation status |
+|---|---|---|---|---|---|---|
+| `2026-05-26-advisor-sdforger-pamap2-update` | `slides/decks/2026-05-26-advisor-sdforger-pamap2-update.md`; `slides/decks/2026-05-26-advisor-sdforger-pamap2-update.pptx` | Advisor | 2026-05-26 | 3-slide progress update on activity-conditioned SDForger for PAMAP2 | `docs/experiments/latent-constraint-results-20260523.md`, `outputs/*acf_psd*.png`, `outputs/*periodicity.png` | PPTX generated; QuickLook first-slide thumbnail checked; template clone/build blocked by network |
+| `2026-06-08-advisor-postmeeting-update` | `slides/decks/2026-06-08-advisor-postmeeting-update.pptx`; `slides/decks/2026-06-08-advisor-postmeeting-update.md`; `slides/decks/2026-06-08-advisor-postmeeting-update.pdf` | Advisor | 2026-06-08 | 2-slide post-meeting verification update: normalization, multi-subject, unseen subject, latent validity | `docs/experiments/combined-experiment-table-20260607.md`, `docs/experiments/multisubject-unified-conditioning-results-20260607.md`, `docs/experiments/unseen-subject-evaluation-results-20260607.md`, `docs/experiments/generation-time-validity-results-20260608.md` | Editable PPTX generated; package has 2 slides and notes; Slidev build/PDF also available |

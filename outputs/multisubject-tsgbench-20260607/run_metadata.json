@@ -1,0 +1,30 @@
+{
+  "walking_train_windows": 54,
+  "running_train_windows": 62,
+  "combined_train_windows": 116,
+  "channel": "hand_acc16_x",
+  "train_length_per_activity": 15000,
+  "window_length": 300,
+  "embedding_type": "fica",
+  "embedding_dims": [
+    8
+  ],
+  "model_id_or_path": "gpt2",
+  "tuned_model_path": "output/time_series/pamap2_subject101_102_105_unified_label_conditioned_hand_acc16_x/model/model_iter-1/best",
+  "generation_stats": {
+    "walking": {
+      "raw_outputs": 128,
+      "parsed_rows": 128,
+      "accepted_rows": 51,
+      "attempts": 2
+    },
+    "running": {
+      "raw_outputs": 192,
+      "parsed_rows": 191,
+      "accepted_rows": 58,
+      "attempts": 3
+    }
+  },
+  "value_space": "standardized_sdforger_window_space",
+  "note": "window-level labels are assigned after independent activity-specific preprocessing and before joint FICA embedding."
+}

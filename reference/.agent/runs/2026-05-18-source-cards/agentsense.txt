@@ -1,0 +1,1050 @@
+                                            AgentSense: Virtual Sensor Data Generation Using LLM Agents in Simulated
+                                                                       Home Environments
+                                              Zikang Leng1 * , Megha Thukral1 * , Yaqi Liu1 * , Hrudhai Rajasekhar1 , Shruthi K. Hiremath1 ,
+                                                                            Jiaman He2 , Thomas Plötz1
+                                                                  1
+                                                               School of Interactive Computing, Georgia Institute of Technology, Atlanta, USA
+                                                                                   2
+                                                                                     RMIT University, Melbourne, Australia
+                                             {zleng7, mthukral3, yliu3387, hrajasekhar3, shiremath9, thomas.ploetz}@gatech.edu, jiaman.he@student.rmit.edu.au
+
+
+
+
+arXiv:2506.11773v4 [cs.CV] 11 Nov 2025
+                                                                      Abstract                                    In 2018, Xia et al. (2018) introduced the Gibson Environ-
+                                                                                                               ment, a realistic 3D simulation platform designed for train-
+                                           A major challenge in developing robust and generalizable            ing and evaluating embodied agents—AI systems that per-
+                                           Human Activity Recognition (HAR) systems for smart homes            ceive and act within physical or simulated environments.
+                                           is the lack of large and diverse labeled datasets. Variations in
+                                           home layouts, sensor configurations, and individual behav-
+                                                                                                               Since then, virtual embodied agents (VEAs) have become
+                                           iors further exacerbate this issue. To address this, we lever-      integral to a wide range of interactive and conversational
+                                           age the idea of embodied AI agents—virtual agents that per-         tasks. These agents take on diverse forms, from virtual
+                                           ceive and act within simulated environments guided by inter-        2D or 3D avatars to physical robotic androids equipped
+                                           nal world models. We introduce AgentSense, a virtual data           with synthetic skin, expressive facial features, and motor-
+                                           generation pipeline in which agents live out daily routines         ized mechanisms for controlling facial expressions and lip
+                                           in simulated smart homes, with behavior guided by Large             movements (Fung et al. 2025). Recent advances have also
+                                           Language Models (LLMs). The LLM generates diverse syn-              explored the use of world model-based approaches, which
+                                           thetic personas and realistic routines grounded in the envi-        allow agents to ground vision-language prompts within em-
+                                           ronment, which are then decomposed into fine-grained ac-            bodied domains and learn complex behaviors through imag-
+                                           tions. These actions are executed in an extended version of
+                                           the VirtualHome simulator, which we augment with virtual
+                                                                                                               inative simulation (Mazzaglia et al. 2024).
+                                           ambient sensors that record the agents’ activities. Our ap-            Building on the foundation of prior work in embodied
+                                           proach produces rich, privacy-preserving sensor data that re-       AI, we shift the focus from simulating robotic behaviors
+                                           flects real-world diversity. We evaluate AgentSense on five         or dialogue agents to simulating human lives within vir-
+                                           real HAR datasets. Models pretrained on the generated data          tual smart home environments. Our aim is to translate the
+                                           consistently outperform baselines, especially in low-resource       simulated lives into sensor-level data. Specifically, we focus
+                                           settings. Furthermore, combining the generated virtual sen-
+                                                                                                               on smart home based Human Activity Recognition (HAR),
+                                           sor data with a small amount of real data achieves perfor-
+                                           mance comparable to training on full real-world datasets.           which rely on ambient sensors to monitor daily activities.
+                                           These results highlight the potential of using LLM-guided           HAR is crucial in domains such as healthcare, elder care,
+                                           embodied agents for scalable and cost-effective sensor data         and assisted living (Alam, Reaz, and Ali 2012; Qi et al.
+                                           generation in HAR. Our code is publicly available at https:         2018; Chernova et al. 2024). However, the development of
+                                           //github.com/ZikangLeng/AgentSense                                  effective HAR models is limited by the scarcity of large,
+                                                                                                               diverse, and annotated sensor datasets (Liciotti et al. 2020;
+                                                                                                               Bouchabou et al. 2021).
+                                                                 Introduction                                     To address this challenge, we simulate diverse human per-
+                                         In 1999, The Matrix created a simulated reality, one in               sonas and embed them as agents within virtual smart home
+                                         which most humans lived unknowingly inside a computer-                environments. Each persona is generated using large lan-
+                                         generated illusion. That world was created by intelligent ma-         guage models (LLMs), which also direct the agent’s be-
+                                         chines, built not to serve humanity, but to control it. Today,        havior by producing realistic daily routines and correspond-
+                                         we are building simulated environments of our own 1 . But             ing actions grounded in the simulated home environment.
+                                         this time, the purpose is different: to understand, model, and        These actions are executed within VirtualHome, a 3D simu-
+                                         support human life through intelligent systems. With the ad-          lation platform that we extend with ambient sensor capabil-
+                                         vent of large language models (LLMs) and rich, interactive            ities—referred to as X-VirtualHome.
+                                         simulations, we now have the tools to do so.                             Each interaction with the environment—opening a door,
+                                             * These authors contributed equally.                              turning on a light, walking between rooms—triggers corre-
+                                         Copyright © 2026, Association for the Advancement of Artificial       sponding virtual sensor signals, mimicking real-world smart
+                                         Intelligence (www.aaai.org). All rights reserved.                     home sensor data. This process allows us to generate large-
+                                             1                                                                 scale, fully annotated, privacy-preserving datasets without
+                                               Visualized      at     https://drive.google.com/file/d/1uab6-
+                                         Y03uDGwqJ1GV9ooQTIlEAW39pJz/view?usp=sharing                          the need for intrusive real-world data collection.
+   Crucially, our simulation is not solely aimed at generating   explored. We build on this direction by generating struc-
+large volumes of data, but at producing diverse and struc-       tured, ambient sensor data from agents enacting daily lives
+tured sensor data that capture the heterogeneity of human be-    in simulated homes. Rather than creating one-to-one digi-
+havior. By systematically varying personas, daily routines,      tal twins (Grieves and Vickers 2016), we adopt the digital
+home layouts, and sensor configurations, our approach gen-       cousin approach (Dai et al. 2024), simulating diverse agents
+erates datasets designed to help HAR models generalize           and environments to support diverse data generation.
+across a wide range of real-world scenarios.                        A natural extension of this approach is to integrate LLMs
+   In our experiments, we simulate 18 distinct personas          to guide agent behavior.
+across 22 unique home layouts, generating a total of 250
+days of virtual sensor data. We evaluate the resulting mod-      Language Models for Behavior Simulation Recent ad-
+els on five real-world smart home datasets—Aruba, Milan,         vances in LLMs have enabled their integration into agent-
+Kyoto7, and Cairo from the CASAS collection (Cook et al.         based systems for reasoning, planning, and interaction.
+2012), as well as Orange4Home (Cumin et al. 2017)—and            Several works have explored using LLMs to control au-
+find that HAR models pretrained on our simulated data con-       tonomous agents in virtual environments. For instance, Voy-
+sistently outperform baseline methods. Notably, even when        ager (Wang et al. 2023) uses GPT-4 to explore, plan, and
+fine-tuned with only a small amount of real data, these mod-     act in Minecraft by generating code and updating a skill li-
+els achieve performance comparable to those trained en-          brary. Generative Agents (Park et al. 2023) simulate human
+tirely on full real-world datasets. These results underscore     behaviors in a virtual town by assigning LLM-driven agents
+the practical value of our approach for developing more ef-      memories, goals, and interactions. CAMEL (Li et al. 2023)
+ficient and scalable HAR systems.                                employs role-playing to facilitate multi-agent cooperation
+   To summarize, through our LLM-based agents in simu-           toward task completion.
+lated home environments, we make the following contribu-            These efforts demonstrate the potential of LLMs to pro-
+tions:                                                           duce structured, plausible agent behaviors. However, most
+1. An embodied agent framework for smart home data               focus on narrative, dialogue, or open-ended exploration
+   simulation: We present AgentSense, where LLM-driven           rather than generating structured data for downstream tasks,
+   agents enact daily lives in virtual smart homes to generate   though recent work has examined LLM–human equivalence
+   structured, privacy-preserving ambient sensor datasets.       in annotation behavior (He et al. 2025). Our work extends
+                                                                 this line by using LLM-guided agents to simulate the daily
+2. Comprehensive evaluation of virtual sensor data for           lives of diverse synthetic personas in virtual smart homes,
+   HAR: We demonstrate the effectiveness of our ap-              enabling ambient sensor data generation for training HAR
+   proach through extensive experiments on five benchmark        models—a new application of LLM-embodied simulation.
+   smart home datasets. Our results show that models pre-
+   trained on virtual data significantly improve HAR perfor-     Synthetic Data Generation for Human Activity Recog-
+   mance—especially in low-data regimes—and can match            nition Smart home-based Human Activity Recognition
+   full-data baselines when combined with minimal real-          (HAR) systems rely on ambient sensors to passively and
+   world data.                                                   privacy-preservingly monitor daily activities (Cook et al.
+                                                                 2012; Cumin et al. 2017). However, building robust HAR
+                     Related Work                                models is challenging due to the scarcity of large, diverse,
+Embodied Agents and Simulation Platforms Embodied                annotated datasets that capture variations in home layouts,
+agents are AI systems that perceive, reason, and act within      sensor setups, and resident routines (Liciotti et al. 2020;
+physical or simulated environments. This line of research        Bouchabou et al. 2021).
+has become foundational to robotic navigation, task plan-           To address data scarcity, recent work has explored syn-
+ning, and interactive learning. Simulation platforms have        thetic data generation, particularly for wearable HAR—e.g.,
+been critical to this progress. The Gibson Environment (Xia      generating IMU data from video (Kwon et al. 2020), au-
+et al. 2018) introduced a photorealistic 3D simulator for        dio (Liang et al. 2022), and text (Leng, Kwon, and Ploetz
+training and evaluating embodied agents in rich environ-         2023; Leng et al. 2024a). However, these methods do not
+ments. Platforms such as AI2-THOR (Kolve et al. 2017),           naturally extend to ambient sensors, which involve distinct
+Habitat (Savva et al. 2019), and VirtualHome (Puig et al.        spatial and triggering mechanisms.
+2018) further expanded agent capabilities, enabling object          Simulation environments like VirtualHome (Puig et al.
+interactions, scripted activities, and complex navigation.       2018) have been used to model household activities. Some
+   Recent work has broadened the scope of embodied agents        approaches generate routines from program sketches (Liao
+beyond physical interaction. Agents now include expressive       et al. 2019) or use LLMs for daily schedule genera-
+humanoid avatars and physically embodied androids capa-          tion (Yonekura et al. 2024) and action planning (Huang et al.
+ble of gaze, speech, and facial expression (Fung et al. 2025).   2022), but none produce ambient sensor data.
+Others integrate world models that support abstract reason-         Our work bridges this gap by generating synthetic ambi-
+ing and future-state simulation (Mazzaglia et al. 2024), im-     ent sensor data from LLM-guided agents acting out daily
+proving planning and grounded decision-making.                   routines in simulated homes. By varying personas, routines,
+   Despite this progress, simulating human daily routines        and environments, we produce structured, diverse datasets
+in smart home contexts for data generation remains under-        that better reflect real-world variability.
+                      Methodology                                   These attributes affect how actions are realistically per-
+We present a system that uses LLMs and an extended ver-             formed—e.g., a retiree may move slower or take more
+sion of the VirtualHome simulator—X-VirtualHome—to                  steps.
+generate virtual ambient sensor data across diverse home         2. Activity: A scheduled high-level activity and its start/end
+environments and resident profiles (Figure 1). Our pipeline         time. Only in-home activities are decomposed for com-
+prompts LLMs to create personas and daily routines, which           patibility with X-VirtualHome.
+are decomposed into simulator-executable action sequences.       3. Environment: The target room and a list of objects avail-
+We extend VirtualHome by adding virtual motion, appliance           able within it. A separate LLM identifies the appropri-
+door, and device activation sensors, enabling the simula-           ate room, and we pass the full object list to ground the
+tion of privacy-preserving ambient data for training activity       model’s outputs in the actual environment.
+recognition models.                                              4. Actions: A predefined set of 18 allowed simulator ac-
+                                                                    tions with descriptions (e.g., [walk] <bedroom>) to
+Multi-Level Prompting of LLM Agents to Generate                     constrain output format and ensure simulator compatibil-
+Daily Routines in Diverse Home Environments                         ity.
+We use a three-stage prompting pipeline to generate diverse,     5. Example Decompositions: Reference examples demon-
+simulator-executable daily routines from LLMs. Starting             strate how to convert high-level tasks into action se-
+from generated personas, we produce a high-level sched-             quences. These clarify structure and formatting, improv-
+ule, which is then decomposed into fine-grained action se-          ing consistency across generated outputs.
+quences compatible with X-VirtualHome.
+                                                                 Converting LLM Output to Executable Actions in
+Persona Generation We aim to capture behavioral diver-           VirtualHome
+sity crucial for robust HAR models by generating a wide          To ensure LLM-generated routines are executable in X-
+range of personality profiles. Real-world routines vary sig-     VirtualHome, we convert them into simulator-compatible
+nificantly by age, occupation, health, and lifestyle. Collect-   commands. Left unchecked, raw LLM output may include
+ing such varied real-user data at scale is costly and time-      hallucinated or out-of-vocabulary tokens that cause execu-
+intensive. Instead, we leverage LLMs to generate realistic       tion failures. We address this through a five-step process that
+personality descriptions, inspired by prior work on persona      cleans and validates the output against VirtualHome’s ontol-
+generation (Abbasiantaeb et al. 2024; Smrke et al. 2025;         ogy.
+Serapio-Garcı́a et al. 2023).
+                                                                 1. Output Cleaning. We remove extraneous metadata
+High-Level Daily Routine Generation We focus on sim-                (e.g., day labels, high-level activities), retaining only
+ulating routines for a single resident. To generate a persona-      low-level actions annotated with location and timestamp
+specific daily schedule, we prompt the LLM with:                    (e.g.,      [walk] <doorjamb> (06:42{06:42)
+                                                                    (bedroom)).
+1. Persona: A generated profile including age, occupation,
+                                                                 2. Embedding the VirtualHome Vocabulary. Define
+   health status, and lifestyle. These attributes shape behav-
+   ior and introduce meaningful variability for HAR model-                A = {valid actions},     O = {valid objects}.
+   ing.                                                             Each x ∈ A ∪ O is embedded using OpenAI’s
+2. Day of the Week: Daily activities differ across the week         text-embedding-3-small:
+   (e.g., workdays vs. weekends). Specifying the day guides                         e(x) = Embed(x) ∈ Rd .
+   the model to generate contextually appropriate routines.
+                                                                    These are stored in FAISS indices—one for actions, one
+3. Environment: A list of rooms in the selected Virtual-
+                                                                    for objects (Douze et al. 2024).
+   Home layout. To ensure physical plausibility, the LLM
+   must know what rooms exist. Activities are tagged as “at      3. Nearest-Neighbor Retrieval. For each LLM token g, we
+   home” or “outside,” and only in-home activities are re-          compute e(g) and retrieve
+   tained for simulation.                                                        x∗ = arg max cos(e(g), e(x)),
+                                                                                            x∈V
+4. Example Schedules: We provide few-shot examples
+   adapted from the Homer dataset (Patel and Chernova               where V = A for actions or V = Or ⊂ O for room-
+   2022), which reflects real human routines. We also in-           specific objects, and
+   struct the LLM to avoid overly neat time slots (e.g., al-                                       u·v
+                                                                                      cos(u, v) =        .
+   ways ending in 0 or 5) to better mimic natural scheduling.                                     ∥u∥∥v∥
+Decomposing High-Level Routines into Low-Level Ac-               4. Thresholding and Replacement. Accept x∗ only if
+tions We decompose each high-level activity into a se-                                cos(e(g), e(x∗ )) ≥ τ,
+quence of simulator-executable actions. To do so, we prompt
+the LLM with the following inputs:                                  where τact = 0.8 for actions and τobj = 0.6 for ob-
+                                                                    jects. Otherwise, the line is flagged as invalid and regen-
+1. Persona: Generated personality profile, which in-                erated by the LLM using surrounding context. After a
+   cludes age, occupation, lifestyle, and health status.            fixed number of retries, unfixable lines are discarded.
+Figure 1: Overview of the framework. The LLM first generates diverse synthetic personas. For each persona, it then produces
+daily routines grounded in the context of a simulated environment. These routines are decomposed into fine-grained actions,
+which are executed in the X-VirtualHome simulator. The simulator, augmented with ambient sensors, captures virtual sensor
+data as the agent enacts its daily life.
+
+5. Final Command Assembly. Validated tokens replace             1. FindAllRooms: All rooms in a home environment are
+   the originals, yielding simulator-ready commands:               detected using VirtualHome’s FindAllRooms, which
+   [action*] <object*> (start--end) (room).                        traverses the hierarchy to find active game objects tagged
+                                                                   as TYPE ROOM.
+  We implement this embedding and grounding workflow            2. DetermineSensorCount: For each room, the area is
+using LangChain (Chase and contributors 2023) with FAISS           computed from its bounding box. Sensor count is as-
+and OpenAI embeddings. This ensures semantic alignment             signed as follows:
+with the simulator’s ontology, eliminating hallucinations and
+preserving execution correctness.                                   • Small (≤ 30 m2 ): 1 sensor
+                                                                    • Medium (30 < area ≤ 60 m2 ): 2 sensors
+Implementing Virtual Ambient Sensors in                             • Large (> 60 m2 ): 3 sensors
+X-VirtualHome Simulator
+                                                                3. CalculateSensorPositions: Sensors are placed near cor-
+We extend the VirtualHome simulator (Puig et al. 2018)             ners of the room, offset by 0.3 m horizontally and verti-
+to support ambient sensors—specifically motion, appliance          cally (from floor and ceiling). Placement varies depend-
+door, and device activation sensors—aligned with LLM-              ing on the number of sensors required.
+generated routines. While VirtualHome allows for the sim-
+ulation of scripted household activities and supports mul-      4. CreateVirtualSensor: Each sensor is instantiated with a
+timodal outputs (e.g., action logs, video, segmentation), it       unique ID, room name, and detection radius (r = 5.0 m).
+lacks support for privacy-preserving sensor simulation. To         A Motion sensor component is attached, and the sen-
+address this, we integrate virtual motion sensors that track       sor is registered in MotionSensorManager.
+character movement and simulate door/device activations         5. TrackCharacterPosition: The character’s position p(t)
+by monitoring environment graph state changes (Puig et al.         is logged every ∆t = 0.2 s using Unity’s position
+2021).                                                             property. Motion detection is computed as:
+Incorporating Motion Sensors in X-VirtualHome We                                       ∥p(t) − si ∥ ≤ r
+augment each home environment by placing motion sensors
+based on room size. During simulation, character trajectories      where si is the i-th sensor’s 3D position.
+are tracked at fixed intervals, and motion detection events     6. MotionDetectionEvent: On detection, we log: {frame
+are recorded when the character enters a sensor’s detection        number, character ID, sensor ID, room name, (x, y, z)}.
+radius. Below is the detailed procedure:                           All events are saved for analysis.
+7. MotionTriggers: Using recorded positions, we derive           door, temperature), with a floorplan similar to Milan, which
+   ON/OFF states. A segment [ton , toff ] is triggered if:       shares the same sensor types. Kyoto7, Cairo, and Orange
+                                                                 are multi-story homes with more diverse layouts and fewer
+      ∥p(t) − si ∥ ≤ r    and   ∥p(t) − p(t − ∆t)∥ > ϵ           samples. Cairo and Kyoto7 include two residents, adding be-
+   with ϵ = 0.1 m for distinguishing motion from jitter.         havioral variability, while Orange has one. Sensor types also
+   These states are exported as virtual motion sensor read-      vary: Cairo includes motion and temperature; Kyoto7 adds
+   ings.                                                         item usage, light switches, and device activations; Orange
+                                                                 features 18+ modalities, including noise, voltage, and hu-
+Simulating Door and Device Activation Sensors                    midity.
+Environment Graph. The Environment Graph is a struc-             Virtual Dataset We generated virtual sensor data for 18
+tured representation of the VirtualHome simulation environ-      distinct personas across 22 simulated home environments,
+ment. It encodes objects as nodes and their spatial or seman-    yielding 250 days of activity data. The final dataset includes
+tic relationships as edges. Formally, it is defined as a graph   3,266 activity windows, each containing between 3 and 393
+G = (V, E), where:                                               sensor triggers (average: 36). All environments represent
+ • V is the set of nodes, each representing an object instance   single-story homes with a single resident.
+   (e.g., chair, table, toothbrush).                                During data generation, LLM agents freely produced
+ • E is the set of directed edges representing object rela-      open-ended routines without restrictions on the activity
+   tions (e.g., on top of, next to). For example, the object     space. To align these with real-world benchmarks, we
+   cup may be “ON” the kitchen counter.                          mapped the LLM-generated activities to the label sets de-
+                                                                 fined in the target HAR datasets. This was done by prompt-
+   Each node maintains attributes including the object’s         ing the LLM with (1) the high-level activity name, (2) its
+class, associated room, and dynamic states (e.g., OPEN,          decomposed sequence of low-level actions, and (3) the com-
+ON), as well as static properties like CAN OPEN and              plete set of activity labels from the target dataset. The LLM
+HAS SWITCH.                                                      then selected the most appropriate label, which we assigned
+   We simulate two types of ambient sensors—door sensors         to the corresponding virtual sensor data.
+and device activation sensors—by monitoring environment             Since the simulation assumes single-resident settings,
+state transitions as recorded by the Environment Graph after     overlapping activities from multi-resident datasets were in-
+each simulated action. Specifically:                             terpreted as being performed by one individual. Addition-
+ • A door sensor event is triggered when an object with          ally, when real-world activity labels were not reflected in the
+   the property CAN OPEN (e.g., doors, cabinets) transitions     virtual data—due to unconstrained routine generation—we
+   from CLOSED to OPEN.                                          assigned them the label “Other.”
+ • A device activation sensor event is triggered when an ob-
+   ject with the property HAS SWITCH (e.g., microwave,           Classifier Training:
+   washing machine) transitions from OFF to ON.                  We adopt the TDOST-based HAR framework proposed by
+                                                                 Thukral et al. (2025), which transfers across diverse home
+   These virtual sensor events are logged along with meta-
+                                                                 layouts and sensor configurations. Unlike transformer- or
+data such as timestamp, object ID, room location, and up-
+                                                                 graph-based models that assume fixed topologies, TDOST is
+dated object state. This enables a temporally aligned am-
+                                                                 layout-agnostic, making it well-suited for cross-environment
+bient sensor stream suitable for privacy-preserving HAR
+                                                                 evaluation. This allows us to directly assess the impact of
+model training.
+                                                                 pretraining on virtual data.
+                                                                    We use a pre-segmented, activity-level windowing ap-
+                      Experiments                                proach, selecting the first 100 sensor triggers from each ac-
+To evaluate the effectiveness of the virtual sensor data gen-    tivity window. Each trigger includes contextual metadata
+erated using our approach, we conduct experiments using          (e.g., sensor type, location, and timestamp), which we con-
+established real-world smart home datasets. These bench-         vert into natural language sentences using two TDOST vari-
+marks provide a controlled, reproducible setting for assess-     ants:
+ing model performance and allow us to demonstrate the
+                                                                  • TDOST-Basic: Encodes sensor type and location. For
+practical utility of our virtual data generation—without de-
+                                                                    example, ”Motion sensor in bedroom fired with value
+ploying physical hardware. The following sections detail the
+                                                                    ON”.
+datasets and classifier training setup.
+                                                                  • TDOST-Temporal: Adds time information to the above,
+Datasets                                                            e.g., ”Motion sensor in bedroom fired with value ON at
+Real Datasets We conduct experiments on five pub-                   twelve hours six minutes PM”.
+licly available datasets: Aruba, Milan, Kyoto7, and Cairo          These    sentences    are   embedded     using    the
+from the CASAS collection (Cook et al. 2012), and Or-            all-distilroberta-v1 model from Sentence-
+ange4Home (Cumin et al. 2017) from the Amiqual4Home              Transformers (Reimers and Gurevych 2019). The resulting
+environment. Among the CASAS datasets, Aruba has the             sequence of embeddings is passed into a bidirectional
+most data points and balanced sensor modalities (motion,         LSTM (Bi-LSTM) with 64 hidden units, following the
+Table 1: Model performance (Accuracy, Weighted F1, Macro F1) comparing training on real data only versus pretraining on
+virtual data followed by finetuning on real data, using two TDOST embedding variants.
+
+                                                 Aruba            Milan          Cairo         Kyoto7          Orange
+                                                             Accuracy
+           Real (TDOST-Basic)                 91.00 ± 0.53   90.07 ± 0.70    69.01 ± 2.16    70.31 ± 1.53   82.40 ± 0.64
+           Real+Virtual (TDOST-Basic)         93.19 ± 0.22   91.97 ± 0.42    75.61 ± 1.93    70.31 ± 1.53   85.21 ± 0.82
+           Real (TDOST-Temporal)              91.24 ± 0.41   86.58 ± 0.12    57.20 ± 1.00    48.09 ± 0.49   67.40 ± 0.39
+           Real+Virtual (TDOST-Temporal)      93.67 ± 0.04   91.60 ± 0.70    67.10 ± 2.60    49.31 ± 0.49   67.60 ± 0.15
+                                                          Macro F1 Score
+           Real (TDOST-Basic)                 63.98 ± 0.66   70.81 ± 1.94    51.51 ± 1.58    52.48 ± 1.59   21.56 ± 3.75
+           Real+Virtual (TDOST-Basic)         72.20 ± 0.62   74.44 ± 0.85    62.47 ± 1.95    56.07 ± 1.43   41.83 ± 2.58
+           Real (TDOST-Temporal)              68.57 ± 1.21   57.20 ± 1.65    21.07 ± 2.28    29.51 ± 1.99    8.42 ± 2.58
+           Real+Virtual (TDOST-Temporal)      77.36 ± 0.34   73.41 ± 0.93    46.49 ± 2.89    31.62 ± 2.16   10.25 ± 1.46
+                                                         Weighted F1 Score
+           Real (TDOST-Basic)                 89.81 ± 0.55   90.20 ± 0.69    66.79 ± 1.83    66.43 ± 1.48   75.91 ± 0.86
+           Real+Virtual (TDOST-Basic)         92.41 ± 0.18   91.74 ± 0.30    74.65 ± 1.98    68.27 ± 1.02   83.42 ± 0.76
+           Real (TDOST-Temporal)              89.57 ± 0.40   84.99 ± 0.33    44.45 ± 0.29    41.70 ± 1.46   61.68 ± 5.73
+           Real+Virtual (TDOST-Temporal)      93.48 ± 0.12   91.23 ± 0.64    61.14 ± 2.85    43.96 ± 1.68   65.68 ± 0.43
+
+
+architecture used by Thukral et al. (2025). Finally, a                Basic and TDOST-Temporal showing significant improve-
+linear classification layer maps the encoded sequence to a            ments across datasets.
+probability distribution over activity classes.                         The consistency of improvements across all five
+                                                                      datasets—including Orange4Home, which is a large-scale
+Training Settings To evaluate the effectiveness of the                non-CASAS dataset with over 18 different types of sen-
+generated virtual sensor data, we conduct two types of ex-            sors—further reinforces the generalizability of pretraining
+periments across all real-world datasets: Real and Real +             and robustness of our virtual sensor data across different sen-
+Virtual. In the Real setting, the model is trained and evalu-         sor types, activity sets, and home environments. To sum up,
+ated in a fully supervised manner on each dataset indepen-            substantial improvements in downstream HAR performance
+dently, serving as our baseline. In the Real + Virtual setting,       validate our virtual data-generation approach as an effective
+we follow a two-stage training procedure inspired by Kwon             way to reduce reliance on costly real-world data collection,
+et al. (2020): the model is first pretrained on virtual sensor        especially for complex or low-resource environments.
+data, then fine-tuned on real sensor data, with all weights
+updated. Final evaluation is performed on the real test split.        Ablation Studies
+                                                                       Varying the Amount of Real Data Used for Finetuning
+Results                                                               We analyze how varying the amount of real data used dur-
+From Table 1, we note that models pretrained with vir-                ing fine-tuning affects downstream HAR performance. This
+tual data, Real + Virtual (TDOST-Basic) and Real + Virtual            experiment aims to identify the minimum quantity of real-
+(TDOST-Temporal), consistently outperform their counter-              world data needed to achieve competitive performance when
+parts trained exclusively on real data across the benchmark           models are pretrained on virtual data.
+HAR datasets.                                                            For each dataset, we first pretrain the model using all
+   For TDOST-Basic, the average accuracy increases across             available virtual data, then fine-tune it using randomly sam-
+datasets, with notable gains such as 69.01% to 75.61% on              pled subsets of real data. The number of fine-tuning samples
+Cairo, and 82.40% to 85.21% on Orange4Home. Similarly,                varies per dataset, as illustrated in Figure 2. To ensure con-
+TDOST-Temporal shows substantial improvements, espe-                  sistency, the sampled subsets maintain the original distribu-
+cially on low-resource datasets, as such accuracy improves            tion of activity classes. All experiments are conducted using
+by 10% on Cairo and 5% on Milan. while performance                    the TDOST-Basic variant.
+on other datasets such as Kyoto7 and Orange4Home re-                     Across all five benchmark datasets, we observe that the
+mains stable. Macro F1 Score shows substantial gains using            Real+Virtual models consistently outperform those trained
+our Virtual+Real supervised pipeline. For TDOST-Basic,                solely on real data, regardless of the amount used. This indi-
+the Macro F1 increases from 11% on Cairo and by ap-                   cates that pretraining on virtual data provides a strong ini-
+proximately 20% on the Orange4Home dataset. Similarly,                tialization, enabling robust performance even in low-data
+TDOST-Temporal shows a sharp improvement from 68.57%                  regimes. Notably, using only 5% to 10% of real data, pre-
+to 77.36% for Aruba, 51% to 73% for Milan. Weighted F1                training on virtual data yields substantial gains over training
+scores follow a similar upward trend, with both TDOST-                using only the real data. For example, we see a ∼10% im-
+                                                                                                      Real           Real+Virtual
+                                     Milan                                 Kyoto7                                Aruba                               Cairo                              Orange
+                                                                                                                                    0.8
+                     0.9                                                                                                                                                 0.8
+                                                           0.6                                 0.90                                 0.6
+                     0.8                                                                                                                                                 0.6
+
+       Accuracy
+                                                           0.4                                 0.85                                 0.4                                  0.4
+                     0.7
+                                                           0.2                                 0.80                                                                      0.2
+                                                                                                                                    0.2
+                     0.6
+                                                                                                                                                                         0.0
+                             500    1000 1500 2000                   100     200      300                 2000     4000     6000               200       400       600                200         400
+
+                                                           0.6                                  0.7                                 0.6
+                     0.7                                                                                                                                                 0.5
+                                                           0.5                                                                      0.5
+                     0.6                                                                                                                                                 0.4
+                                                                                                0.6
+
+       F1-macro
+                     0.5                                   0.4                                                                      0.4
+                                                                                                                                                                         0.3
+                     0.4                                   0.3                                                                      0.3
+                                                                                                0.5                                                                      0.2
+                     0.3                                   0.2                                                                      0.2
+                                                           0.1                                                                                                           0.1
+                     0.2                                                                        0.4                                 0.1
+                                                           0.0                                                                      0.0                                  0.0
+                             500    1000 1500 2000                   100     200      300                 2000     4000     6000               200       400       600                200         400
+                                                                                                                                    0.8
+                     0.9
+                                                                                               0.90                                                                      0.8
+                                                           0.6
+                     0.8                                                                                                            0.6
+
+
+       F1-weighted
+                                                                                                                                                                         0.6
+                                                                                               0.85
+                     0.7                                   0.4                                                                      0.4                                  0.4
+                     0.6                                                                       0.80
+                                                           0.2                                                                      0.2                                  0.2
+                     0.5                                                                       0.75
+                                                           0.0                                                                                                           0.0
+                             500    1000 1500 2000                   100     200      300                 2000     4000     6000               200       400       600                200         400
+                           Number of Real Data Samples           Number of Real Data Samples          Number of Real Data Samples         Number of Real Data Samples          Number of Real Data Samples
+
+
+Figure 2: TDOST Basic model performance when different amount of real data are used for training. The amount of virtual
+data stays the same.
+provement in macro F1 for Aruba and up to a 45% increase                                                              further improves macro F1 to 71.01%. Finally, incorporat-
+for Kyoto7 when using just 5% of real data. These findings                                                            ing multiple personas leads to the highest performance of
+support our hypothesis that virtual data can significantly re-                                                        72.20% macro F1.
+duce the need for large-scale real-world data collection.                                                                These     results    indicate    that   each    compo-
+   In several cases, such as Orange4Home and Cairo,                                                                   nent—environment, daily routine, and persona—contributes
+Real+Virtual performance approaches the upper bound of                                                                positively to the performance of the downstream classifier.
+fully supervised training. On Cairo, for instance, models                                                             We attribute this improvement to increased diversity in
+reach ∼80% accuracy and ∼60% macro F1 using just 200                                                                  the generated virtual sensor data, which enhances the
+real samples. Similarly, fewer than 200 samples are suffi-                                                            generalizability of the downstream classifier. Notably, the
+cient to achieve comparable results on Orange. This further                                                           total volume of virtual sensor data remains constant across
+underscores the practical value of virtual pretraining for ef-                                                        settings, achieved through repeated generation.
+ficient HAR model development.
+                                                                                                                                                             Conclusion
+ Env                 Days          Personas              Acc     Macro F1             Weighted F1                     We introduced AgentSense, a data generation framework
+                                                     92.72          68.35                   91.66                     that leverages LLM-guided embodied agents to simulate
+  ✓                                                  92.76          70.69                   91.84                     human lives in virtual smart home environments. By gen-
+  ✓                    ✓                             93.22          71.01                   92.38                     erating diverse synthetic personas and their daily routines
+  ✓                    ✓               ✓             93.19          72.20                   92.41                     grounded in varied home layouts, AgentSense produces
+                                                                                                                      structured, richly annotated ambient sensor data designed to
+Table 2: Effect of environment diversity, weekly routine cov-                                                         reflect the heterogeneity of real-world settings. We extended
+erage, and persona variation on HAR performance                                                                       the VirtualHome simulator with virtual ambient sensors, en-
+                                                                                                                      abling the conversion of LLM-generated action sequences
+Effectiveness of Individual Components We evaluate                                                                    into sensor data.
+the impact of different generation settings—namely, per-                                                                 Our experiments across five real-world smart home
+sonas, routines from multiple days of the week, and diverse                                                           datasets demonstrate that models pretrained on this vir-
+home environments—on the effectiveness of virtual sensor                                                              tual data consistently improve downstream HAR perfor-
+data. All experiments are conducted on the Aruba dataset                                                              mance—particularly in low-resource scenarios. Even with
+using the TDOST-Basic variant. As shown in Table 2, when                                                              limited real data, these models approach the performance of
+virtual data is generated using a single persona, a single                                                            those trained on full datasets, highlighting the practical value
+day’s routine, and a single environment, the downstream                                                               of our approach. This work illustrates a promising new di-
+classifier achieves a macro F1 score of 68.35%. Introducing                                                           rection for scalable, privacy-preserving HAR development:
+diversity in environments (22 homes) increases performance                                                            using LLM-guided embodied simulation to reduce depen-
+to 70.69%. Adding routines from all seven days of the week                                                            dence on costly real-world data collection.
+                  Acknowledgments                                11th International Conference, UCAmI 2017, Philadelphia,
+This work was partially supported by NSF IIS-2112633             PA, USA, November 7–10, 2017, Proceedings, 413–425.
+and the NSF Research Fellowship under Grant No. DGE-             Springer.
+2039655.                                                         Dai, T.; Wong, J.; Jiang, Y.; Wang, C.; Gokmen, C.; Zhang,
+   Any opinion, findings, and conclusions or recommenda-         R.; Wu, J.; and Fei-Fei, L. 2024. Automated Creation of
+tions expressed in this material are those of the authors(s)     Digital Cousins for Robust Policy Learning. In Conference
+and do not necessarily reflect the views of the National Sci-    on Robot Learning (CoRL).
+ence Foundation.                                                 Douze, M.; Guzhva, A.; Deng, C.; Johnson, J.; Szilvasy, G.;
+                                                                 Mazaré, P.-E.; Lomeli, M.; Hosseini, L.; and Jégou, H. 2024.
+                       References                                The faiss library. arXiv preprint arXiv:2401.08281.
+Abbasiantaeb, Z.; Yuan, Y.; Kanoulas, E.; and Aliannejadi,       Fung, P.; Bachrach, Y.; Celikyilmaz, A.; Chaudhuri, K.;
+M. 2024. Let the LLMs Talk: Simulating Human-to-Human            Chen, D.; Chung, W.; Dupoux, E.; Jégou, H.; Lazaric, A.;
+Conversational QA via Zero-Shot LLM-to-LLM Interac-              Majumdar, A.; et al. 2025. Embodied AI Agents: Modeling
+tions. In Proceedings of the 17th ACM International Confer-      the World. arXiv preprint arXiv:2506.22355.
+ence on Web Search and Data Mining, 8–17. Merida Mex-            Grieves, M.; and Vickers, J. 2016. Digital twin: Mitigat-
+ico: ACM. ISBN 979-8-4007-0371-3.                                ing unpredictable, undesirable emergent behavior in com-
+Alam, M. R.; Reaz, M. B. I.; and Ali, M. A. M. 2012. A           plex systems. In Transdisciplinary perspectives on complex
+review of smart homes—Past, present, and future. IEEE            systems: New findings and approaches, 85–113. Springer.
+transactions on systems, man, and cybernetics, part C (ap-       Griwodz, C.; Gasparini, S.; Calvet, L.; Gurdjos, P.; Cas-
+plications and reviews), 42(6): 1190–1203.                       tan, F.; Maujean, B.; Lillo, G. D.; and Lanthony, Y. 2021.
+Anthropic. 2024. Claude 3.5 Sonnet: Faster Reasoning, Bet-       AliceVision Meshroom: An open-source 3D reconstruction
+ter Coding. https://www.anthropic.com/news/claude-3-5-           pipeline. In Proceedings of the 12th ACM Multimedia Sys-
+sonnet. Accessed: 2025-05-01.                                    tems Conference - MMSys ’21. ACM Press.
+Arrotta, L.; Bettini, C.; and Civitarese, G. 2021. The marble    Haresamudram, H.; Essa, I.; and Plötz, T. 2021. Contrastive
+dataset: Multi-inhabitant activities of daily living combining   predictive coding for human activity recognition. Proceed-
+wearable and environmental sensors data. In International        ings of the ACM on Interactive, Mobile, Wearable and Ubiq-
+Conference on Mobile and Ubiquitous Systems: Computing,          uitous Technologies, 5(2): 1–26.
+Networking, and Services, 451–468. Springer.                     Haresamudram, H.; Essa, I.; and Plötz, T. 2022. Assess-
+Bouchabou, D.; Nguyen, S. M.; Lohr, C.; LeDuc, B.; and           ing the State of Self-Supervised Human Activity Recogni-
+Kanellos, I. 2021. A survey of human activity recognition in     tion Using Wearables. Proc. ACM Interact. Mob. Wearable
+smart homes based on IoT sensors algorithms: Taxonomies,         Ubiquitous Technol., 6(3).
+challenges, and opportunities with deep learning. Sensors,       He, J.; Leng, Z.; McKay, D.; Spina, D.; and Trippas, J. R.
+21(18): 6037.                                                    2025. Can We Hide Machines in the Crowd? Quantifying
+                                                                 Equivalence in LLM-in-the-loop Annotation Tasks. arXiv
+Chase, H.; and contributors. 2023. LangChain. https://
+                                                                 preprint arXiv:2510.06658.
+github.com/langchain-ai/langchain. Accessed: 2025-05-01.
+                                                                 Hiremath, S. K.; Nishimura, Y.; Chernova, S.; and Plötz, T.
+Chen, H.; Gouin-Vallerand, C.; Bouchard, K.; Gaboury, S.;        2022. Bootstrapping human activity recognition systems for
+Couture, M.; Bier, N.; and Giroux, S. 2024a. Enhanc-             smart homes from scratch. Proceedings of the ACM on In-
+ing human activity recognition in smart homes with self-         teractive, Mobile, Wearable and Ubiquitous Technologies,
+supervised learning and self-attention. Sensors, 24(3): 884.     6(3): 1–27.
+Chen, H.; Gouin-Vallerand, C.; Bouchard, K.; Gaboury, S.;        Hiremath, S. K.; and Plötz, T. 2024. Maintenance required:
+Ngankam, H. K.; Lussier, M.; Couture, M.; Bier, N.; and          Updating and extending bootstrapped human activity recog-
+Giroux, S. 2024b. Utilizing Self-Supervised Learning for         nition systems for smart homes. In 2024 International Con-
+Recognizing Human Activity in Older Adults through La-           ference on Activity and Behavior Computing (ABC), 1–13.
+beling Applications in Real-World Smart Homes. In Pro-           IEEE.
+ceedings of the 2024 International Conference on Informa-
+tion Technology for Social Good, 275–283.                        Huang, W.; Abbeel, P.; Pathak, D.; and Mordatch, I. 2022.
+                                                                 Language Models as Zero-Shot Planners: Extracting Action-
+Chernova, S.; Mynatt, E.; Rozga, A.; Simmons, R.; and            able Knowledge for Embodied Agents. In Proceedings of
+Yanco, H. 2024. AI-CARING: National AI Institute for Col-        the 39th International Conference on Machine Learning,
+laborative Assistance and Responsive Interaction for Net-        9118–9147. PMLR. ISSN: 2640-3498.
+worked Groups. AI Magazine, 45(1): 124–130.
+                                                                 Hwang, S.; Leng, Z.; Oh, S.; Kim, K.; and Plötz, T. 2024.
+Cook, D. J.; Crandall, A. S.; Thomas, B. L.; and Krishnan,       More Data for People with Disabilities! Comparing Data
+N. C. 2012. CASAS: A smart home in a box. Computer,              Collection Efforts for Wheelchair Transportation Mode De-
+46(7): 62–69.                                                    tection. In Proceedings of the 2024 ACM International Sym-
+Cumin, J.; Lefebvre, G.; Ramparany, F.; and Crowley, J. L.       posium on Wearable Computers, ISWC ’24, 82–88. New
+2017. A dataset of routine daily activities in an instrumented   York, NY, USA: Association for Computing Machinery.
+home. In Ubiquitous Computing and Ambient Intelligence:          ISBN 9798400710599.
+Kolve, E.; Mottaghi, R.; Han, W.; VanderBilt, E.; Weihs, L.;     Mazzaglia, P.; Verbelen, T.; Dhoedt, B.; Courville, A.; and
+Herrasti, A.; Gordon, D.; Zhu, Y.; Gupta, A.; and Farhadi,       Rajeswar, S. 2024. GenRL: Multimodal-foundation world
+A. 2017. AI2-THOR: An Interactive 3D Environment for             models for generalization in embodied agents. Advances in
+Visual AI. arXiv.                                                neural information processing systems, 37: 27529–27555.
+Kwon, H.; Abowd, G. D.; and Plötz, T. 2021. Complex Deep        Naveed, H.; Khan, A. U.; Qiu, S.; Saqib, M.; Anwar, S.;
+Neural Networks from Large Scale Virtual IMU Data for Ef-        Usman, M.; Akhtar, N.; Barnes, N.; and Mian, A. 2023. A
+fective Human Activity Recognition Using Wearables. Sen-         comprehensive overview of large language models. arXiv
+sors, 21(24): 8337.                                              preprint arXiv:2307.06435.
+Kwon, H.; Tong, C.; Haresamudram, H.; Gao, Y.; Abowd,            Oord, A. v. d.; Li, Y.; and Vinyals, O. 2018. Representation
+G. D.; Lane, N. D.; and Ploetz, T. 2020. IMUTube: Au-            learning with contrastive predictive coding. arXiv preprint
+tomatic extraction of virtual on-body accelerometry from         arXiv:1807.03748.
+video for human activity recognition. Proceedings of the         Park, J. S.; O’Brien, J. C.; Cai, C. J.; Morris, M. R.; Liang,
+ACM on Interactive, Mobile, Wearable and Ubiquitous Tech-        P.; and Bernstein, M. S. 2023. Generative Agents: Interac-
+nologies, 4(3): 1–29.                                            tive Simulacra of Human Behavior. ArXiv:2304.03442 [cs].
+Leng, Z.; Bhattacharjee, A.; Rajasekhar, H.; Zhang, L.;          Patel, M.; and Chernova, S. 2022. Proactive robot assis-
+Bruda, E.; Kwon, H.; and Plötz, T. 2024a. IMUGPT 2.0:           tance via spatio-temporal object modeling. arXiv preprint
+Language-Based Cross Modality Transfer for Sensor-Based          arXiv:2211.15501.
+Human Activity Recognition.                                      Patil, R.; and Gudivada, V. 2024. A review of current trends,
+Leng, Z.; Jung, M.; Hwang, S.; Oh, S.; Zhang, L.; Plötz, T.;    techniques, and challenges in large language models (llms).
+and Kim, K. 2024b. Emotion Recognition on the Go: Utiliz-        Applied Sciences, 14(5): 2074.
+ing Wearable IMUs for Personalized Emotion Recognition.          Puig, X.; Fidler, S.; et al. 2024. VirtualHome Simulator Doc-
+In Companion of the 2024 on ACM International Joint Con-         umentation. http://virtual-home.org/documentation/master/.
+ference on Pervasive and Ubiquitous Computing, UbiComp           Accessed: 2025-05-01.
+’24, 537–544. New York, NY, USA: Association for Com-            Puig, X.; Ra, K.; Boben, M.; Li, J.; Wang, T.; Fidler, S.;
+puting Machinery. ISBN 9798400710582.                            and Torralba, A. 2018. VirtualHome: Simulating Household
+Leng, Z.; Kwon, H.; and Ploetz, T. 2023. Generating Virtual      Activities via Programs. ArXiv:1806.07011 [cs].
+On-Body Accelerometer Data from Virtual Textual Descrip-         Puig, X.; Shu, T.; Li, S.; Wang, Z.; Liao, Y.-H.; Tenenbaum,
+tions for Human Activity Recognition. In Proceedings of the      J. B.; Fidler, S.; and Torralba, A. 2021. Watch-And-Help: A
+2023 ACM International Symposium on Wearable Comput-             Challenge for Social Perception and Human-AI Collabora-
+ers. New York, NY, USA: Association for Computing Ma-            tion. ArXiv:2010.09890 [cs].
+chinery. ISBN 9798400701993.
+                                                                 Qi, J.; Yang, P.; Waraich, A.; Deng, Z.; Zhao, Y.; and Yang,
+Leng, Z.; Kwon, H.; and Plötz, T. 2023. On the Benefit of       Y. 2018. Examining sensor-based physical activity recogni-
+Generative Foundation Models for Human Activity Recog-           tion and monitoring for healthcare using Internet of Things:
+nition. arXiv:2310.12085.                                        A systematic review. Journal of biomedical informatics, 87:
+Li, G.; Hammoud, H. A. A. K.; Itani, H.; Khizbullin, D.;         138–153.
+and Ghanem, B. 2023. CAMEL: Communicative Agents for             Reimers, N.; and Gurevych, I. 2019. Sentence-BERT:
+”Mind” Exploration of Large Language Model Society. In           Sentence Embeddings using Siamese BERT-Networks.
+Thirty-seventh Conference on Neural Information Process-         arXiv:1908.10084.
+ing Systems.
+                                                                 Savva, M.; Kadian, A.; Maksymets, O.; Zhao, Y.; Wijmans,
+Liang, D.; Li, G.; Adaimi, R.; Marculescu, R.; and Thomaz,       E.; Jain, B.; Straub, J.; Liu, J.; Koltun, V.; Malik, J.; et al.
+E. 2022. Audioimu: Enhancing inertial sensing-based activ-       2019. Habitat: A platform for embodied ai research. In
+ity recognition with acoustic models. In Proceedings of the      Proceedings of the IEEE/CVF international conference on
+2022 ACM International Symposium on Wearable Comput-             computer vision, 9339–9347.
+ers, 44–48.                                                      Serapio-Garcı́a, G.; Safdari, M.; Crepy, C.; Sun, L.; Fitz,
+Liao, Y.-H.; Puig, X.; Boben, M.; Torralba, A.; and Fidler, S.   S.; Romero, P.; Abdulhai, M.; Faust, A.; and Matarić,
+2019. Synthesizing Environment-Aware Activities via Ac-          M. 2023. Personality Traits in Large Language Models.
+tivity Sketches. In 2019 IEEE/CVF Conference on Com-             ArXiv:2307.00184.
+puter Vision and Pattern Recognition (CVPR), 6284–6292.          Smrke, U.; Rehberger, A.; Plohl, N.; and Mlakar, I. 2025.
+Long Beach, CA, USA: IEEE. ISBN 978-1-7281-3293-8.               Exploring the Feasibility of Generative AI in Persona Re-
+Liciotti, D.; Bernardini, M.; Romeo, L.; and Frontoni, E.        search: A Comparative Analysis of Large Language Model-
+2020. A sequential deep learning application for recognis-       Generated and Human-Crafted Personas in Obesity Re-
+ing human activities in smart homes. Neurocomputing, 396:        search. Applied Sciences, 15(4).
+501–513.                                                         Team, G.; Anil, R.; Borgeaud, S.; Alayrac, J.-B.; Yu, J.; Sori-
+Liu, A.; Feng, B.; Xue, B.; Wang, B.; Wu, B.; Lu, C.; Zhao,      cut, R.; Schalkwyk, J.; Dai, A. M.; Hauth, A.; Millican, K.;
+C.; Deng, C.; Zhang, C.; Ruan, C.; et al. 2024. Deepseek-v3      et al. 2023. Gemini: a family of highly capable multimodal
+technical report. arXiv preprint arXiv:2412.19437.               models. arXiv preprint arXiv:2312.11805.
+Thukral, M.; Dhekane, S. G.; Hiremath, S. K.; Haresamu-
+dram, H.; and Ploetz, T. 2025. Layout-Agnostic Human Ac-
+tivity Recognition in Smart Homes through Textual Descrip-
+tions Of Sensor Triggers (TDOST). Proceedings of the ACM
+on Interactive, Mobile, Wearable and Ubiquitous Technolo-
+gies, 9(1): 1–38.
+Touvron, H.; Lavril, T.; Izacard, G.; Martinet, X.; Lachaux,
+M.-A.; Lacroix, T.; Rozière, B.; Goyal, N.; Hambro, E.;
+Azhar, F.; et al. 2023. Llama: Open and efficient founda-
+tion language models. arXiv preprint arXiv:2302.13971.
+Uhlenberg, L.; and Amft, O. 2022. Comparison of Surface
+Models and Skeletal Models for Inertial Sensor Data Syn-
+thesis. In 2022 IEEE-EMBS International Conference on
+Wearable and Implantable Body Sensor Networks (BSN), 1–
+5.
+Wang, G.; Xie, Y.; Jiang, Y.; Mandlekar, A.; Xiao, C.;
+Zhu, Y.; Fan, L.; and Anandkumar, A. 2023. Voyager: An
+Open-Ended Embodied Agent with Large Language Mod-
+els. ArXiv:2305.16291 [cs].
+Xia, C.; and Sugiura, Y. 2022. Virtual IMU Data Augmen-
+tation by Spring-Joint Model for Motion Exercises Recog-
+nition without Using Real Data. In Proceedings of the
+2022 ACM International Symposium on Wearable Comput-
+ers, ISWC ’22, 79–83. Association for Computing Machin-
+ery. ISBN 9781450394246.
+Xia, F.; Zamir, A. R.; He, Z.; Sax, A.; Malik, J.; and
+Savarese, S. 2018. Gibson env: Real-world perception for
+embodied agents. In Proceedings of the IEEE conference on
+computer vision and pattern recognition, 9068–9079.
+Xiao, F.; Pei, L.; Chu, L.; Zou, D.; Yu, W.; Zhu, Y.; and
+Li, T. 2021. A Deep Learning Method for Complex Human
+Activity Recognition Using Virtual Wearable Sensors. In
+Spatial Data and Intelligence. Springer International Pub-
+lishing. ISBN 978-3-030-69873-7.
+Yonekura, H.; Tanaka, F.; Mizumoto, T.; and Yamaguchi, H.
+2024. Generating Human Daily Activities with LLM for
+Smart Home Simulator Agents. In 2024 International Con-
+ference on Intelligent Environments (IE), 93–96. Ljubljana,
+Slovenia: IEEE. ISBN 979-8-3503-8679-0.
+     Full Prompt Template for Personality                      to sleep, using the 24-hour time
+                 Generation                                    format. For each time slot, vary the
+Below are the exact system and user prompts used for per-      start and end times, avoiding times
+sona generation.                                               divisible by 5 or 10 minutes.
+                                                               Activities happening at home must be
+      GPT 4o-mini Persona Generation Prompt                    in one of the provided rooms:
+                                                               {room_list}. If an activity does not
+   --SYSTEM--                                                  occur in one of these rooms, it must
+   You are a personality generator that                        happen ’outside.’ The character is
+   generates descriptions of people based                      the only person at home, so do not
+   on the specified format. Each                               generate events involving family or
+   description should include the person’s                     friends. Use the following format:
+   name, age, job, health status (whether                      ’Activity Description (Start Time -
+   physical or mental), and a description                      End Time) (at home/outside).’ Two
+   of their lifestyle, habits, and                             examples are provided below. Generate
+   personality traits. The total length                        the schedule in this format only; do
+   must be between 85 and 100 words.                           not include any additional information.
+   Remember to include proper punctuation,
+   but do not use asterisks anywhere in                        Example 1:
+   the sentences!!!                                            wake_up (06:47 - 06:50) (at home)
+                                                               brushing_teeth (06:50 - 06:56)
+   --USER--                                                    (at home)
+   Each description should strictly follow                     going_to_the_bathroom (06:56 - 07:12)
+   this format: ’Person’s name, he/she is                      (at home)
+   XX years old, job description, and has                      yoga_practice (07:12 - 07:41)
+   the following health situation:                             (at home)
+   [physical or mental conditions, or                          showering (07:41 - 08:02) (at home)
+   none].’ The description should include                      breakfast (08:02 - 08:30) (at home)
+   details about the person’s lifestyle,                       commuting_to_work (08:30 - 09:14)
+   habits, and personality traits. Make                        (outside)
+   sure the age, job, health condition,                        computer_work (09:14 - 11:45) (outside)
+   and lifestyle vary between people, and                      going_to_the_bathroom (11:45 - 11:52)
+   the descriptions should be unique and                       (outside)
+   diverse.                                                    lunch_with_colleagues (11:52 - 12:48)
+                                                               (outside)
+                                                               catching_up_on_emails (12:48 - 14:06)
+       Full Prompt Template for Schedule                       (outside)
+                                                               team_meeting (14:06 - 15:30) (outside)
+                  Generation                                   brainstorming_session (15:30 - 16:17)
+Below is the exact prompt sent to the LLM on each day, with    (outside)
+placeholders for the variable parts and the complete example   going_to_the_bathroom (16:17 - 16:25)
+routines:                                                      (outside)
+                                                               computer_work (16:25 - 18:00) (outside)
+     GPT 4o-mini Schedule Generation Prompt                    commuting_home (18:00 - 18:42)
+                                                               (at home)
+   --SYSTEM--                                                  going_to_the_bathroom (18:42 - 18:49)
+   Generate a detailed daily schedule                          (at home)
+   based on a person’s personality,                            vegan_cooking_experiment
+   home environment, and the specific                          (18:49 - 20:06) (at home)
+   day of the week. The schedule should                        cleaning_up_after_cooking
+   cover the entire day, from wake-up to                       (20:06 - 20:30) (at home)
+   sleep, and reflect a realistic                              playing_computer_games (20:30 - 22:40)
+   lifestyle with variations between                           (at home)
+   weekdays and weekends.                                      wind_down_time (22:40 - 23:10) (at home)
+                                                               reading (23:10 - 00:33) (at home)
+   --USER--                                                    brushing_teeth (00:33 - 01:14) (at home)
+   The personality description is as                           sleep (01:14) (at home)
+   follows: "{personality_description}"
+   Based on the provided description                           Example 2:
+   (job, age, health, and personality),                        wake_up (10:01 - 10:07) (at home)
+   generate a daily schedule for this                          brushing_teeth (10:07 - 10:16) (at home)
+   person on {day}. The schedule should                        showering (10:16 - 10:32) (at home)
+   cover the entire day, from wake-up                          commuting_to_class (10:32 - 10:55)
+   (outside)                                               End Time: {end_time}
+   environmental_science_class                             Personality Description:
+   (10:55 - 11:50) (outside)                               {personality_description}
+   going_to_the_bathroom (11:50 - 11:54)                   Location: {selected_room}
+   (outside)
+   studying_in_library (11:54 - 12:30)                     Based on the ’Activity Name,’ break
+   (outside)                                               this activity into detailed action
+   lunch (12:30 - 13:08) (outside)                         steps corresponding to smaller time
+   commuting_to_work (13:08 - 16:25)                       intervals (24-hour format) within the
+   (outside)                                               ’Start Time’ and ’End Time’. For each
+   going_to_the_bathroom (16:25 - 16:31)                   smaller time interval, use the
+   (outside)                                               following format:
+   finishing_work (16:31 - 16:42) (outside)
+   commuting_home (16:42 - 17:05) (outside)                First line: ’Start time - End time,
+   going_to_the_bathroom (17:05 - 17:08)                   {selected_room}’
+   (at home)
+   dinner_preparation (17:08 - 17:40)                      Then, in the following lines, describe
+   (at home)                                               the activities during that smaller time
+   dinner (17:40 - 18:28) (at home)                        interval. Each action step should also
+   socializing_with_friends_via_video_call                 have its own time slot. The
+   (18:28 - 19:44) (at home)                               ’Personality Description’ is provided
+   organizing_photography_ideas                            for reference. Each activity step can
+   (19:44 - 20:45) (at home)                               only use objects from this list:
+   musical_exploration_time (20:45 - 21:21)                {objects_str}. Additionally, each step
+   (at home)                                               must adhere to one of the structural
+   going_out_for_an_evening_walk                           formats below. If an action requires
+   (21:21 - 22:04) (outside)                               a verb that is not on the format list,
+   wind_down_with_a_book (22:04 - 23:00)                   replace it with the closest matching
+   (at home)                                               verb from the list. Under no
+   do_homework (23:00 - 03:00) (at home)                   circumstances should you introduce
+   brushing_teeth (03:00 - 03:07) (at home)                new verbs or deviate from the defined
+   sleep (03:07) (at home)                                 structures. Below are all the format
+                                                           structures:
+
+           Activity Breakdown Prompt                       [walk] <object>
+                                                           (e.g., walk to the bedroom should be
+Below is the exact system and user prompt used to decom-   [walk] <bedroom>)
+pose each high-level activity into fine-grained steps.
+                                                           [run] <object>
+     GPT 4o-mini Activity Breakdown Prompt                 (e.g., run to the kitchen should be
+                                                           [run] <kitchen>)
+   --SYSTEM--
+   Based on the start time, end time, a                    [walkforward]
+   brief activity description, and the                     (just walk forward; no objects should
+   specific room where this activity                       follow)
+   takes place (as all activities occur
+   at home), your task is to break the                     [turnleft]
+   activity into detailed steps, imagining                 (just turn left; no objects should
+   you are the person following the                        follow)
+   schedule. You will also be provided
+   with the person’s description, a list                   [turnright]
+   of available objects in the room, and a                 (just turn right; no objects should
+   predefined set of action verbs and                      follow)
+   structures that must be strictly
+   followed to ensure consistency and                      [sit] <object>
+   accuracy in the breakdown.                              (e.g., sit on the chair should be
+                                                           [sit] <chair>)
+   --USER--
+   Now you are provided with the following                 [standup]
+   details:                                                (just stand up; no objects should
+                                                           follow)
+   Activity Name: {activity}
+   Start Time: {start_time}                                [grab] <object>
+(e.g., grab the apple should be              Step 1: [grab] <toothpaste>
+[grab] <apple>)                              (7:22 - 7:22)
+                                             Step 2: [put] <toothpaste> <toothbrush>
+[open] <object>                              (7:22 - 7:23)
+(e.g., open the fridge should be             Step 3: [drink] <waterglass>
+[open] <fridge>)                             (7:23 - 7:25)
+                                             Step 4: [put] <waterglass>
+[close] <object>                             <bathroomcounter> (7:25 -7:25)
+(e.g., close the fridge should be            Step 5: [switchoff] <lightswitch>
+[close] <fridge>)                            (7:26 - 7:26)
+
+[put] <object 1> <object 2>                  The format must be exactly like this.
+(e.g., put the apple on the table            Do not generate any other sentences!!!!!
+should be [put] <apple> <table>)
+
+[switchon] <object>
+                                             Below is the exact system and user prompt used to select
+(e.g., switch on the stove should         the most appropriate room for a given activity.
+be [switchon] <stove>)
+                                                  GPT 4o-mini Room Detection Prompt
+[switchoff] <object>
+(e.g., switch off the stove should           --SYSTEM--
+be [switchoff] <stove>)                      You will be provided with a list of
+                                             rooms and an activity name. Your
+[drink] <object>                             task is to determine which room is
+(e.g., drink from the waterglass             most likely to be the location for
+should be [drink] <waterglass>)              the given activity.
+
+[touch] <object>                             --USER--
+(e.g., touch the stove should be             Your task is to determine the most
+[touch] <stove>)                             appropriate room for a given
+                                             activity from the provided list.
+[lookat] <object>                            Below are the activity description
+(e.g., look at the stove should be           and the room list:
+[lookat] <stove>)
+                                             Activity: {activity}
+Please follow the structure. Verbs are       Room list: {room_list_str}
+already provided in the format list
+above, and objects can only be selected      Return the name of the room that is
+from the object list above.                  most suitable for this activity
+                                             from the list above. You must select
+Here is an example of an activity            and return exactly one room name. Do
+breakdown, where the ’Activity Name’         not include any explanations or
+is ’brushing_teeth’, the ’Start Time’        additional information, just the room
+is 7:20, and the ’End Time’ is 7:26.         name.
+As you can see, the start time of the
+first step in each interval aligns with
+the interval’s start time, and the last    Full Prompt Template for Label Generation
+step of each interval ends with the       Below is the exact prompt sent to the LLM to generate a
+interval’s end time.                      label on each action block.
+7:20 - 7:22, bathroom                            GPT 4o-mini Label Generation Prompt
+Step 1: [walk] <bathroom>
+(7:20 - 7:20)                                --SYSTEM--
+Step 2: [switchon] <lightswitch>             You are an intelligent assistant
+(7:20 - 7:20)                                helping label smart home activities.
+Step 3: [walk] <bathroomcounter>             You will be provided with an ’Activity
+(7:20 - 7:21)                                Name’ and its corresponding detailed
+Step 4: [grab] <toothbrush>                  routine steps. Your task is to choose
+(7:21 - 7:21)                                ONE label from the provided set that
+Step 5: [lookat] <toothpaste>                best describes the activity. Return
+(7:21 - 7:22)                                ONLY the label (exactly the same word
+                                             appears in the set). Do NOT provide
+7:22 - 7:26, bathroom                        any explanation.
+   --USER--                                                       [grab] <waterglass> (07:22 - 07:23)
+   Activity Name: {activity_name}                                 (kitchen)
+   Routine Block: {routine_text}                                  [drink] <waterglass> (07:26 - 07:26)
+   Label Set:                                                     (kitchen)
+   {aruba_labels/milan_labels/cairo_labels                        [put] <waterglass> <kitchencounter>
+   /kyoto7_labels/orange_labels}                                  (07:26 - 07:27) (kitchen)
+                                                                  [grab] <coffeepot> (07:27 - 07:30)
+   Note: The label ’bed_to_toilet’ refers                         (kitchen)
+   to activities that involve walking from
+   the bed to the bathroom.                                       LLM-Generated Labels:
+                                                                  Aruda: Eating
+   Which label from the list best fits                            Cairo: Breakfast
+   this activity? Please return ONLY the                          Milan: Kitchen Activity
+   label (exactly the same word appears                           Kyoto7: Meal Preparation
+   in the set). Do NOT provide any                                Orange: Cooking
+   explanation.
+
+                                                                                   Real Datasets
+   Below is an example of our input block and the generated   We specify the details of Smart Home datasets under evalu-
+labels:                                                       ation in our work. We detail more the type of sensors, floor
+                                                              layouts and activities in Table 3. This table has been taken
+     GPT 4o-mini Generated Labels for an Input                from (Thukral et al. 2025) with permission.
+                 Action Block
+   Input Action Block:                                                        Mapping of Activities
+   [walk] <kitchen> (07:10 - 07:10)                           The set of activities generated by the LLM may not exactly
+   (kitchen)                                                  match those in the real-world datasets (Aruba, Milan, Ky-
+   [switchon] <coffeemaker>                                   oto7, Cairo, Orange). When mapping, we pair a real-world
+   (07:10 - 07:10) (kitchen)                                  activity with its VirtualHome counterpart if it was generated;
+   [standup] (07:10 - 07:11) (kitchen)                        otherwise, we assign it to the “Other” category. All mapping
+   [grab] <waterglass> (07:11 - 07:11)
+                                                              activities for each dataset are in Table 4.
+   (kitchen)
+   [drink] <waterglass> (07:11 - 07:12)
+   (kitchen)                                                                     Training Settings
+   [put] <waterglass> <kitchencounter>                        We train the model for up to 30 epochs using the Adam op-
+   (07:12 - 07:13) (kitchen)                                  timizer and a ReduceLROnPlateau scheduler. Hyperparam-
+   [walk] <fridge> (07:13 - 07:13)                            eters are selected via grid search over learning rates ([1e-2,
+   (kitchen)
+                                                              1e-3, 1e-4, 5e-5]) and weight decay values ([0, 1e-4, 1e-5]).
+   [open] <fridge> (07:13 - 07:14)
+   (kitchen)                                                  For pretraining and finetuning, we also search over the same
+   [grab] <bananas> (07:14 - 07:15)                           set of learning rates. The optimal configuration was found to
+   (kitchen)                                                  be a learning rate of 1e-4 and a weight decay of 0.
+   [close] <fridge> (07:15 - 07:15)                              Both experimental settings use three-fold stratified cross-
+   (kitchen)                                                  validation. In each fold, one subset is held out for testing,
+   [put] <bananas> <kitchencounter>                           while the remaining two are split into training and vali-
+   (07:16 - 07:16) (kitchen)                                  dation sets. All virtual data is used during the pretraining
+   [walk] <toaster> (07:16 - 07:17)                           phase without additional partitioning. We report the mean
+   (kitchen)                                                  and standard deviation of accuracy, macro F1, and weighted
+   [switchon] <toaster> (07:17 - 07:17)
+                                                              F1 across the three folds, consistent with evaluation proto-
+   (kitchen)
+   [grab] <breadslice> (07:17 - 07:18)                        cols in prior work.
+   (kitchen)
+   [put] <breadslice> <toaster>                                            Computing Infrastructure
+   (07:18 - 07:18) (kitchen)                                  All experiments and simulations in this paper were con-
+   [lookat] <toaster> (07:20 - 07:20)                         ducted on a dedicated server equipped with an NVIDIA
+   (kitchen)
+                                                              RTX A5000 GPU (24 GB VRAM), an Intel(R) Xeon(R)
+   [walk] <kitchentable> (07:20 - 07:21)
+   (kitchen)                                                  Gold 6342 CPU @ 2.80GHz, and 50 GB of system
+   [sit] <kitchentable> (07:21 - 07:21)                       RAM. The server includes 48 physical cores and 96 log-
+   (kitchen)                                                  ical processors across two CPU sockets, with Ubuntu
+   [lookat] <coffeemaker> (07:21 - 07:22)                     22.04.5 LTS (Jammy) as the operating system. The
+   (kitchen)                                                  software environment consists of Python 3.11.11, Py-
+                                                              Torch 2.8.0.dev20250319+cu128, CUDA 12.8, and cuDNN
+Table 3: This table summarizes the datasets used in our experiments. The sensors M , D, T , I, LS, AD, S, M D, N , V , P R,
+SH, L, P , DR, H, HE, LM , C, W T , and W correspond to motion, door, temperature, item, light switch, activate device
+(burner, hot water, cold water), setpoint, mode, noise, voltage, presence, drawer, humidity, heater, luminosity, cupboard, water,
+and window sensors, respectively. The datasets differ in sensor types, sensor placement, number of residents, home layouts,
+and recorded activities. The number of activity datapoints is as in the original dataset. This table has been taken from (Thukral
+et al. 2025) with permission.
+
+         Dataset   Sensors                Res.   Floorplan                   Activities
+         Aruba     [M, D, T ]             1      Single story home with liv- Relax (2919), Meal Preparation (1606), En-
+                                                 ing space, dining space, ter Home (431), Leave Home (431), Sleeping
+                                                 kitchen, office, 2 bedrooms, (401), Eating (257), Work (171), Bed to Toilet
+                                                 2 bathrooms, and closet       (157), Wash Dishes (65), Housekeeping (33),
+                                                                               Resperate (6), Other (6354)
+         Milan     [M, D, T ]             1      Single story with living Kitchen Activity (554), Guest Bathroom (330),
+                                                 space, dining, kitchen, Read (314), Master Bathroom (306), Leave
+                                                 workspace/TV room, 2 Home (214), Master Bedroom Activity (117),
+                                                 bedrooms, 2 bathrooms, Watch TV (114), Sleep (96), Bed to Toilet (89),
+                                                 and closet                    Desk Activity (54), Morning Meds (41), Chores
+                                                                               (23), Dining Room Activity (22), Evening
+                                                                               Meds (19), Meditate (17), Other (1943)
+         Kyoto7    [M, D, T I, LS, AD]    2      Double story with living, Meal Preparation, R1 Work (59), R1 Personal
+                                                 dining, kitchen, pantry, Hygiene (44), R2 Work (44), R2 Bed to Toilet
+                                                 closet, 2 bedrooms, office, (39), R2 Personal Hygiene (38), R1 Sleep (35),
+                                                 bathroom                      R2 Sleep (35), R1 Bed to Toilet (34), Watch TV
+                                                                               (30), Study (9), Clean (2), Wash Bathtub (1)
+         Cairo     [M, T ]                2      Three story with living, din- Leave Home (69), Night Wandering (67), R1
+                                                 ing, kitchen, 2 bedrooms, Wake (53), R2 Wake (52), R2 Sleep (52), R1
+                                                 office, laundry, garage       Sleep (50), Breakfast (48), R1 Work in Of-
+                                                                               fice (46), R2 Take Medicine (44), Dinner (42),
+                                                                               Lunch (37), Bed to Toilet (30), Laundry (10)
+         Orange    [S, W T, M D], [D, V, P 1
+                                           R],   Double story with living {Bathroom:} Cleaning (4), Showering (19), Us-
+                   [P, DR, W ], [H, HE, LM ],    room, kitchen, entrance, ing Sink (38), Using Toilet (9), {Bedroom:}
+                   [LS, T, N ], [SH, L, C]       staircase, toilet, bathroom, Cleaning (3), Dressing (30), Napping (15),
+                                                 walkway, bedroom, and Reading (15), {Entrance:} Entering (21), Leav-
+                                                 office                        ing (21), {Kitchen:} Cleaning (4), Cooking
+                                                                               (19), Preparing (19), Washing Dishes (19),
+                                                                               {Living Room:} Cleaning (19), Computing
+                                                                               (15), Eating (19), Watching TV (18), {Office:}
+                                                                               Cleaning (4), Computing (46), Watching TV
+                                                                               (14), {Staircase:} Going Up (57), Going Down
+                                                                               (57), {Toilet:} Use Toilet (11), Other (478)
+
+
+
+90800. Additional libraries include OpenCV, NumPy, and                  In the following section, we outline how insights gained
+standard scientific computing packages.                              from this work can inform future directions and detail the
+                                                                     next steps in advancing our research.
+                        Discussion
+A key challenge in developing robust smart home-based                Bridging the Domain Gap Between Real and
+HAR models is the lack of large-scale labeled datasets, fur-         Virtual Homes
+ther complicated by variations in home layouts, sensor se-           We generated virtual sensor datasets from 22 distinct envi-
+tups, and individual behaviors. To address this, we intro-           ronments within the VirtualHome simulator. While diverse,
+duce AgentSense, a virtual data generation pipeline that uses        none of these virtual environments precisely replicate the
+LLMs to create diverse personas and routines, which are              home layouts found in the real-world HAR datasets used for
+then executed in a simulated home instrumented with virtual          evaluation. As illustrated in Figire 3, a comparison between
+sensors. This enables the generation of rich, diverse datasets       a VirtualHome environment and the Milan dataset reveals
+that improve HAR model performance, particularly in set-             noticeable differences—Milan, for instance, includes more
+tings where data is scarce. Models trained with our virtual          rooms and unique spaces such as an aisle. These discrepan-
+data and minimal real data achieve performance on par with           cies in layout introduce a domain gap between the virtual
+those trained on full datasets, demonstrating the potential of       and real data. Despite this, our results show that incorporat-
+simulation-driven approaches to overcome data scarcity.              ing virtual data significantly improves HAR model perfor-
+                                         Table 4: Mapping of activities for each dataset.
+
+ Aruba                      Milan                     Kyoto7                      Cairo                      Orange
+ Relax → Relax              Kitchen Activity →        Meal Preparation →          Leave Home → Leave         Cleaning → Cleaning
+                            Kitchen Activity          Meal Preparation            Home
+ Meal Preparation →         Guest Bathroom →          R1 Work → Work              Night Wandering →          Showering → Show-
+ Meal Preparation           Guest Bathroom                                        Night Wandering            ering
+ Enter Home → Other         Read → Read               R1 Personal Hygiene         R1 Wake → Wake             Using Sink → Using
+                                                      → Personal Hygiene                                     Sink
+ Leave Home → Leave         Master Bathroom →         R2 Work → Work              R2 Wake → Wake             Using Toilet → Using
+ Home                       Master Bathroom                                                                  Toilet
+ Sleeping → Sleeping        Leave Home → Leave        R2 Bed to Toilet →          R1 Sleep → Sleep           Dressing → Dressing
+                            Home                      Bed to Toilet
+ Eating → Eating            Master Bedroom Ac-        R2 Personal Hygiene         R2 Sleep → Sleep           Napping → Napping
+                            tivity → Master Bed-      → Personal Hygiene
+                            room Activity
+ Work → Work                Watch TV → Other          R1 Sleep → Sleep            Breakfast → Break-         Reading → Reading
+                                                                                  fast
+ Bed to Toilet → Bed        Sleep → Sleep             R2 Sleep → Sleep            R1 Work in Office →        Entering → Other
+ to Toilet                                                                        Work in Office
+ Wash Dishes → Other        Bed to Toilet → Bed       R1 Bed to Toilet →          R2 Take Medicine →         Leaving → Leaving
+                            to Toilet                 Bed to Toilet               Take Medicine
+ Housekeeping      →        Desk Activity →           Watch TV → Other            Dinner → Dinner            Kitchen Preparing →
+ Housekeeping               Other                                                                            Kitchen Preparing
+ Resperate → Other          Morning Meds →            Study → Study               Lunch → Lunch              Washing Dishes →
+                            Other                                                                            Washing Dishes
+ Other → Other              Chores → Chores           Clean → Other               Bed to Toilet → Bed
+                                                                                  to Toilet
+                            Dining Room Activity      Wash        Bathtub   →     Laundry → Other            Computing → Com-
+                            → Dining Room Ac-         Other                                                  puting
+                            tivity
+                            Evening Meds →            Other → Other               Other → Other              Watching TV →
+                            Other                                                                            Other
+                            Meditate → Meditate                                                              Going Up → Other
+                            Other → Other                                                                    Going Down → Other
+                                                                                                             Eating → Eating
+                                                                                                             Cooking → Cooking
+                                                                                                             Other → Other
+
+
+mance, even in the presence of this domain mismatch.                   data that matches the actual home layout. With this virtual
+   One promising future direction is to leverage the control           data, an initial HAR model can be trained and deployed from
+offered by simulation to replicate the specific layout of a            day one, enabling activity recognition without the need for
+target home when needed. This enables personalization of               manual labeling or real-world data collection – thus support-
+HAR models for specific homes at virtually no additional               ing the transition to the maintenance procedure for HAR in
+cost. By generating layout-matched virtual sensor data, the            homes (Hiremath and Plötz 2024).
+model can be better adapted to the unique movement pat-
+terns and spatial transitions of that home.                            Optimizing Sensor Placement Through Virtual
+   Consider, for example, a newly instrumented smart home              Data Simulation for HAR
+with no prior sensor data. Traditionally, HAR model devel-             We generated virtual sensor data using motion sensors
+opment in such settings requires a ”cold phase” (Hiremath              placed according to predefined rules, as detailed in Section .
+et al. 2022)—a period of passive observation during which              However, the sensor placement can be fully customized
+user activities are manually annotated to create labeled train-        within the virtual environment. This flexibility is particularly
+ing data. By extending AgentSense, this phase could be by-             useful for identifying optimal sensor configurations when in-
+passed entirely. A simple video walkthrough of the home can            strumenting a new home with ambient sensors. Consider a
+be used to reconstruct a 3D model of the environment using             scenario in which a new home is to be equipped with sen-
+tools like Meshroom (Griwodz et al. 2021). This model can              sors to support recognition of a specific set of user-desired
+then be imported into the simulator to generate virtual sensor         activities. Rather than deploying sensors directly and rely-
+           (a) VirtualHome layout                                                     (b) Milan dataset layout
+
+Figure 3: Comparison between a VirtualHome environment and the Milan dataset. Virtual Home layout image from (Puig,
+Fidler et al. 2024) and Milan Layout taken from (Cook et al. 2012)
+
+
+ing on trial-and-error in the real world, one can first sim-    with the fine-grained motion tracking offered by wearables,
+ulate various sensor layouts in the virtual environment. By     particularly for activities of daily living (Arrotta, Bettini, and
+generating virtual sensor data under different configurations   Civitarese 2021).
+and evaluating the resulting HAR model performance, the
+optimal sensor layout can be identified—defined as the con-
+                                                                Future Work
+figuration that yields the highest activity recognition accu-
+racy. This approach enables cost-effective, large-scale ex-     Several avenues for future work directly connect to the work
+perimentation without the time and expense associated with      we presented in this paper. In what follows, we outline some
+real-world sensor deployment.                                   of these future avenues.
+Extending to Multi-modal Data Generation in                     Exploring Alternative Large Language Models for Vir-
+Simulated Home Environments:                                    tual Data Generation: In this work, we utilize GPT-4o-
+As described in Section , the VirtualHome simulator sup-        mini or various language generation tasks, including per-
+ports the generation of multiple camera-based modalities,       sona creation, high-level routine synthesis, and decomposi-
+including RGB images, depth maps, semantic segmentation,        tion into low-level action sequences. This model offers near-
+and pose data. Our extended version enhances this capability    zero cost for generating the required sequences. It can be
+by adding support for multiple ambient sensor data streams      substituted with other open-source LLMs such as DeepSeek
+that are time-synchronized with these visual modalities.        (Liu et al. 2024), Claude (Anthropic 2024), Gemini (Team
+   Among these, pose and video data are especially valu-        et al. 2023), or Llama (Patil and Gudivada 2024; Naveed
+able for sensor-based HAR, as they allow the integration of     et al. 2023; Touvron et al. 2023). In future iterations, we
+existing Pose2IMU and Video2IMU methods (Kwon et al.            plan to investigate how different LLMs influence the gen-
+2020; Xiao et al. 2021; Uhlenberg and Amft 2022; Xia and        erated action sequences and how these variations affect the
+Sugiura 2022; Kwon, Abowd, and Plötz 2021; Leng, Kwon,         resulting virtual data in simulation environments.
+and Plötz 2023; Leng et al. 2024b; Hwang et al. 2024) to          While our multi-stage prompting procedure and activity
+generate synchronized virtual accelerometer and gyroscope       annotations rely on LLM-generated outputs, one could ar-
+signals. In future work, we plan to jointly simulate these      gue that these may not fully capture the nuances of real-
+sensor modalities, leveraging LLM-based activity genera-        world, situated home environments. In future work, we will
+tion to create richly annotated, multi-modal datasets. Such     include a formal evaluation of LLM outputs by comparing
+simulation of synchronized ambient and wearable sensor          them against real resident inputs of annotation sourced via
+streams would enable more comprehensive activity analy-         Amazon Mechanical Turk (Patel and Chernova 2022), as
+sis—combining the contextual awareness of ambient sensors       successfully demonstrated in prior studies.
+Exploring Additional Pretraining Methods with Virtual
+Data In this work, we utilized the state-of-the-art TDOST
+framework to assess the benefits of incorporating virtual
+data into the Human Activity Recognition (HAR) pipeline.
+Low-level action sequences generated by LLMs were fed
+into the VirtualHome simulator, and the resulting sensor
+event triggers were encoded using the TDOST representa-
+tion. Evaluation was conducted by pre-training on virtual
+data, followed by fine-tuning with a combination of vir-
+tual and real data. This setup was benchmarked against the
+standard TDOST pipeline, which has demonstrated strong
+performance in generalizable, layout-agnostic HAR—where
+home layouts and activity patterns differ between source
+and target homes. To examine whether virtual data enhances
+generalization, we directly compared TDOST alone with
+TDOST pre-trained on virtual data. The improved perfor-
+mance in the pre-trained variant highlights the utility of syn-
+thetic data for building robust HAR systems. In future work,
+we plan to expand this analysis by incorporating traditional
+baselines, for example, the use of CASAS features (Cook
+et al. 2012; Alam, Reaz, and Ali 2012) and exploring other
+self-supervised pre-training strategies (Chen et al. 2024b,a;
+Haresamudram, Essa, and Plötz 2022; Haresamudram, Essa,
+and Plötz 2021; Oord, Li, and Vinyals 2018).
+Enhancing Coverage and Diversity in HAR through
+LLM-Generated Activities: A notable advantage of in-
+corporating LLMs in the simulation pipeline is their abil-
+ity to generate broad spectrum of plausible human activ-
+ities, many of which align with real-world behaviors yet
+remain underrepresented in existing HAR datasets. While
+such datasets are typically constrained by a fixed set of an-
+notated labels, actual human routines are significantly more
+varied and context-dependent. LLMs, trained on diverse and
+expansive textual corpora, can implicitly capture this behav-
+ioral richness and often produce activities that, though miss-
+ing from benchmark datasets, mirror everyday human ac-
+tions. In our generation process, we observed such instances,
+where the LLM surfaced realistic sequences absent from the
+labeled datasets – highlighting limitations in traditional data
+collection pipelines, which are often bound by cost or activ-
+ity taxonomies.
+   Conversely, we also noted that certain activities com-
+monly found in benchmark datasets, such as ‘Watch TV’ or
+‘Enter Home’, were occasionally overlooked in the LLM-
+generated routines. This suggests areas where the open-
+ended simulation process could benefit from more targeted
+prompting In future work, we aim to explicitly include
+such activities to ensure alignment with established datasets
+and achieve fuller coverage of both common (occurring in
+benchmarked datasets) and underrepresented behaviors.
+

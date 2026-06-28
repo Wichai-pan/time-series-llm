@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "channel": "hand_acc16_x",
+    "train_length": 5000,
+    "window_length": 300,
+    "walking_real_train_windows": 31,
+    "running_real_train_windows": 31,
+    "walking_synthetic": 72,
+    "running_synthetic": 79,
+    "synthetic_space_handling": "inverse_transformed_from_sdforger_scaled_space_using_requested_activity_train_window_mean_std"
+  },
+  "overall": {
+    "accuracy": 0.9470198675496688,
+    "balanced_accuracy": 0.945675105485232,
+    "macro_f1": 0.9467372134038801,
+    "confusion_matrix": [
+      [
+        66,
+        6
+      ],
+      [
+        2,
+        77
+      ]
+    ]
+  },
+  "per_requested_label": [
+    {
+      "requested_label": "walking",
+      "samples": 72,
+      "predicted_walking": 66,
+      "predicted_running": 6,
+      "requested_label_accuracy": 0.9166666666666666
+    },
+    {
+      "requested_label": "running",
+      "samples": 79,
+      "predicted_walking": 2,
+      "predicted_running": 77,
+      "requested_label_accuracy": 0.9746835443037974
+    }
+  ]
+}

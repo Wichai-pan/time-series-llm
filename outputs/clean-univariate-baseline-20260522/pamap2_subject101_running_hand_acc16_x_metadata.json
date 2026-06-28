@@ -1,0 +1,12 @@
+{
+  "input": "/scratch/project_2016517/panh/datasets/pamap2/PAMAP2_Dataset/Protocol/subject101.dat",
+  "output": "data/public/time_series/pamap2_subject101_running_hand_acc16_x.parquet",
+  "activity_id": 5,
+  "columns": [
+    "hand_acc16_x"
+  ],
+  "rows": 21265,
+  "min_rows": 5000,
+  "value_space": "raw_pamap2_sensor_units",
+  "note": "activity-specific subset; activity_id is not stored in the SDForger parquet because the baseline is univariate sensor-only."
+}

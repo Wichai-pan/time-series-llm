@@ -1,0 +1,23 @@
+{
+  "mdd": 0.3958023488521576,
+  "acd": 1.1973481178283691,
+  "sd": 0.8330897092819214,
+  "kd": 0.9512722492218018,
+  "ed": 19.039300081603614,
+  "dtw": 304.4371006629392,
+  "shr": null,
+  "real_window_count": 31,
+  "synthetic_window_count": 85,
+  "paired_sample_count": 31,
+  "sequence_length": 300,
+  "distance_subset_mode": "first",
+  "distance_subset_seed": 42,
+  "train_length": 5000,
+  "train_samples": 1,
+  "augmentation_strategy": "univariate",
+  "min_windows_length": 300,
+  "min_windows_number": 30,
+  "train_splitting": "minimize-overlap",
+  "metric_impl": "tsgbench_exact_for_mdd_acd_sd_kd_ed_dtw",
+  "shr_status": "not_implemented_exact_sidl_required"
+}

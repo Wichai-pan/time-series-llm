@@ -1,0 +1,31 @@
+{
+  "walking_train_windows": 31,
+  "running_train_windows": 31,
+  "combined_train_windows": 62,
+  "channel": "hand_acc16_x",
+  "train_length_per_activity": 5000,
+  "window_length": 300,
+  "embedding_type": "fica",
+  "embedding_dims": [
+    5
+  ],
+  "n_bins": 4,
+  "model_id_or_path": "gpt2",
+  "tuned_model_path": "output/time_series/pamap2_subject101_unified_stat_prompt_hand_acc16_x/model/model_iter-1/best",
+  "generation_stats": {
+    "walking": {
+      "raw_outputs": 128,
+      "parsed_rows": 126,
+      "accepted_rows": 73,
+      "attempts": 2
+    },
+    "running": {
+      "raw_outputs": 128,
+      "parsed_rows": 127,
+      "accepted_rows": 74,
+      "attempts": 2
+    }
+  },
+  "value_space": "standardized_sdforger_window_space",
+  "conditioning": "label + quantized per-window mean/std/min/max bins, folded into composite data token"
+}

@@ -1,0 +1,5 @@
+variant,label,input_rows,clean_accept_rows,repaired_rows,rejected_rows,output_rows,latent_abs_max,decoded_abs_max,decoded_std_mean,hard_rule,repair_rule
+strict_reject_p05_p95,walking,51,14,0,37,14,2.026,1.9584216129620517,0.4580796142589708,all latent dims inside train p05-p95,none
+soft_repair_p05_p95_minmax,walking,51,14,13,24,27,2.368978638712268,2.8473954073120833,0.6235501928136176,reject if any latent dim outside train min-max,clip remaining p05-p95 violations to p05-p95
+strict_reject_p05_p95,running,58,10,0,48,10,1.485,1.6928990119936294,0.4955416325912224,all latent dims inside train p05-p95,none
+soft_repair_p05_p95_minmax,running,58,10,24,24,34,2.368978638712268,2.4936672208501496,0.5577661120069282,reject if any latent dim outside train min-max,clip remaining p05-p95 violations to p05-p95

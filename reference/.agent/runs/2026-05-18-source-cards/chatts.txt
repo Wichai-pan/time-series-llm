@@ -1,0 +1,1079 @@
+                                              ChatTS: Aligning Time Series with LLMs via Synthetic Data
+                                                    for Enhanced Understanding and Reasoning
+                                                       Zhe Xie                            Zeyan Li                         Longlong Xu                                                   Xidao Wen
+                                                 Tsinghua University                      Xiao He                      Tsinghua University                                                  BizSeer
+                                                    China, Beijing                       ByteDance                        China, Beijing                                                 China, Beijing
+                                             xiez22@mails.tsinghua.edu.cn               China, Beijing
+
+                                                                   Tieying Zhang                             Rui Shi                                           Dan Pei
+                                                                    Jianjun Chen                          ByteDance                                 Tsinghua University
+
+
+
+
+arXiv:2412.03104v3 [cs.AI] 16 Apr 2025
+                                                                       ByteDance                         China, Beijing                                China, Beijing
+                                                                      USA, San Jose
+                                                                                                                                                                                                         Time Series Array
+                                         ABSTRACT                                                                      Q: Are there any fluctuations in the Success Rate?
+                                                                                                                                                                                                  HTTP Requests
+
+                                                                                                                                                                                       User
+                                         Understanding time series is crucial for its application in real-world                                                                                   Success Rate
+                                                                                                                                A: Yes. There are continuous downward spikes.
+                                         scenarios. Recently, large language models (LLMs) have been in-           LLM                                                                            Disk I/O
+
+                                         creasingly applied to time series tasks, leveraging their strong lan-         Q: Are there other metrics exhibiting abnormal behavior
+                                                                                                                                                                                                  Network Error
+                                                                                                                       near this point? What might have happened?
+                                                                                                                                                                                        User
+                                         guage capabilities to enhance various applications. However, re-                                                                                         Memory Usage
+                                                                                                                                A: Disk I/O, Memory Usage, and CPU Usage all experienced
+                                         search on multimodal LLMs (MLLMs) for time series understand-                          abnormal fluctuations around this point. This suggests that the
+                                                                                                                   LLM          system may have encountered an overload or I/O anomaly.           CPU Usage
+                                         ing and reasoning remains limited, primarily due to the scarcity
+                                         of high-quality datasets that align time series with textual infor-
+                                         mation. This paper introduces ChatTS, a novel MLLM designed              Figure 1: Example of an AIOps application of time series-
+                                         for time series analysis. ChatTS treats time series as a modality,       related dialogue.
+                                         similar to how vision MLLMs process images, enabling it to per-
+                                         form both understanding and reasoning with time series. To ad-
+                                         dress the scarcity of training data, we propose an attribute-based       in domains such as electricity [53], healthcare [46], traffic [33],
+                                         method for generating synthetic time series with detailed attribute      weather [36], and finance [50], frequently requires understanding
+                                         descriptions. We further introduce Time Series Evol-Instruct, a          and reasoning about time series patterns. Therefore, the ability to
+                                         novel approach that generates diverse time series Q&As, enhancing        reason using both text and time series data is a critical capability
+                                         the model’s reasoning capabilities. To the best of our knowledge,        for MLLMs, enabling them to support human decision-making by
+                                         ChatTS is the first MLLM that takes multivariate time series as          providing natural language explanations that align with human
+                                         input for understanding and reasoning, which is fine-tuned exclu-        logic. Figure 1 illustrates such an example in an AIOps [66] scenario
+                                         sively on synthetic datasets. We evaluate its performance using          where understanding and reasoning about multivariate system mon-
+                                         benchmark datasets with real-world data, including six alignment         itoring time series are achieved through natural language dialogue,
+                                         tasks and four reasoning tasks. Our results show that ChatTS signifi-    thereby improving the diagnostic and troubleshooting process.
+                                         cantly outperforms existing vision-based MLLMs (e.g., GPT-4o) and           Existing LLM-based methods for understanding and reasoning
+                                         text/agent-based LLMs, achieving a 46.0% improvement in align-           about time series attributes can be broadly categorized into text-
+                                         ment tasks and a 25.8% improvement in reasoning tasks. We have           based, vision-based, and agent-based approaches. Text-based meth-
+                                         open-sourced the source code, model checkpoint and datasets at           ods directly use LLMs by structuring historical observations as
+                                         https://github.com/NetManAIOps/ChatTS.                                   raw text [8]. However, these methods are often constrained by the
+                                                                                                                  limitation of prompt length and generally perform poorly in under-
+                                                                                                                  standing the global features of time series compared to vision-based
+                                         1    INTRODUCTION                                                        methods. Vision-based methods utilize vision MLLMs, which accept
+                                         Multimodal large language models (MLLMs) have recently achieved          plot figures of time series data [43], such as GPT-4o [5] or Qwen-
+                                         significant progress in vision-language tasks, showing exceptional       VL [9]. While these methods can better capture global features,
+                                         performance even in scenarios requiring complex understanding            they are limited by the resolution of the plotted figures and face
+                                         and reasoning [9, 31, 37, 58]. However, this success has not been        challenges in accurately interpreting the details. Recent works also
+                                         replicated in the time series domain. Even though some studies have      show how agents can leverage time series analysis tools to interact
+                                         attempted to integrate LLMs with time series, such as TimeLLM [26],      with LLMs [52, 68]. However, the ability of agents to understand
+                                         they usually only focus on specific classical time series tasks (e.g.,   time series is restricted by the functionality of the tools.
+                                         forecasting) rather than understanding, reasoning, and dialogue             Therefore, there is a strong need for TS-MLLM, a MLLM that can
+                                         based on time series attributes, as well as integrating into existing    naturally handle time series modality, akin to how vision MLLMs
+                                         LLM workflows. Moreover, recent studies indicate that LLMs still         process images. Such models have the potential to unlock valuable
+                                         struggle with zero-shot reasoning about time series [43]. This is        insights from time series by providing intuitive, question-driven
+                                         particularly significant because time series analysis, widely applied    analysis capabilities. Specifically, TS-MLLMs can capture global and
+                                                                                            Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan Pei
+
+
+                                                 Q: Are there other metrics exhibiting similar fluctuations to the success rate? What might have happened?                    User
+                                                                                               HTTP Requests
+             The time series values of HTTP Requests are: [105.1, 103.2, …]
+             The time series values of Success Rate are: [89.1, 89.2, 89.3, …]
+                                                                                                                                                                            Vision
+                                         ……                                                                                                                                                             Answer
+                                                                                                                                                                            MLLM
+                                                                                               Success Rate
+      According to the values, please answer the following: Are other metrics
+      exhibiting similar fluctuations to the success rate? What might have happened?                                                           Time Series Image                            Multimodal
+                                                                                               Disk I/O                                                                                    Vision-Based
+     Text-Based                                     LLM              Answer
+                                                                                                                                                         Q: According to the time series, are there …
+     Agent-Based                                                                                                                             Time Series Arrays
+                                                                                               Network Error
+                                                                                                                                                                                             Multimodal
+      LLM        Thought 1: Check Success Rate        Observation 1: Fluctuation Near 120                                                   105.1 103.2 101.8 …
+                                                                                                                                              89.1 89.2 89,3 …                                TS-Based
+                                                                                                                                                …     …     …   …
+                                                                                               Memory Usage                                       …     …    …   …
+      LLM        Thought 2: Check HTTP Requests       Observation 2: No Fluctuations                                                               …     …    …   …
+                                                                                                                                                    …     …   …   …
+
+      LLM        Thought 3: Check Disk I/O            Observation 3: Fluctuation Near 118                                                                Time Series Multimodal LLM
+                                                 ……                                            CPU Usage
+      LLM                                                            Answer                                                                                             Answer
+
+
+               Figure 2: Comparison of four kinds of LLM-based methods for time series understanding and reasoning.
+
+
+local features and relationships between multivariate time series                                              of time series with LLMs. Compared with existing studies on syn-
+(MTS), areas where existing LLMs and MLLMs have struggled.                                                     thetic time-series generation [21, 61], the proposed attribute-based
+By incorporating textual modalities as input, these models can                                                 time-series generation method provides precise textual attributes
+broaden their applicability and better contextualize time series data,                                         for each detailed pattern of the time series, laying a foundation for
+aligning the analysis with user queries. If successful, TS-MLLMs                                               generating diverse text data. Furthermore, to equip MLLM with
+could perform novel tasks such as citing patterns and events in                                                enhanced time series understanding and reasoning capabilities, we
+time series as evidence for observations and inferences, drawing                                               propose the Time Series Evol-Instruct (TSEvol) algorithm. Through
+interpretable conclusions from complex dynamical systems, and                                                  the diverse combinations of attributes and tasks, TSEvol can gener-
+recognizing and responding to temporal patterns [43].                                                          ate diverse time series Q&A datasets through evolutions, thereby
+    However, developing TS-MLLMs with effective understanding                                                  enhancing the model’s overall performance. To handle multivariate
+and reasoning ability for time series attributes faces several core                                            time-series inputs and fully preserve semantic information, we pro-
+challenges. First, multimodal time series data, especially language-                                           pose ChatTS, trained using the generated synthetic datasets. ChatTS
+time series pair data, is extremely scarce [15, 27, 43]. Unlike modal-                                         employs a context-aware time-series encoder capable of encoding
+ities such as images and audio, almost no research focuses on the                                              time series of (theoretically) arbitrary length and quantity while
+language alignment of time series. As a result, there is a significant                                         retaining their original numerical information. Finally, to support
+lack of time-series + text data, which makes the construction of                                               comprehensive evaluation regarding both language alignment and
+time-series dialogue and reasoning datasets challenging. This is                                               time series reasoning, we have collected evaluation datasets com-
+fundamental for TS-MLLMs to develop temporal understanding and                                                 prising both real and synthetic time series. These datasets include
+reasoning capabilities. Second, time-series data contains abundant                                             both alignment and reasoning tasks with uni/multivariate time
+shape and numerical attributes (i.e., the types of local fluctuations                                          series, ensuring a thorough assessment of the model’s performance.
+and their amplitudes). Therefore, a diverse range of text is needed                                            Our contributions. This paper makes the following contributions.
+to comprehensively describe these attributes while ensuring accu-
+racy to achieve effective alignment. Third, real-world time-series
+data are usually variable in length, multivariate, and of uncertain
+quantity. The correlations among MTS are often a focus of attention                                            • We propose to align LLMs with time series using attribute-based
+(as illustrated in Figure 1). In MLLMs for other modalities, such as                                             synthetic time series and text data. Building on this, we further
+images, few methods emphasize the relationships between multiple                                                 introduce Time Series Evol-Instruct (TSEvol), an algorithm that
+samples. However, such relationships are indispensable for under-                                                generates diverse, accurate, and multimodal training datasets of
+standing and reasoning about time series. Finally, there is a lack                                               time series and text entirely through synthetic data generation.
+of evaluation data and methods for TS-MLLMs. Developing com-                                                   • We propose a context-aware TS-MLLM, ChatTS, designed for
+prehensive and reasonable datasets and methodologies to evaluate                                                 variable-length, multivariate time series input and trained us-
+their performance is necessary.                                                                                  ing the generated synthetic data. To the best of our knowledge,
+    To address the challenges above, we innovatively propose a                                                   ChatTS is the first TS-MLLM with multivariate time series as input
+method to fine-tune a pre-trained LLM for TS-MLLMs solely using                                                  for understanding and reasoning about time series attributes.
+synthetic time series and text data. An important reason is that                                               • We have collected evaluation datasets containing real-world time
+synthetic time series data for time series model training has shown                                              series data, including six alignment tasks and four reasoning
+good results [21]. However, current methods are difficult to apply                                               tasks. Evaluation results across multiple datasets demonstrate
+directly because time series-text alignment tasks require both pre-                                              that ChatTS significantly outperforms baseline models, including
+cise and diverse time series attribute descriptions. Therefore, we                                               GPT-4o, in both time series alignment and reasoning tasks.
+propose an attribute-based method for generating synthetic time                                                • We have open-sourced the model, source code, and evaluation
+series and precise text attributes to facilitate the modal alignment                                             datasets to support future research: https://github.com/NetManAIOps/
+                                                                                                                 ChatTS.
+ChatTS: Aligning Time Series with LLMs via Synthetic Data
+for Enhanced Understanding and Reasoning
+
+
+2 PRELIMINARY AND MOTIVATION                                                       it does not rely on lengthy token chains or visual representations,
+                                                                                   thereby reducing computational overhead and mitigating issues
+2.1 Problem Definition
+                                                                                   with hallucination. Through the alignment of time series and text,
+The task of a TS-MLLM is to generate text-based responses based                    TS-MLLM can perform both global and local analysis of the shape
+on the input textual query and MTS array. Given a set of time series               and numerical information of time series. This capability allows
+T = {𝑇1,𝑇2, . . . ,𝑇𝑛 }, where each 𝑇𝑖 = {𝑡𝑖,1, 𝑡𝑖,2, . . . , 𝑡𝑖,𝑚𝑖 } represents   it to achieve higher accuracy and greater potential than existing
+a sequence of 𝑚𝑖 observed values over time for the 𝑖-th metric, and                methods.
+a natural language question 𝑄, the goal is to generate an answer 𝐴
+that captures relevant patterns or relationships across T based on                 3 METHODOLOGY
+the context of 𝑄. Formally, it can be defined as follows:
+                                                                                   3.1 Overview
+• Input:
+    – A set of time series T = {𝑇1,𝑇2, . . . ,𝑇𝑛 }, where 𝑇𝑖 ∈ R𝑚𝑖
+       represents the values of the 𝑖-th metric over 𝑚𝑖 time points.                                            Attribute-Based
+    – A natural language query 𝑄 specifies the information of                                                     Time Series
+                                                                                                                                   Generated
+                                                                                                                   Generator
+       interest within the time series data.                                         Attribute
+                                                                                                                                  Time Series
+• Output: A text answer 𝐴 derived from the T analysis, providing                     Selector
+                                                                                                 Attribute                                         Model
+  insights based on 𝑄.                                                                             Pool           Time Series                     Training
+                                                                                                                 Evol-Instruct
+   The task of TS-MLLM can be expressed as a function:                                                                            Generated
+                                                                                                                                    Text
+                               𝑓 (𝑄, T ) → 𝐴,
+                                                                                                      Figure 3: Overview of ChatTS.
+where 𝑓 denotes the model or algorithm responsible for interpreting
+the text query 𝑄 and generating the text answer 𝐴 by analyzing                        Due to the scarcity of high-quality datasets that align time series
+relevant patterns and relationships across the time series in T .                  with textual information, we propose to generate synthetic text-
+                                                                                   time series pairs for model training. Synthetic data is a common
+2.2     Existing Methods                                                           approach when there is a lack of sufficient real training data, and its
+Although mainstream LLMs currently do not support the direct                       effectiveness has been well validated in various fields [21, 39, 49].
+input of time series modality data, time series information can                    However, as discussed earlier, "time series + text" data for TS-MLLM
+be provided to LLMs through alternative methods to do simple                       requires sufficient accuracy to ensure alignment precision, compre-
+understanding and reasoning about time series attributes, as shown                 hensive coverage of time series attributes to guarantee effective
+in Figure 2. Existing approaches can be broadly categorized into text-             multimodal alignment, and task diversity in the text to enhance
+based, vision-based, and agent-based, each with distinct limitations.              QA and reasoning abilities. Unfortunately, existing time series gen-
+   Text-based methods encode time series values as raw text [8].                   eration methods [21, 61] fail to achieve these goals. A key reason
+However, these methods are constrained by the length of prompts,                   is that we need a diverse set of time series and precise, detailed
+limiting their global analysis capabilities and often resulting in an              descriptions of time series patterns. Therefore, in this paper, we
+incomplete understanding of the data context (refer to Section 4).                 propose an attribute-based method to generate time series + text
+   Vision-based approaches, which use visual representations of                    data, as illustrated in Figure 3:
+time series data (e.g., time series plots) processed by vision MLLMs [5,           • Attribute Selector (Section 3.2): To produce highly controllable
+9], may face challenges in accurately capturing detailed information                 time-series data with precise attributes, we use a detailed feature
+in time series, resulting in lower accuracy for data-intensive tasks                 set to describe time series. These attributes are aligned with
+and high computational overhead (refer to Section 4).                                real-world settings through an LLM selection.
+   Agent-based methods employ a reasoning and action strategy,                     • Attribute-Based Time Series Generator (Section 3.2): Con-
+breaking down complex tasks into a sequence of thoughts, observa-                    struct time series that correspond exactly to the attribute pool
+tions, and actions conducted by external tools to analyze time series.               using a rule-based approach.
+While potentially more flexible, this approach is heavily dependent                • Time Series Evol-Instruct (Section 3.3): A novel Time Series
+on expert knowledge and effectiveness of tools, token-intensive,                     Evol-Instruct module for creating large, diverse, and accurate
+and time-consuming, often requiring extensive token chains to                        datasets of time-series and text question-answering pairs for
+handle MTS data. Additionally, hallucination becomes a signifi-                      complex reasoning.
+cant problem [59] as the chains grow longer, reducing reliability in               • Model Design (Section 3.4): To handle MTS, we design a context-
+complex analytical tasks.                                                            aware MLLM encoding for multiple time series input, along with
+                                                                                     a value-preserved time series encoding method.
+2.3     Time Series Multimodal LLM                                                 • Model Training (Section 3.5): A large-scale training and a SFT
+TS-MLLM is a new type of MLLM that aims at overcoming the limi-                      are conducted to perform language alignment and improve time
+tations of existing methods by natively integrating both textual and                 series-related reasoning ability.
+time series inputs (see Figure 2). It can process multiple time series             As shown in Figure 3, the framework in ChatTS integrates synthetic
+data and textual descriptions, enabling a unified analysis that cap-               data generation and model training into a pipeline that ensures
+tures complex, multivariate relationships. Unlike previous methods,                effective time series attributes understanding and reasoning with
+                                                                         Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan Pei
+
+
+     All Attribute Set                           Attribute Subset                                  Attribute Pool for Req. Count
+                             Predefined
+   Trend Set                  Metric Set      Trend Subset                                          Trend Attribute
+
+
+
+
+                                                                                                                                                        Time Series Generator
+                                                                                                                                                                                                  Trend
+      Stable    Increase      Req. Count,                                                           [increase] from 50.0, reach
+                                               Stable    Increase
+
+
+
+
+                                                                               Attribute Sampler
+                             Travel Speed,                                                          75.0 at point 150, and
+       Decrease         …                       Decrease        …                                   [decrease] to 25 at point 256
+                             Weather Temp.,
+   Periodicity Set                …           Periodicity Subset                                    Periodicity Attribute                                                                      Periodicity
+      Sin        Square                          Sin                                                [(composite) sine] wave, with
+                                     Sample                 Square                                  period of 45.5 and amplitude
+    No Periodicity      …                      No Periodicity        …                              of 11.3
+                            Sampled Metric
+   Local Fluctuation Set       Req. Count
+                                              Local Fluctuation Subset                              Local Fluctuation Attribute                                                           Local Fluctuation
+     Spike      Convex                                                                              [upward spike] with amplitude of
+                                                Spike     Convex                                    28 at point 103; [downward spike]                                                                                              Generated Time Series
+    Phase Change       …                       Phase Change    …                                    with amplitude of 23 at point 189                                                                                                for “Req. Count”
+   Noise Set                                  Noise Subset                                          Noise Attribute                                                                               Noise
+                            GPT Selection
+      Noisy    Smooth …                        Noisy    Smooth …                                    [noisy], the overall std is 3.35
+
+
+
+
+                              Figure 4: Attribute selector and attribute-based time series generator in ChatTS.
+
+only synthetic data. First, building on the attribute-based time se-                                       Then, the Attribute Sampler randomly samples a combination
+ries generation and TSEvol described in Sections 3.2 and 3.3, the                                       of attributes from the Attribute Subset. It also assigns specific nu-
+pipeline generates synthetic data that captures intricate numer-                                        merical values, like position and amplitude, based on rules and
+ical and textual information for effective multimodal alignment.                                        constraints from the GPT Selector. These details are stored in the
+This data is then used to train the model (Section 3.4), where the                                      “Attribute Pool”, which records all the detailed information about
+context-aware time series encoder preserves the time series values                                      a time series. The Time Series Generator finally creates time series
+while aligning attributes with textual semantics accurately. Finally,                                   arrays that exactly match the attributes from the pool in a rule-
+by alignment training and SFT (Section 3.5), ChatTS achieves pre-                                       based manner (more details can be found in the source code). This
+cise alignment between time series encoding and text embeddings,                                        process allows us to generate diverse synthetic time series with
+along with enhanced reasoning capabilities.                                                             precise attribute descriptions.
+
+                                                                                                         3.3           Time Series Evol-Instruct
+
+3.2      Attribute-Based Time Series Generator                                                                         Evol Type                  Breadth                                 Depth                Reasoning                       Situation
+
+Diverse time series and precise, detailed textual attribute descrip-                                                                                          Trend
+                                                                                                                            Seed Q&A                                                                                                                   Evolve
+tions are essential to achieve accurate time series language align-                                                                                    Q#0: What is the trend of M#1?
+                                                                                                                                                       A#1: The trend of M#1 is …                                                      Trend           Referenced Attribute
+ment. Time series have rich pattern attributes, which can be roughly                                                                                                                                   Bre                                      Generated Q&A
+                                                                                                                                                      dth                                                 adth
+categorized into trend, periodicity, and remainder [24, 47]. Much ex-                                                                             Brea
+
+isting research on the generation of time series [20, 21] also adopts                                             Trend       Period                                                                   Trend           Trend
+                                                                                                                                                                                                   Q#2: Do M#1 and M#3 have the same
+                                                                                                            Q#1: Does M#1 fluctuates                                Generated
+similar approaches to classify these attributes. Therefore, following                                       periodically around a fixed value?                        Q&A
+                                                                                                                                                                                                   overall trend?
+                                                                                                            A#1: No. Because the trend of …                                                        A#2: Yes. The trend of M#1 is …
+existing studies, we classify time series attributes into four ma-                                                                                                                                                                     S itu
+                                                                                                                          Reasoning                                                                               pth                       atio
+jor categories, Trend, Periodicity, Noise, and Local Fluctuation, to                                                                                                                                            De                               n
+
+construct the corresponding attribute set for time series.                                                     Trend        Period            Local                               Trend           Trend          Trend                         Trend              Trend
+                                                                                                                                                                                                                                                Local Correlation #1
+                                                                                                            Q#3: What might have occurred                                        Q#4: Do M#1, M#2, and M#3
+    Based on this, we propose an attribute selector and an attribute-                                       in M#1? Choose from: almost no                                       exhibit the same trend? If not,                  Q#5: In a microservices system,
+                                                                                                            change; stable periodic                                              please provide a detailed                        has the metric M#1 exhibited
+based time series generator that produces synthetic time series data                                        oscillations; periodic oscillations                                  comparison of their differences                  any anomalies? Is there fault
+                                                                                                            with sudden spikes.                                                  and output the analysis.                         propagation between them?
+(see Figure 4). First, we define an “All Attribute Set”, which includes                                     A#3: Periodic oscillations …                                         A#3: No. Because the trend of                    A#5: Yes, there is a …
+many specific attributes under different attribute categories. The                                                                                                                                               Metric#3 Pool                       Correlation Pool
+                                                                                                                                 Metric#1 Pool                                    Metric#2 Pool
+All Attribute Set includes 4 types of Trend, 7 types of Seasonality,                                       Attribute          Trend           Period                            Trend         Period           Trend          Period              Shape Correlation #1
+                                                                                                             Pool             Local           Noise                             Local         Noise            Local
+                                                                                                                                                                                                                        ...
+                                                                                                                                                                                                                              Noise               Local Correlation #1
+                                                                                                                                                                                                                                                            ...
+                                                                                                                                        ...                                             ...
+3 types of Noise, and 19 types of local fluctuations. The complete
+list can be found in the source code. Different attributes within the
+same category can be combined. A time series can include multiple                                                                      Figure 5: Time Series Evol-Instruct
+segments of trends and several local fluctuations by combining the
+same type of attributes (see Figure 4). Additionally, by combining                                          To improve the model’s question-answering and reasoning abil-
+sine waves, we can generate a diverse range of periodic fluctua-                                        ities, it is essential to have high-quality SFT training data that is
+tion patterns. Therefore, the proposed time series generator can                                        diverse in format and tasks. However, due to the lack of time-series
+theoretically generate an infinite number of different time series,                                     + text data, it is challenging to obtain sufficiently diverse time-series-
+ensuring the richness of attributes. We also introduced a GPT Selec-                                    related training data directly. To generate accurate time-series +
+tor. Specifically, when generating an attribute set for time series, we                                 text SFT data with rich question-answering formats, inspired by
+randomly sample a metric from a large “Metric Set” that contains                                        Evol-Instruct [55] and its multimodal version MMEvol [40], we
+567 predefined metric names from real-world scenarios and use GPT                                       innovatively propose Time Series Evol-Instruct (TSEvol).
+to choose a attribute subset from the all attribute set, based on the                                       Evol-Instruct [55] is a data generation approach that incremen-
+actual physical meaning of the metric and the predefined scenario.                                      tally evolves instructional prompts and their outputs to enhance
+This helps align time series with real-world physical meanings.                                         the diversity and complexity of training datasets for LLMs. TSEvol
+…   …   …   …                      the time series, are
+…   …   …   …
+                                   there any …?
+                                         Text
+
+
+
+
+        ChatTS: Aligning Time Series with LLMs via Synthetic Data
+        for Enhanced Understanding and Reasoning
+
+
+                                                                       Time Series Patches
+                  HTTP Requests is a time series:
+                                                                                                         Time Series
+                                                                                                          Encoder
+                   Success Rate is a time series:
+                                                                                                                                                                LLM               Answer
+                                                                           Tokenized Text
+                                ……                                  HTTP Requests     is     a
+                                                                                                           Text
+                    Q: According to the Time                        time    series    :     <ts>
+                                                                                                         Embedding
+                 Series, are there any metrics …?                   <ts/> Success    Rate    is                                                    ……
+                                                                               ……                                                          Insert &
+                    Time Series + Text Input                         Patch + Tokenize                  Feature Encode                     Concatenate                          Text Output
+                                                      Figure 6: Model Structure of the Multimodal LLM in ChatTS
+                                                                                                                                                                HTTP Request is a time series:
+                                                                                                                          HTTP Request is a time series:
+                                                                                                                                                [Scaled By: 100.0 | Offset: -5.1]
+        builds upon Evol-Instruct by introducing a mechanism to incorpo-                           the LLM to capture105.1both       temporal and
+                                                                                                                           103.2 101.8 …
+                                                                                                                                                    contextual dependencies
+                                                                                                                                                      1.0 0.98 0.97 …
+        rate time series attributes dynamically into each evolutionary step                        across different metrics.       This sequence is then
+                                                                                                                          Original Array                            fed into the LLM,
+                                                                                                                                                         Normalized Array
+
+        (see Figure 5). TSEvol relies on attribute pools of multivariate time                      which generates an answer that incorporates insights from both
+        series (see Section 3.2). Additionally, to enhance the model’s abil-                       the time series data and the natural language query, achieving a
+        ity to analyze correlations, we introduce a correlation pool, which                        multimodal understanding suited for complex question-answering
+        records time series with related attributes (refer to the source code                      tasks.
+        for details). During each step of the evolution process, a subset of
+        attributes is randomly selected from the attribute pool and added
+                                                                                                     Input Question                                 Text           HTTP Request is a time series:
+        as additional context, guiding the LLMs to generate Q&As about                                HTTP Request is a time series:             Prompt       [Value Scaling: 100.0 | Value Offset: -5.1]
+        a broader set of time series attributes according to the evolution                              105.1 103.2 101.8       …           Normalized                                               Normalized
+                                                                                                              Original Array                    Vector
+                                                                                                                                                                    1.0   0.98      0.97         …     Value
+        type. With TSEvol, generated Q&As can cover more attributes in
+        the time series and avoid repetitive questions. We also added an
+        attribute-based eliminator to ensure the Q&As match the time se-                                Figure 7: Value-Preserved Time Series Normalization
+        ries attributes. In addition to the commonly used evolution types,
+        we also add two more types, reasoning (reasoning-based questions)                          3.4.2 Value-Preserved Time Series Normalization. The numerical
+        and situation (situation-based questions), to enhance the model’s                          features of time series are essential, as real-world applications often
+                                                                                                                                                            HTTP Request is a time series:
+        ability to handle complex questions.                                                       involve specific numericalText       queries
+                                                                                                                                            Prompt (e.g.,  asking
+                                                                                                                                                     [Value Scaled By:for  theValue Offset:
+                                                                                                                                                                       100.0 |    maximum     -5.1 |
+                                                                                                     HTTP Request   is a time series:                  Noise Scaled By: 10.0 | Noise Offset: 0.0]
+                                                                                                   CPU   utilization).      However, normalization            of time series data can
+                                                                                                        105.1
+                                                                                                   lead to     103.2 101.8
+                                                                                                            losing     original… numerical information.   1.0 0.98  To 0.97
+                                                                                                                                                                        address        Normalized
+                                                                                                                                                                                 … this,      we
+        3.4     Time Series Multimodal LLM                                                                                            Dual-Channel                                        Value
+                                                                                                              Original Array
+                                                                                                   introduce a value-preserved            time   series 0.1 0.3
+                                                                                                                                                          normalization          schemeNormalized
+                                                                                                                                                                                               (as
+                                                                                                                                  Normalized Vector                      0.2     …        Noise
+        In this subsection, we introduce the model structure of the proposed
+                                                                                                   shown in Figure 7). First, we apply standard min-max normalization
+        ChatTS, as shown in Figure 6. ChatTS takes multivariate time series
+                                                                                                   (0-1 scaling) to each time series array. Then, for each time series, we
+        and text, along with their contextual information as the input.
+                                                                                                   include the normalization parameters-“Value Scaling” (the scaling
+        3.4.1 Context-Aware Time-Series Multimodal LLM. To handle the                              factor during normalization) and “Value Offset” (the offset applied
+        multimodal inputs, ChatTS first separates the input time series                            during normalization)—in the text as part of a prompt. This ap-
+        arrays and the text. Following the established practice in encoding                        proach leverages the numerical understanding capabilities of LLMs,
+        time series for LLMs [26], the input time series arrays are divided                        enabling us to normalize time series features while preserving the
+        into fixed-size patches, which enables the model to handle and                             original numerical information. To further enhance numerical un-
+        encode temporal patterns more effectively. We employ a simple                              derstanding, numerical tasks are included in the training dataset
+        5-layer MLP to encode each patch of the time series, as time series                        (see Section 3.5).
+        inherently have sequential patterns. Therefore, a simple structure
+        can map the patch features to a space aligned with the text embed-                         3.5       Model Training
+        ding. For text input, they are tokenized and then encoded through
+        a text embedding layer. In this way, each patch of the time series                                                     Table 1: Training Datasets
+        and each text token are mapped to the same space.
+                                                                                                         Stage                         Alignment                                           SFT
+           To fully retain the contextual information of multivariate time
+                                                                                                       Dataset         UTS        MTS-Shape            MTS-Local          TSEvol           Instruct Follow
+        series, we performed token-level concatenation based on the po-
+        sition of the time series in the original input. Specifically, the en-                       # Samples        35,000           35,000              35,000          24,270                5,050
+        coded patches corresponding to each time series were inserted
+        between the surrounding text tokens. Unlike the method used in                               ChatTS is trained based on QWen2.5-14B-Instruct [56]1 , with a
+        TimeLLM [26], this approach ensures that the contextual informa-                           two-stage fine-tuning process: large-scale alignment training and
+        tion of the time series is fully preserved. This is especially important                   supervised fine-tuning (SFT). Table 1 shows the datasets we use
+        in multivariate scenarios, where referencing the corresponding time                        during training.
+        series in textual form is often necessary. This process results in a se-
+        quence that reflects the multivariate structure of the data, enabling                      1 https://huggingface.co/Qwen/Qwen2.5-14B-Instruct
+                                                                             Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan Pei
+
+
+                Instruction
+                You are a time series analysis expert. In an Internet system, there are many monitoring metrics:
+                HTTP Request is a time series:                                               ; Success Rate is a time series:                                      ;…
+                Alignment Task: Seasonal
+               Q: What is the periodicity of HTTP Request? Please choose from: no periodic fluctuation, periodic fluctuation. If there is periodic fluctuation, describe the
+               fluctuation frequency and amplitude.
+               A: Periodic fluctuation, each period is around 20.58 points, and the amplitude of the periodic fluctuation is around 31.51.
+               Alignment Task: Cluster
+               Q: From the perspective of the overall trend, which metric(s) have very similar trend with HTTP Request?
+               A: Disk Read per Second, Disk Write per Second.
+               Reasoning Task: Inductive
+               Q: From the perspective of the overall trend, do HTTP Request and Success Rate have very similar trend? Just answer yes or no, and explain why they
+               are correlated/no correlated considering their physical meaning in one sentence?
+               A: No. HTTP requests show traffic load, and success rate shows response quality. They may not always match.
+               Reasoning Task: Causal
+               Q: What might be inferred about the system from the Success Rate? Choose from: The system is functioning normally; An error occurred, and it has
+               not recovered; a small number of request anomalies during a software update.
+               A: A small number of request anomalies during a software update.
+                                                        Figure 8: Example QAs in some evaluation tasks.
+
+3.5.1 Large-Scale Alignment Training. In the first stage, we per-                                     3.5.3 Training Settings. We use QA pairs as the data format for
+form large-scale alignment training using the attribute-based syn-                                    both training stages. During alignment training, we mixed in a small
+thetic time series data to establish an initial alignment between the                                 amount of IF data and found that this mitigates the decline in the
+text and time series modalities within the LLM. This stage enables                                    model’s IF ability. In the SFT stage, we mixed 30% of the alignment
+ChatTS to align textual descriptions with time series attributes                                      training dataset to reduce overfitting. The training dataset includes
+effectively. During the alignment stage, we created three datasets                                    time series with lengths ranging from 64 to 1024 to ensure that
+for large-scale training based on a series of manually designed tem-                                  ChatTS can handle varying time series lengths. Full-parameter SFT
+plates and LLM refinement. The UTS dataset includes tasks for basic                                   is used for ChatTS with DeepSpeed [2] and LLaMA-Factory [65],
+attribute descriptions of univariate time series (both global and lo-                                 with Qwen2.5-14B-Instruct [6, 56] as the base model. Inference for
+cal attribute tasks are included). The MTS-Shape dataset consists                                     both Qwen and ChatTS is also conducted with DeepSpeed.
+of multivariate data with global trend correlations designed to en-
+hance the model’s ability to analyze multivariate correlations. The                                   4      EVALUATION
+MTS-Local dataset contains multivariate data with correlated local                                    In this section, we will comprehensively evaluate the performance
+fluctuations, aiming to improve the model’s capability in analyzing                                   of ChatTS by answering the following research questions (RQs):
+local features of multivariate data. Given MTS’s more complex fea-
+                                                                                                      • RQ1. How well does ChatTS align with time series?
+ture combinations, we set the training data size for MTS and UTS
+                                                                                                      • RQ2. How does ChatTS perform in time series reasoning tasks?
+at an approximately 2:1 ratio. We conduct a dataset scaling study
+                                                                                                      • RQ3. Are attribute-based data and TSEvol effective?
+in Section 4.5 to investigate the impact of training dataset size.
+                                                                                                      • RQ4. How does the training set size affect model performance?
+                                                                                                      • RQ5. Is the time series modalilty in ChatTS truly useful?
+                                                                                                      • RQ6. Does ChatTS, with its native time-series multimodal capa-
+3.5.2 Supervised Fine-Tuning. In the second stage, we use SFT to
+                                                                                                         bilities, have advantages over agent-based methods?
+develop the LLM’s ability to perform complex question-answering
+and reasoning tasks. This stage utilizes two main types of training
+data: the datasets generated with TSEvol, designed to enhance the
+                                                                                                      4.1       Experimental Setup
+model’s question answering and reasoning ability about time series,                                   4.1.1 Evaluation Tasks. To comprehensively evaluate the model’s
+and an instruction-following (IF) dataset, constructed based on a                                     performance, we set two categories of evaluation tasks: alignment
+series of predefined templates, designed to enhance the model’s                                       tasks and reasoning tasks, following the general evaluation methods
+ability to follow specific response formats. For TSEvol, we used the                                  of multimodal LLMs [10, 37, 40]. For each type of evaluation task,
+dataset from alignment training along with LLM-generated QAs as                                       we designed a series of subtasks based on existing work. Some
+the seed data. Together, these datasets train the multimodal LLM to                                   example QAs are shown in Figure 8 (more details can be found
+respond accurately to time series-specific queries and follow task                                    in the source code). Specific tasks that rely heavily on domain-
+instructions, strengthening its capacity for complex, context-driven                                  specific knowledge (e.g., classification and etiological reasoning)
+question-answering and reasoning tasks. In both Alignment and                                         were excluded due to the lack of high-quality datasets that provide
+SFT stages, we enhance ChatTS’s numerical capabilities through                                        sufficient background information. Therefore, we primarily focused
+a series of numerical tasks. Specifically, we explicitly train the                                    on the following tasks:
+model to learn various aspects, such as maximum/minimum val-                                             Alignment tasks are divided into univariate and multivariate:
+ues, segmented averages, local features (e.g., spike positions and                                    • Univariate tasks. Identify trends, seasonality, noise, and local
+amplitudes), seasonality and trend amplitudes, and raw numerical                                         fluctuations. These tasks include both categorical subtasks and
+values at individual time points. The numerical evaluation metrics                                       numerical subtasks.
+in our experimental results further demonstrate ChatTS’s strong                                       • Multivariate tasks. Correlation and clustering. These tasks are
+performance in time series numerical analysis.                                                           all categorical.
+ChatTS: Aligning Time Series with LLMs via Synthetic Data
+for Enhanced Understanding and Reasoning
+
+
+  The reasoning tasks include inductive reasoning, deductive rea-            MCQ2 [43] is an open-source dataset [4] that includes compari-
+soning, causal reasoning, and comparison reasoning (MCQ2):                son reasoning tasks. The questions, answers, and time series in this
+• Inductive reasoning. Q&A task. Inductive summarization of               dataset are all generated by LLMs. We did not use the etiological
+  the physical meaning reflected by a uni/multivariate time series.       reasoning and forecasting datasets as they are not aligned with our
+• Deductive reasoning. True/False (T/F) task. Reasoning based             evaluation settings. Furthermore, [43] suggests that the settings of
+  on a predefined condition in conjunction with univariate time           the MCQ1 dataset are unsuitable for evaluating the performance of
+  series.                                                                 time series reasoning, so we also did not adopt it. Considering the
+• Causal reasoning. Multiple-choice task. Based on univariate             inference cost, we randomly sampled 100 questions.
+  time series, select the most likely cause.
+• Comparison reasoning (MCQ2). Multiple-choice task. Com-                 4.1.4 Baselines. Based on different modalities, we categorized the
+  pare two time series and select the correct answer.                     baseline methods into the following types:
+More details about the evaluation tasks can be found in the source        • Text-Based: These methods convert time series arrays into
+code and the evaluation dataset.                                            textual prompts as inputs for LLMs. We choose several main-
+                                                                            stream LLMs as our base model (GPT-4o/GPT-4o-mini/GPT-4-
+4.1.2 Evaluation Metrics. For categorical tasks in alignment evalu-
+                                                                            Turbo/QWen2.5-14B-Instruct) for evaluation.
+ation, we match labels from the responses of LLMs using rule-based
+                                                                          • Vision-Based: These methods plot time series and input them
+matching and use F1-Score as the metric. For numerical tasks in
+                                                                            into visual MLLMs. We choose mainstream vision MLLMs (GPT-
+alignment evaluation, we extract numbers from the responses of
+                                                                            4o/GPT-4o-mini) for evaluation.
+LLMs and use relative accuracy (1.0 - relative error) as the metric:
+                                                                        • Agent-Based: These methods employ the ReAct [57] framework
+                                      |𝑉𝑎𝑛𝑠𝑤𝑒𝑟 − 𝑉𝑙𝑎𝑏𝑒𝑙 |                   to interact with multiple tools to analyze the time series. The
+     𝑟𝑒𝑙𝑎𝑡𝑖𝑣𝑒_𝑎𝑐𝑐𝑢𝑟𝑎𝑐𝑦 = max 1.0 −                        , 0.0
+                                            |𝑉𝑙𝑎𝑏𝑒𝑙 |                       tools used include single-point/range query, STL decomposition,
+We set a minimum value of 0.0 for relative accuracy to mitigate             anomaly detection (autoregression AD in adtk [1]), and classifi-
+the impact of outlier results. For Q&A tasks in inductive reasoning,        cation (Rocket [18]) for UTS; trend/fluctuation correlation (based
+answers are evaluated using RAGAS [19], a keyword-matching                  on Pearson correlation & rules), multivariate version of AD and
+approach through LLM-based fuzzy matching. T/F and MC tasks                 classification for MTS. We choose GPT-4o/GPT-4o-mini for the
+are directly evaluated through choice matching and the accuracy is          agent. More details about the tools’ implementation can be found
+calculated. All evaluation metrics are the higher, the better.              in the source code. We also conducted additional experiments to
+                                                                            explore further the capabilities of agent-based methods (Section
+                                                                            4.7), which studies the impact of tool accuracy.
+               Table 2: Tasks in Evaluation Dataset
+ Dataset                         Tasks                      # Questions
+                                                                          4.1.5 Implementation. For GPT-based models, we used OpenAI’s
+                                                                          API to infer and track token consumption. For ChatTS and QWen-
+              Alignment (Trend, Season, Noise, Local,                     based models, the training and inference are conducted locally on
+    A        Correlation, Cluster), Reasoning (Inductive,      525
+                                                                          8×A800 GPUs. The token consumption for ChatTS is calculated
+                         Deductive, Causal)
+                                                                          after the “Reorder & Concat” step.
+              Alignment (Trend, Season, Noise, Local,
+     B                                                         1,616
+             Correlation, Cluster), Reasoning (Inductive)
+                                                                          4.2    RQ1. Alignment Tasks
+  MCQ2            Reasoning (Comparison - MCQ2)                100
+                                                                          The evaluation results on alignment tasks are shown in Table 3.
+                                                                          ChatTS consistently outperforms all baseline models across nearly
+4.1.3 Evaluation Datasets. Our evaluation is conducted on three           all tasks and datasets, achieving 46.0%–75.9% improvement in cate-
+datasets (see Table 2) to test the model’s performance across both        gorical metrics and 80.7%–112.7% in numerical metrics compared
+real-world and synthetic time series scenarios. Dataset A and B are       to industry-leading models like GPT-4o. This demonstrates that
+collected by us, and Dataset MCQ2 is an open-source dataset [43].         synthetic training data can effectively enable strong alignment with
+   Dataset A includes real-world time series data collected from          real-world time series.
+multiple domains, including AIOps [35], weather [3], the NAB                  Among the baselines, GPT-4o (Vision) performs best, suggesting
+(Numenta Anomaly Benchmark) [7], and Oracle system metrics [34].          vision-based MLLMs possess some capability to analyze shape char-
+We manually label and collect a total of 525 questions, including         acteristics of time series, though they remain limited by image reso-
+both alignment tasks and reasoning tasks.                                 lution when interpreting details. Text-based methods struggle with
+   To expand the size of the evaluation set, we used the attribute-       the constraints of prompt length, while agent-based approaches
+based time series generator introduced in ChatTS to generate a            performed below expectations (see Section 4.7 for detailed analysis).
+series of time series and created alignment Q&A by applying a set             ChatTS’s advantages are particularly pronounced in multivariate
+of templates. We also develop a set of reasoning questions with           tasks, where text-based models face challenges with excessively
+LLM, resulting in a larger-scale Dataset B containing 1,616 questions.    long prompts and vision-based models struggle to distinguish fea-
+Considering the complexity of reasoning tasks, we have included           tures across multiple time series plotted simultaneously. In contrast,
+only inductive reasoning tasks in the reasoning tasks of this dataset     ChatTS’s context-aware time series encoding accurately analyzes
+to ensure the quality of the questions.                                   referenced time series based on contextual information.
+                                                                       Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan Pei
+
+
+Table 3: Comparison of different models in terms of performance and cost of input tokens on alignment tasks (*image tokens
+are converted in some models according to price). “Cate.” and “Num.” denotes categorical and numerical tasks respectively.
+F1-Score and relative accuracy are used in evaluating categorical and numerical tasks, respectively.
+  Dataset      Type    Model                 Trend            Season              Noise             Local        Corr.    Clus.      Overall        Tokens     Est. Cost
+                       Task              Cate.    Num.     Cate.    Num.      Cate.   Num.      Cate.   Num.     Cate.    Cate.   Cate.    Num.                    $
+                       GPT-4o-mini       0.585    0.752    0.649    0.264    0.952    0.312     0.263   0.187    0.357    0.254   0.464    0.310     1.3M         0.20
+                       GPT-4o            0.585    0.882    0.811    0.768    0.905    0.153     0.379   0.256    0.476    0.333   0.542    0.371     1.3M         3.25
+               Text
+                       GPT-4-Turbo       0.526    0.699    0.649    0.131    0.900    0.339     0.303   0.247    0.417    0.269   0.490    0.353     1.3M         13.0
+                       QWen2.5-14B       0.707    0.709    0.622    0.205    0.833    0.231     0.137   0.099    0.571    0.349   0.464    0.241     1.3M         0.35
+       A               GPT-4o-mini       0.610    0.501    0.432    0.205     0.667   0.201     0.242   0.184    0.357    0.330   0.404    0.248     2.2M*        0.33
+              Vision
+                       GPT-4o            0.659    0.613    0.811    0.559     0.810   0.248     0.537   0.414    0.476    0.480   0.609    0.436    0.13M*        0.32
+                       GPT-4o-mini       0.559    0.773    0.595    0.270     0.714   0.105     0.400   0.212    0.381    0.361   0.469    0.309     3.0M         0.45
+               Agent
+                       GPT-4o            0.537    0.650    0.405    0.000     0.595   0.088     0.232   0.136    0.429    0.417   0.390    0.220     2.7M         6.75
+                TS     ChatTS            0.927    0.874    0.973    0.849     0.857   0.511    0.895    0.805    0.905   0.782    0.889    0.788     0.08M        0.02
+                       GPT-4o-mini       0.619    0.716    0.711    0.317     0.427   0.198     0.145   0.091    0.335    0.269   0.336    0.217     4.5M         0.67
+                       GPT-4o            0.690    0.825    0.732    0.474     0.573   0.331     0.191   0.136    0.324    0.281   0.366    0.284     4.5M         11.3
+               Text
+                       GPT-4-Turbo       0.667    0.732    0.667    0.345     0.348   0.067     0.188   0.133    0.438    0.369   0.385    0.259     4.5M         45.0
+                       QWen2.5-14B       0.711    0.669    0.705    0.217     0.256   0.094     0.111   0.082    0.402    0.276   0.339    0.193     4.5M         1.22
+       B               GPT-4o-mini       0.679    0.240    0.814    0.453     0.305   0.238     0.141   0.081    0.327    0.307   0.347    0.142    11.4M*        1.71
+              Vision
+                       GPT-4o            0.702    0.361    0.938    0.589     0.610   0.398     0.375   0.265    0.367    0.389   0.472    0.311    0.56M*        1.40
+                       GPT-4o-mini       0.612    0.591    0.455    0.605     0.375   0.000     0.043   0.022    0.654    0.585   0.372    0.125     8.5M         1.27
+               Agent
+                       GPT-4o            0.532    0.586    0.619    0.658     0.391   0.262     0.551   0.287    0.500    0.464   0.490    0.370     7.2M         10.8
+                TS     ChatTS            0.976    0.902    1.000    0.930    0.927    0.572    0.828    0.752    0.818   0.834    0.862    0.787     0.34M        0.09
+
+
+Table 4: Reasoning tasks. Inductive Reasoning is in the form                              reflected in time series. Moreover, ChatTS also achieved notable im-
+of Q&A, evaluated with RAGAS. Other tasks are MC or T/F                                   provements in other reasoning tasks, which indicates that even with
+questions, which are evaluated with accuracy.                                             only synthetic training data, the model can be equipped with good
+  Type       Model            Induct.   Deduct.   Causal    MCQ2       Average            reasoning capabilities related to time series. This further demon-
+             GPT-4o-mini      0.333      0.326     0.576    0.480        0.429            strates the effectiveness of the proposed attribute-based time series
+             GPT-4o           0.336      0.628     0.685    0.470        0.530            generation method and TSEvol.
+   Text
+             GPT-4-Turbo      0.280      0.581     0.644    0.490        0.499
+             QWen2.5-14B      0.184      0.605     0.348    0.320        0.364
+
+  Vision
+             GPT-4o-mini
+             GPT-4o
+                              0.323
+                              0.322
+                                         0.442
+                                         0.605
+                                                   0.495
+                                                   0.652
+                                                            0.480
+                                                            0.490
+                                                                         0.435
+                                                                         0.517
+                                                                                          4.4      RQ3. Studies of Synthetic Training Data
+             GPT-4o-mini      0.219      0.357     0.692    0.340        0.402
+                                                                                          To evaluate the effectiveness of attribute-based time series genera-
+  Agent                                                                                   tion and TSEvol, we conducted ablation studies with two variants:
+             GPT-4o           0.167      0.553     0.696    0.380        0.449
+      TS     ChatTS           0.518     0.744     0.804     0.600       0.667             (1) w/o Attribute-Based, where all training datasets were replaced by
+                                                                                          GPT-generated datasets from [43], containing time series directly
+                                                                                          generated using GPT-produced Python code with corresponding
+                                                                                          GPT-generated Q&As; (2) w/o TSEvol, where SFT datasets were
+   From the efficiency perspective, ChatTS’s native multimodal                            replaced with data directly generated using an LLM without the
+encoding requires significantly fewer tokens to represent time series                     evolutionary approach, though with prompts designed to encour-
+data, resulting in much lower costs compared with the baselines                           age diversity. Both variants included the instruct-following dataset
+(see Table 3). This shows both the effectiveness and efficiency of                        to ensure fair comparison.
+treating time series as a native modality.                                                   The evaluation results in Figures 9 and 10 reveal that mod-
+                                                                                          els trained on GPT-generated data performed significantly worse
+                                                                                          across alignment tasks, particularly for local fluctuation detection
+4.3        RQ2. Reasoning Tasks                                                           and numerical analysis. This suggests the attribute-based genera-
+The comparison results of our model and the baseline models for                           tion method better captures precise feature details and numerical
+Reasoning Tasks are shown in Table 4. Reasoning tasks are typically                       values. Meanwhile, models trained with TSEvol demonstrated sub-
+more complex and better aligned with real-world application sce-                          stantial improvements in reasoning capabilities and modest gains
+narios than alignment tasks. It can be found that ChatTS achieves                         in alignment tasks, indicating that TSEvol effectively diversifies
+consistent improvements over the baseline models across all rea-                          question formats and generates tailored Q&As for different time
+soning tasks. In the Inductive Reasoning task, ChatTS achieved a                          series attributes, enhancing overall model performance.
+34.5% improvement compared to the baseline models, indicating
+that ChatTS can accurately associate time series attributes with
+their physical meanings in the real world. This demonstrates that                         4.5      RQ4. Scaling of Training Dataset
+the proposed attribute-based time series generation effectively en-                       Figure 11a illustrates the relationship between ChatTS performance
+ables the model to understand the patterns of the physical world                          and training data size. The results show that increasing the Phase 1
+ChatTS: Aligning Time Series with LLMs via Synthetic Data
+for Enhanced Understanding and Reasoning
+
+
+                                                                                     Ours               w/o TS Modality           w/o TSEvol                      w/o Attribute-Based Data
+                            Trend                                        Season                                  Noise                                   Local                                   MTS                                      Overall
+         1.0                                              1.0                                     1.0                              1.0                                          1.0                                     1.0
+
+         0.5                                              0.5                                     0.5                              0.5                                          0.5                                     0.5
+
+         0.0                                              0.0                                     0.0                              0.0                                          0.0                                     0.0
+                     Cate.         Num.                               Cate.        Num.                     Cate.        Num.                    Cate.           Num.                    Corr.         Clus.                       Cate.          Num.
+                                                                                                                           (a) Dataset A
+                                                                                     Ours               w/o TS Modality          w/o TSEvol                       w/o Attribute-Based Data
+                            Trend                                        Season                                 Noise                                    Local                                   MTS                                      Overall
+        1.0                                               1.0                                     1.0                             1.0                                           1.0                                     1.0
+
+        0.5                                               0.5                                     0.5                             0.5                                           0.5                                     0.5
+
+        0.0                                               0.0                                     0.0                             0.0                                           0.0                                     0.0
+                     Cate.        Num.                                Cate.        Num.                     Cate.        Num.                    Cate.           Num.                    Corr.        Clus.                        Cate.         Num.
+                                                                                                                           (b) Dataset B
+                                                                                            Figure 9: Ablation studies on alignment tasks.
+                     Ours              w/o TS Modality                  w/o TSEvol            w/o Attribute-Based Data
+                                                                                                                                     extensive multivariate training data, text-only LLMs still struggle
+                                                                  Reasoning                                                          to handle multivariate problems due to excessively long context
+               1.0
+                                                                                                                                     lengths because of severe hallucinations and inaccurate responses.
+               0.5                                                                                                                   Additionally, to compare the performance gains between text-based
+                                                                                                                                     LLMs and TS-MLLMs, we fine-tuned various sizes of the Qwen2.5
+               0.0
+                             Induct.                 Deduct.           Causal          MCQ2              All                         series text-based LLMs using the text version of the ChatTS train-
+               Figure 10: Ablation studies on reasoning tasks.                                                                       ing dataset (as shown in Figure 11b). Experimental results indicate
+                                                                                                                                     that even when fine-tuning the larger Qwen2.5-32B text model, the
+           Cate.        Num.                    Cate.          Num.       Reason          Text LLMs + SFT       ChatTS (14B)
+                                                           Overall                   Univariate             Multivariate
+                                                                                                                                     results still do not outperform those of ChatTS (14B), which has
+          Dataset Scaling
+                                                                                                                                     native multimodal capabilities. This further validates the impor-
+0.75                                           0.8
+0.50                                   Score
+                                                                                                                                     tance of native multimodal capabilities in ChatTS, whether in the
+                                               0.6
+0.25                                                                                                                                 accuracy for MTS analysis or cost efficiency (see Table 3).
+       10%50% 100%          200%                     7B     14B      32B 7B   14B      32B 7B   14B      32B
+        Training Dataset Scaling                          Model Size        Model Size        Model Size
+                                                                                                                                     4.7                RQ6. Study of Agent-Based Methods
+   (a) Train Data                                              (b) SFT on Text-Based LLMs
+Figure 11: Scaling of training dataset and text-based LLMs.                                                                                       Categorical        Numerical                   Inductive Reasoning                      Agent         ChatTS
+                                                                                                                                                             Overall                                Univariate                             Multivariate
+                                                                                                                                                1.0
+training dataset size from 10% to 100% of the current size signifi-                                                                             0.8
+                                                                                                                                                0.6
+cantly improves performance, but further expansion yields minimal                                                                       Score   0.4
+                                                                                                                                                0.2
+gains. Thus, our chosen training set size is well-balanced, ensuring                                                                            0.0
+                                                                                                                                                      0.4 0.5 0.6 0.7 0.8 0.9 1.0 0.4 0.5 0.6 0.7 0.8 0.9 1.0 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+sufficient data for effective alignment while avoiding too much                                                                                               Tool Accuracy               Tool Accuracy               Tool Accuracy
+resource consumption during training.
+                                                                                                                                                                       (a) Agent with different tool accuracy.
+                                                                                                                                                  All Tools          w/o STL              w/o MTS AD&CL                Origin (Agent)            Misunderstanding
+4.6            RQ5. Study of Time Series Modality                                                                                                 w/o AD&CL          w/o All MTS Tools    w/o Corr                     Error Tool Using          Hallucination
+
+To investigate the effectiveness of the time series multimodality                                                                                             Univariate                 Multivariate               Accuracy w/o Specific Errors          Portion
+                                                                                                                                     1.0                                                                      1.0                                   1.0
+in ChatTS, we performed an ablation study based on a text-only
+version of ChatTS (w/o TS Modality). We remove the time series                                                                       0.5                                                                      0.9                                   0.5
+encoder in ChatTS (i.e. using the original QWen-2.5 model) and
+use the same training data with ChatTS (the time series arrays are                                                                   0.0                                                                      0.8                                   0.0
+                                                                                                                                                      Cate.     Num.       Reason        Cate.     Reason                Cate.            Num.
+encoded into text) in model training. The experimental results are
+                                                                                                                                                  (b) Agent w/o different tools.                                     (c) Study of error cases.
+shown in Figure 9 and Figure 10. Overall, the model using only the
+text modality performs significantly worse than the original ChatTS
+model. This indicates that encoding multimodal information is cru-                                                                   Figure 12: Agent with “Perfect Tools”. Even with perfect tools,
+cial for accurately capturing both shape and numerical information.                                                                  Agent still makes errors (e.g., Error Tool Using)
+However, in certain sub-evaluation metrics (e.g., noise), the text-                                                                     Agent-based methods are widely applied but showed suboptimal
+only model outperforms the multimodal ChatTS, suggesting that                                                                        performance in our evaluations (RQ1, RQ2) due to several main
+text modality models still have strong capabilities for identifying                                                                  issues: (1) tool inaccuracy (2) error tool use, and (3) response for-
+small fluctuations. In MTS tasks, the text-only model is nearly in-                                                                  matting that caused parsing failures. To explore their performance
+capable of answering any questions. This implies that even with                                                                      upper bound, we conducted detailed analyses:
+                                                             Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan Pei
+
+
+(1) Parsing Failures: We exclude responses that failed to parse,                                                     Basic Shape Analysis
+    ensuring all outputs were valid.                                                                                                         NYC taxi passengers
+(2) Perfect Tools: We design “perfect tools” with controlled accu-
+    racy through time series labels in the synthetic dataset (Figure
+    12a). The accuracy of the perfect tools can be strictly controlled.           User: Please analyze the trend, seasonality and local changes.
+(3) Tool Ablation: We perform ablation studies (Figure 12b) to                    ChatTS: The overall trend contains multiple segments: From point 0 to point 122, there is
+                                                                                  an increasing trend. From point 122 to point 255, there is a decreasing trend. The time series
+    evaluate the impact of individual tools on accuracy.                          is showing periodic fluctuation: the amplitude of the periodic fluctuation is around 22524.
+                                                                                  Each fluctuation period is approximately 49.6 points. In terms of local characteristics, an
+(4) Error Analysis: We categorize agent errors into three types:                  upward spike occurred between point 139 and point 142, with the time series value rapidly
+    Error Tool Using, Misunderstanding, and Hallucination. We                     rising from around 27953 to around 40136 and then quickly falling back to around 25744.
+    analyze their impact on performance (Figure 12c).                                                                  Statistic Analysis
+   Our sensitivity analysis (Figure 12a) shows that agent perfor-                                                                   Max          Advertisement CPC
+mance is highly sensitive to tool accuracy, especially in the [0.9, 1.0]
+range. For categorical and numerical tasks, the agent with perfect
+tools slightly outperforms ChatTS on UTS tasks but lags behind                                                                              Min
+                                                                                  User: What's the maximum and minimum values and where are they?
+in MTS tasks. For agents, MTS tasks typically require more tool
+                                                                                  ChatTS: The maximum value in this time series is 92.9, which occurs around point 129. The
+calls and reasoning, which places higher demands on LLMs’ tool-                   minimum value is 6.93, which occurs around point 169.
+using and summarization capabilities. In contrast, ChatTS processes                                                    OOD Fluctuation
+multiple time series natively, reducing complexity and improving
+                                                                                                                                                 Traffic Occupancy
+accuracy for MTS tasks. The tool ablation study (Figure 12b) shows
+that Agent depends heavily on both tool precision and complete-
+ness, particularly for MTS tasks. Even with all tools available, agents            User: What is the local fluctuations of this time series? Create a name for this to better
+frequently fail to invoke the correct tool at the right time (e.g., using          describe it if the following types cannot accurately describe it: [upward spike, downward spike,…]
+the classification tool rather than the anomaly detection tool to                  ChatTS: Starting from point 100, the time series value rises from around 4.37 to around
+                                                                                   28.82, forms an upward convex with an amplitude of about 22.94, and then falls back to
+identify the position of a spike), limiting their effectiveness. Error             around 5.08. This local fluctuation is named as "Convex-Shaped Elevation" because it
+                                                                                   captures the essence of a gradual rise followed by a sharp decline, which is not fully
+analysis (Figure 12c) reveals “Error Tool Using” as the largest source             captured by existing terms like increase after upward spike or wide upward spike.
+of errors. When these cases are excluded, agent accuracy exceeds
+95%, surpassing ChatTS. This validates the correctness of the imple-                Figure 13: Case studies on real-world time series data.
+mentation of perfect tools and the model, which also shows their
+limitations: Agents may struggle with tool selection and reasoning.             with the overall shape of a convex. This demonstrates ChatTS’s
+   In summary, while perfect tools improve agent performance,                   inherent understanding of time series patterns themselves, rather
+challenges such as tool selection errors, misunderstandings, and                than simply repeating representations from the training set. This
+hallucinations persist, leaving agents less effective than ChatTS for           indicates that ChatTS has a certain capacity to generalize to real-
+complex time series tasks.                                                      world data despite being trained exclusively on synthetic data.
+
+5 CASE STUDIES AND APPLICATIONS                                                 5.2       Real-World Application: DB Operation
+5.1 Case Studies on Real-World Data                                             To illustrate the performance of ChatTS with its native time se-
+To investigate the performance of ChatTS on real-world time series,             ries multimodal capability in real-world applications, we present a
+we perform several case studies with challenging questions, the                 typical Oracle DB operation application through an MTS-related
+results are shown in Figure 13.                                                 multi-turn dialogue with ChatTS. In this case study, an Oracle DB
+                                                                                operator has identified a recent anomaly and retrieves several time
+5.1.1 Shape and Statistical Analysis. The “Basic Shape Analysis”                series metrics from the monitoring system, inputting them into
+case demonstrates ChatTS’s capability to analyze an NYC taxi pas-               ChatTS for analysis (as shown in Figure 14)2 . By querying ChatTS,
+senger time series with complex periodic fluctuations and local                 the operator obtains the names of all metrics with anomalies. Then,
+anomalies. ChatTS accurately identifies multiple trend segments,                to accurately pinpoint the root cause, the operator provides ChatTS
+the periodicity, and the upward spike along with their amplitudes.              with a textual document titled “Oracle Database Troubleshooting
+This shows ChatTS’s capability to capture both global patterns and              Rulebook” and requests ChatTS to analyze the root cause and prop-
+localized features. In the “Statistic Analysis” case, ChatTS analyzes           agation of the system failure step-by-step, combining insights from
+advertisement CPC data with misleading scaling. Despite potential               the rulebook and the time series anomalies. Notably, the rulebook is
+confusion in the minimum value, ChatTS correctly identifies the                 entirely in text form, without a strictly structured format, which is
+max/min values and their positions. These cases show ChatTS’s                   helpful for the operators to share their expert experience effectively.
+robustness in statistical analysis in complex real-world time series.           The responses of ChatTS show that it can accurately identify anom-
+5.1.2 OOD Fluctuation Recognition. The “OOD Fluctuation” case                   alies and amplitudes in multivariate time series. By leveraging “the
+presents ChatTS with a traffic occupancy time series containing                 metric with the largest fluctuation” in the rulebook, ChatTS can
+an OOD fluctuation pattern absent from its training data. However,              further reason about the root cause and failure propagation path.
+ChatTS accurately describes it as a “Convex-Shaped Elevation”,                  2 DB Metrics can be input into ChatTS through API. The system implementation details
+characterized by a gradual rise followed by a sharper decline along             are out of the scope of this paper.
+ChatTS: Aligning Time Series with LLMs via Synthetic Data
+for Enhanced Understanding and Reasoning
+
+
+           System: We have 6 metrics collected from the Oracle database. The          all three “hot events” from the time series. Furthermore, ChatTS
+           metrics are as follows: DB File Operations I/O is <ts><ts/>…
+                                                                                      can precisely identify the highest point and its position in the time
+            Disk File Operations I/O
+                                                                                      series based on the numerical values of the local peaks and perform
+            Buffer Busy Waits                                                         event analysis according to the physical meaning of the series. This
+                                                                                      demonstrates that ChatTS can accurately recognize both shape and
+            DB File Sequential Read
+                                                                Agent Study (Complex Caption
+                                                                                      numericalCase)
+                                                                                                 characteristics of time series and perform reasoning and
+            GC Buffer Busy Acquire                                                    analysis based on vague user input.
+            Library Cache Lock
+                                                                                                    5.4       Baseline Comparison
+            Log File Sync
+
+
+                                                                                                              Time Series Caption about Seasonality, Trend and Local Fluctuations
+  User: We found a fault in the Oracle database at around point 225 in the time series. Please
+  first help me identify which metrics are anomalous near this point.
+  ChatTS: The anomalous metrics are “Buffer Busy Waits”, “DB File Sequential Read”, and
+  “Log File Sync”. [Detailed Information …]
+                                                                                                     Question: What is the trend of this time series? Please choose from […] and describe the value of trend
+                 Reference: Oracle Database Troubleshooting Rulebook                                 change from left to right. Answer Format: …
+                 - For metrics in DBFile, Cache, LogFile, GC, the metric with the largest
+                 fluctuation should more likely to be the root cause.                                Agent (GPT-4o): The time series exhibits multiple trend segments: an increase from 0 to 30, decrease
+                                                                                                     from 30 to 60, increase from 60 to 90, decrease from 90 to 120 […] and a significant decrease towards
+  User: Please read the above rulebook and analyze the anomalous metrics step by step.               the end. It has a periodic component with a period of 14, with seasonal values ranging from -2.13 to 3.73.
+  You should tell me which one should be the root cause, and how the failure propagates.             Local anomalies occur at points 13 and 136, classified as an increase after an upward spike and a wide
+                                                                                                     downward spike, respectively.
+  ChatTS: The anomalous of "buffer busy waits" is 16; The anomalous of "db file sequential
+  read" is 865; The anomalous of "log file sync" is 26453. Therefore, according to the               Vision (GPT-4o): The time series displays a significant spike from point 0 to point 10. It remains
+                                                                                                     relatively steady with minor oscillations until point 130, where a small spike occurs. The series shows
+  rulebook, the root cause should be "log file sync" because it has the largest fluctuation. The     irregular fluctuations and settling behavior towards the end, indicating a complex dynamic with local
+  failure likely starts with issues in the LogFile system, which then affects the DBFile as the      spikes and noise rather than clear periodicity.
+  database tries to manage transactions and data access, leading to anomalies in buffer busy
+                                                                                                     Ours (ChatTS): The time series is showing periodic fluctuation: the amplitude of the periodic
+  waits and db file sequential read.                                                                 fluctuation is 10.3. Each fluctuation period is approximately 46.7 points. At the beginning, from point 0
+                                                                                                     to 12, the trend increase with values from -9.17 to -7.52; from point 12 to point 15, an upward spike with
+Figure 14: An application case of ChatTS in a failure diagnosis                                      an amplitude of 46.01 occurred; from point 15 to 133, the trend increase with values from -7.25 to 1.37;
+                                                                                                     from point 133 to point 135, an upward spike with an amplitude of 17.06 occurred; from point 135 to 174,
+with an Oracle database system.                                                                      the trend increase with values from 0.34 to 1.32, and then the trend of the time series changes to decrease;
+                                                                                                     finally, from point 174 to 255, the trend decrease with values from 1.32 to -15.15.
+
+
+                                                                                                                  (a) Case Study on Complex Time Series Caption
+This further shows that ChatTS can effectively utilize its alignment
+capability to analyze time series and perform complex analysis in                                                                  Overall Shape & Statistic Analysis
+
+real-world applications with its robust reasoning ability.
+                                                                                                                    Cropped
+5.3      Real-World Application: Detailed Analysis                                                                  Original
+
+
+
+
+          System: On Twitter, the discussion volume of AAPL is as follow: <ts><ts/>
+                                                                                                     Question: What is the trend of this time series? Please choose from […] and describe the value of
+                Twitter_volume_AAPL                                                                  trend change from left to right. Answer Format: …
+                                                                                                     Label: Decrease, the starting point value is around 47.63, and the trend change value from left to
+                                                                                                     right is around -9.53.
+                                                                                                     Vision (GPT-4o): Steady, the starting point value is around 40, and the trend change value from left
+                                                                                                     to right is around -0.2.
+                                                                                                     Text (GPT-4o): Increasing, the starting point value is around 47.635, and the trend change value
+  User: Please analyze all the events shown in the time series. And analyze what may happen          from left to right is around 0.28.
+  according to your knowledge.
+                                                                                                     Ours (ChatTS): Decrease, the starting point value is around 47.00, and the trend change value from
+  ChatTS: There are 3 major events shown in the time series: An upward spike with an                 left to right is around -10.30.
+  amplitude of 2737 occurred between point 16 and point 18; An upward spike with an
+  amplitude of 1858 occurred between point 51 and point 54; A slow rise followed by a slow
+  decline between point 124 and point 145, forming a wide upward spike. These events may                                              (b) Case Study on Trend
+  indicate significant interest or reactions to specific events, such as the release of new Apple
+  products or major market news affecting the company's stock.
+  User: Where is the highest point? According to your knowledge, what may happen?                   Figure 16: Case studies on different types of LLMs in time
+  ChatTS: The highest point is around point 130, with a value of 12579. This significant peak       series alignment tasks.
+  could be associated with a major event, such as the release of a highly anticipated Apple
+  product or a significant announcement that greatly impacted public interest on Twitter.
+                                                                                                    5.4.1 Seasonality, Trend and Fluctuations. As shown in Figure 16a,
+Figure 15: An ChatTS application case in detailed time series.                                      due to tool inaccuracy, the Agent fails to identify the periodicity.
+                                                                                                    This further led the Agent to misinterpret periodic patterns as dif-
+   Another typical application of ChatTS is conducting a detailed                                   ferent trend changes, resulting in errors in trend analysis. Moreover,
+analysis of time series features, combined with LLMs’ knowledge                                     the LLM does not realize the problem or attempt to correct it. Sim-
+and reasoning capabilities to perform simple reasoning and question                                 ilarly, the Vision-based model also exhibited errors in analyzing
+answering. In Figure 15, we present a case study of time series                                     local fluctuations and periodicity. In contrast, ChatTS, with its time-
+analysis on the discussion intensity of AAPL-related topics on                                      series modality awareness, accurately captures the periodicity and
+Twitter, using data from NAB [7]. Notably, even without explicit                                    trend transitions. This case shows a key limitation of agent-based
+instructions from the user to identify local fluctuations, ChatTS can                               tools: the precision of tools alone cannot overcome the cascading
+accurately infer the user’s intent and determine the timestamps of                                  errors caused by the initial error of time series patterns.
+                                                            Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan Pei
+
+
+5.4.2 Detailed Trend Analysis. Figure 16b presents a misleading                question answering and reasoning applications. Moreover, some
+case where the original image suggests a steady trend. However, in             studies employ vision-based multimodal LLMs for time series pre-
+the cropped plot that ignores the two spikes, there is a significant           diction [14] and anomaly detection [69]. This approach aligns with
+decreasing trend. Due to the subtle nature of trends displayed in              the vision-based LLM methods discussed in this paper but is signif-
+the time series images, the Vision-based model incorrectly classi-             icantly constrained in its ability to analyze time series.
+fied them as steady. Similarly, text-based models, while identifying
+starting values, fail to identify the global shape of the time series.         7      LIMITATION AND FUTURE WORK
+In contrast, ChatTS captures both the overall trend and numerical
+                                                                               Due to the limited existing research on time series understanding
+details accurately due to its native time series encoding capabilities.
+                                                                               and reasoning, although ChatTS has explored an effective approach,
+                                                                               we believe it still has a number of limitations. First, while our ex-
+6   RELATED WORK                                                               periments demonstrate that synthetic data can achieve satisfactory
+                                                                               alignment and reasoning performance, we believe that real-world
+Multimodal LLMs (MLLMs). MLLMs have developed rapidly in
+                                                                               data is essential for further enhancing the capabilities of TS-MLLMs.
+recent years and found extensive applications [58, 62]. A signifi-
+                                                                               We hope more relevant datasets will emerge in the future. Second,
+cant body of research integrates different types of data to achieve
+                                                                               although we found that a simple MLP encoder performs well due to
+multimodal fusion, including images [9, 31, 37], videos [32, 41, 63],
+                                                                               the relatively simple structure of time series data, exploring more
+audio [16, 48], and graphs [45, 64]. These models have been applied
+                                                                               effective methods for multimodal encoding and integration remains
+across diverse domains, with image-based question answering and
+                                                                               a valuable research direction. Third, despite labeling hundreds of
+reasoning representing an important research direction. Many stud-
+                                                                               real-world time series and using 14 evaluation metrics for evalu-
+ies leverage vision-based LLMs for image reasoning tasks [25, 40],
+                                                                               ation, we believe that this is still insufficient for a comprehensive
+fully utilizing the natural language understanding and reasoning
+                                                                               evaluation of TS-MLLMs. More labeled real-world data is needed
+capabilities of large language models. However, in the field of time
+                                                                               for a more comprehensive evaluation. Finally, while this work fo-
+series, despite the existence of numerous works (as discussed be-
+                                                                               cuses on understanding tasks like language alignment and reasoning,
+low) that combine time series data with LLMs, research on aligning
+                                                                               MLLM-based time series generation is also worth exploring. Thus,
+LLMs with time-series modalities with time-series modalities re-
+                                                                               developing a multimodal model that can generate time series based
+mains limited. This limitation is primarily due to the scarcity of
+                                                                               on textual input is an important area for future research.
+high-quality multimodal datasets that combine time series with
+textual information [15, 27, 43]. As a result, the development of
+time series-specific MLLMs for question-answering and reasoning                8      CONCLUSION
+tasks has lagged behind other modalities.                                      Understanding and reasoning are important for real-world time
+Time Series Question Answering (TSQA). With the rapid devel-                   series applications, but research is limited due to the lack of time
+opment of LLMs, TSQA systems have combined the reasoning ca-                   series-text data. In this paper, we propose ChatTS, the first TS-
+pabilities of LLMs with time series analysis to enable more efficient          MLLM with multivariate time series as input for complex time
+cross-domain decision-making and complex task handling [27].                   series QA and reasoning, which is fine-tuned on synthetic data.
+Time series question-answering systems have been explored in var-              We introduce an attribute-based time series generation method,
+ious fields, such as AIOps [52, 68], IoT [22, 54], healthcare [44, 60],        which not only generates diverse time series but also provides
+finance [28, 42], and traffic [17, 29]. However, these methods are of-         complete and precise attribute descriptions. Building on this, we
+ten limited to agent-based [57] and retrieval-augmented generation             further propose TSEvol, which leverages rich attribute combina-
+(RAG) [30] approaches, lacking a comprehensive understanding of                tions from the attribute pool and Evol-Instruct to generate diverse
+time series and sufficient reasoning capabilities. Although some               and accurate QAs, enhancing the model’s capabilities in complex
+recent studies [15] have attempted to leverage temporal multimodal             question answering and reasoning. To comprehensively evaluate
+approaches for time series reasoning tasks, they typically rely on             the capabilities of our model, we collect datasets that include real-
+task-specific corpora. They are trained and evaluated on specific              world time series data, covering the evaluation of both alignment
+tasks (e.g., classification tasks or forecasting tasks), lacking multi-        tasks and reasoning tasks. Evaluation results show that our model
+variate analysis capabilities. Compared to the research on multi-              achieves significant improvements, outperforming baselines by
+modal question answering in fields like images and videos, time                46.0% in alignment tasks and 25.8% in reasoning tasks. These find-
+series question answering still lacks robust multimodal alignment              ings demonstrate the effectiveness of our approach in bridging the
+methods and evaluation frameworks [10, 43]. Therefore, in contrast             gap between time series data and natural language understanding.
+to existing studies, this paper is the first to propose a comprehensive        We have open-sourced the source code, trained model weights,
+time series modality alignment and fine-tuning process, evaluated              and the evaluation datasets for reproduction and future research:
+using multiple alignment and reasoning tasks.                                  https://github.com/NetManAIOps/ChatTS.
+LLM + Time Series. In addition to the research above, many
+studies have combined LLMs with time series for various down-                  REFERENCES
+stream tasks, leveraging the powerful capabilities of LLMs [11–                 [1]   2019. Anomaly Detection Toolkit. https://github.com/arundo/adtk
+13, 23, 26, 38, 51, 67]. However, while these models are using LLMs             [2]   2020. DeepSpeed. https://www.deepspeed.ai/
+                                                                                [3]   2023. Weather Dataset. https://www.bgc-jena.mpg.de/wetter/
+as backbones, they are designed for specific downstream tasks and               [4]   2024. MCQ2 Dataset. https://github.com/behavioral-data/TSandLanguage
+lack language alignment capabilities, making them unsuitable for                [5]   2024. OpenAI GPT-4o. https://openai.com/index/hello-gpt-4o/
+ChatTS: Aligning Time Series with LLMs via Synthetic Data
+for Enhanced Understanding and Reasoning
+
+
+ [6] 2024. Qwen2.5-14B-Instruct Model. https://huggingface.co/Qwen/Qwen2.5-                [30] Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir
+     14B-Instruct                                                                               Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rock-
+ [7] Subutai Ahmad, Alexander Lavin, Scott Purdy, and Zuha Agha. 2017. Unsu-                    täschel, et al. 2020. Retrieval-augmented generation for knowledge-intensive nlp
+     pervised real-time anomaly detection for streaming data. Neurocomputing 262                tasks. Advances in Neural Information Processing Systems 33 (2020), 9459–9474.
+     (2017), 134–147.                                                                      [31] Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. 2023. Blip-2: Bootstrapping
+ [8] Sarah Alnegheimish, Linh Nguyen, Laure Berti-Equille, and Kalyan Veeramacha-               language-image pre-training with frozen image encoders and large language
+     neni. 2024. Large language models can be zero-shot anomaly detectors for time              models. In International conference on machine learning. PMLR, 19730–19742.
+     series? arXiv preprint arXiv:2405.14755 (2024).                                       [32] KunChang Li, Yinan He, Yi Wang, Yizhuo Li, Wenhai Wang, Ping Luo, Yali Wang,
+ [9] Jinze Bai, Shuai Bai, Shusheng Yang, Shijie Wang, Sinan Tan, Peng Wang, Junyang            Limin Wang, and Yu Qiao. 2023. Videochat: Chat-centric video understanding.
+     Lin, Chang Zhou, and Jingren Zhou. 2023. Qwen-vl: A frontier large vision-                 arXiv preprint arXiv:2305.06355 (2023).
+     language model with versatile abilities. arXiv preprint arXiv:2308.12966 (2023).      [33] Li Li, Xiaonan Su, Yi Zhang, Yuetong Lin, and Zhiheng Li. 2015. Trend model-
+[10] Yifu Cai, Arjun Choudhry, Mononito Goswami, and Artur Dubrawski. 2024. Time-               ing for traffic time series analysis: An integrated study. IEEE Transactions on
+     SeriesExam: A time series understanding exam. arXiv preprint arXiv:2410.14752              Intelligent Transportation Systems 16, 6 (2015), 3430–3439.
+     (2024).                                                                               [34] Zeyan Li, Nengwen Zhao, Mingjie Li, Xianglin Lu, Lixin Wang, Dongdong Chang,
+[11] Yifu Cai, Mononito Goswami, Arjun Choudhry, Arvind Srinivasan, and Artur                   Xiaohui Nie, Li Cao, Wenchi Zhang, Kaixin Sui, et al. 2022. Actionable and
+     Dubrawski. 2023. Jolt: Jointly learned representations of language and time-series.        interpretable fault localization for recurring failures in online service systems.
+     In Deep Generative Models for Health Workshop NeurIPS 2023.                                In Proceedings of the 30th ACM Joint European Software Engineering Conference
+[12] Defu Cao, Furong Jia, Sercan O Arik, Tomas Pfister, Yixiang Zheng, Wen Ye, and             and Symposium on the Foundations of Software Engineering. 996–1008.
+     Yan Liu. 2023. Tempo: Prompt-based generative pre-trained transformer for time        [35] Zeyan Li, Nengwen Zhao, Shenglin Zhang, Yongqian Sun, Pengfei Chen, Xidao
+     series forecasting. arXiv preprint arXiv:2310.04948 (2023).                                Wen, Minghua Ma, and Dan Pei. 2022. Constructing large-scale real-world
+[13] Ching Chang, Wen-Chih Peng, and Tien-Fu Chen. 2023. Llm4ts: Two-stage                      benchmark datasets for aiops. arXiv preprint arXiv:2208.03938 (2022).
+     fine-tuning for time-series forecasting with pre-trained llms. arXiv preprint         [36] Bryan Lim and Stefan Zohren. 2021. Time-series forecasting with deep learning:
+     arXiv:2308.08469 (2023).                                                                   a survey. Philosophical Transactions of the Royal Society A 379, 2194 (2021),
+[14] Mouxiang Chen, Lefei Shen, Zhuo Li, Xiaoyun Joy Wang, Jianling Sun, and                    20200209.
+     Chenghao Liu. 2024. VisionTS: Visual Masked Autoencoders Are Free-Lunch               [37] Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. 2024. Visual in-
+     Zero-Shot Time Series Forecasters. arXiv preprint arXiv:2408.17253 (2024).                 struction tuning. Advances in neural information processing systems 36 (2024).
+[15] Winnie Chow, Lauren Gardiner, Haraldur T Hallgrímsson, Maxwell A Xu, and              [38] Haoxin Liu, Shangqing Xu, Zhiyuan Zhao, Lingkai Kong, Harshavardhan Ka-
+     Shirley You Ren. 2024. Towards time series reasoning with llms. arXiv preprint             marthi, Aditya B Sasanur, Megha Sharma, Jiaming Cui, Qingsong Wen, Chao
+     arXiv:2409.11376 (2024).                                                                   Zhang, et al. 2024. Time-MMD: A New Multi-Domain Multimodal Dataset for
+[16] Yunfei Chu, Jin Xu, Xiaohuan Zhou, Qian Yang, Shiliang Zhang, Zhijie Yan,                  Time Series Analysis. arXiv preprint arXiv:2406.08627 (2024).
+     Chang Zhou, and Jingren Zhou. 2023. Qwen-audio: Advancing universal audio             [39] Dongsheng Luo, Wei Cheng, Yingheng Wang, Dongkuan Xu, Jingchao Ni, Wen-
+     understanding via unified large-scale audio-language models. arXiv preprint                chao Yu, Xuchao Zhang, Yanchi Liu, Yuncong Chen, Haifeng Chen, et al. 2023.
+     arXiv:2311.07919 (2023).                                                                   Time series contrastive learning with information-aware augmentations. In
+[17] Longchao Da, Kuanru Liou, Tiejin Chen, Xuesong Zhou, Xiangyong Luo, Yezhou                 Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 37. 4534–4542.
+     Yang, and Hua Wei. 2024. Open-ti: Open traffic intelligence with augmented            [40] Run Luo, Haonan Zhang, Longze Chen, Ting-En Lin, Xiong Liu, Yuchuan Wu,
+     language model. International Journal of Machine Learning and Cybernetics                  Min Yang, Minzheng Wang, Pengpeng Zeng, Lianli Gao, et al. 2024. Mmevol:
+     (2024), 1–26.                                                                              Empowering multimodal large language models with evol-instruct. arXiv preprint
+[18] Angus Dempster, François Petitjean, and Geoffrey I Webb. 2020. ROCKET: excep-              arXiv:2409.05840 (2024).
+     tionally fast and accurate time series classification using random convolutional      [41] Muhammad Maaz, Hanoona Rasheed, Salman Khan, and Fahad Shahbaz Khan.
+     kernels. Data Mining and Knowledge Discovery 34, 5 (2020), 1454–1495.                      2023. Video-chatgpt: Towards detailed video understanding via large vision and
+[19] Shahul Es, Jithin James, Luis Espinosa-Anke, and Steven Schockaert. 2023. Ra-              language models. arXiv preprint arXiv:2306.05424 (2023).
+     gas: Automated evaluation of retrieval augmented generation. arXiv preprint           [42] Elliot Maître, Zakaria Chemli, Max Chevalier, Bernard Dousset, Jean-Philippe
+     arXiv:2309.15217 (2023).                                                                   Gitto, and Olivier Teste. 2020. Event detection and time series alignment to
+[20] Elizabeth Fons, Rachneet Kaur, Soham Palande, Zhen Zeng, Tucker Balch,                     improve stock market forecasting. In Joint conference of the information retrieval
+     Manuela Veloso, and Svitlana Vyetrenko. 2024. Evaluating Large Language                    communities in europe (circle 2020), Vol. 2621. CEUR-WS. org, 1–5.
+     Models on Time Series Feature Understanding: A Comprehensive Taxonomy                 [43] Mike A Merrill, Mingtian Tan, Vinayak Gupta, Tom Hartvigsen, and Tim Althoff.
+     and Benchmark. arXiv preprint arXiv:2404.16563 (2024).                                     2024. Language Models Still Struggle to Zero-shot Reason about Time Series.
+[21] Fanzhe Fu, Junru Chen, Jing Zhang, Carl Yang, Lvbin Ma, and Yang Yang. 2024.               arXiv preprint arXiv:2404.11757 (2024).
+     Are Synthetic Time-series Data Really not as Good as Real Data? arXiv preprint        [44] Jungwoo Oh, Gyubok Lee, Seongsu Bae, Joon-myoung Kwon, and Edward Choi.
+     arXiv:2402.00607 (2024).                                                                   2024. Ecg-qa: A comprehensive question answering dataset combined with
+[22] Simone Gallo, Fabio Paterno, and Alessio Malizia. 2023. Conversational interfaces          electrocardiogram. Advances in Neural Information Processing Systems 36 (2024).
+     in iot ecosystems: where we are, what is still missing. In Proceedings of the 22nd    [45] Shirui Pan, Linhao Luo, Yufei Wang, Chen Chen, Jiapu Wang, and Xindong Wu.
+     International Conference on Mobile and Ubiquitous Multimedia. 279–293.                     2024. Unifying large language models and knowledge graphs: A roadmap. IEEE
+[23] Nate Gruver, Marc Finzi, Shikai Qiu, and Andrew G Wilson. 2024. Large language             Transactions on Knowledge and Data Engineering (2024).
+     models are zero-shot time series forecasters. Advances in Neural Information          [46] Robert B Penfold and Fang Zhang. 2013. Use of interrupted time series analysis
+     Processing Systems 36 (2024).                                                              in evaluating health care quality improvements. Academic pediatrics 13, 6 (2013),
+[24] Xiao He, Ye Li, Jian Tan, Bin Wu, and Feifei Li. 2023. OneShotSTL: One-Shot                S38–S44.
+     Seasonal-Trend Decomposition For Online Time Series Anomaly Detection And             [47] CLEVELAND RB. 1990. STL: A seasonal-trend decomposition procedure based
+     Forecasting. Proc. VLDB Endow. 16, 6 (2023), 1399–1412. https://doi.org/10.14778/          on loess. J Off Stat 6 (1990), 3–73.
+     3583140.3583155                                                                       [48] Paul K Rubenstein, Chulayuth Asawaroengchai, Duc Dung Nguyen, Ankur
+[25] Ding Jiang and Mang Ye. 2023. Cross-modal implicit relation reasoning and align-           Bapna, Zalán Borsos, Félix de Chaumont Quitry, Peter Chen, Dalia El Badawy,
+     ing for text-to-image person retrieval. In Proceedings of the IEEE/CVF Conference          Wei Han, Eugene Kharitonov, et al. 2023. Audiopalm: A large language model
+     on Computer Vision and Pattern Recognition. 2787–2797.                                     that can speak and listen. arXiv preprint arXiv:2306.12925 (2023).
+[26] Ming Jin, Shiyu Wang, Lintao Ma, Zhixuan Chu, James Y Zhang, Xiaoming Shi,            [49] Neil Savage. 2023. Synthetic data could be better than real data. Nature (2023).
+     Pin-Yu Chen, Yuxuan Liang, Yuan-Fang Li, Shirui Pan, et al. 2023. Time-llm:           [50] Omer Berat Sezer, Mehmet Ugur Gudelek, and Ahmet Murat Ozbayoglu. 2020.
+     Time series forecasting by reprogramming large language models. arXiv preprint             Financial time series forecasting with deep learning: A systematic literature
+     arXiv:2310.01728 (2023).                                                                   review: 2005–2019. Applied soft computing 90 (2020), 106181.
+[27] Ming Jin, Yifan Zhang, Wei Chen, Kexin Zhang, Yuxuan Liang, Bin Yang, Jindong         [51] Jing Su, Chufeng Jiang, Xin Jin, Yuxin Qiao, Tingsong Xiao, Hongda Ma, Rong
+     Wang, Shirui Pan, and Qingsong Wen. 2024. Position paper: What can large                   Wei, Zhi Jing, Jiajun Xu, and Junhong Lin. 2024. Large language models for
+     language models tell us about time series analysis. arXiv preprint arXiv:2402.02713        forecasting and anomaly detection: A systematic literature review. arXiv preprint
+     (2024).                                                                                    arXiv:2402.10350 (2024).
+[28] Litton Jose Kurisinkel, Pruthwik Mishra, and Yue Zhang. 2024. Text2timeseries:        [52] Zefan Wang, Zichuan Liu, Yingying Zhang, Aoxiao Zhong, Jihong Wang, Fengbin
+     Enhancing financial forecasting through time series prediction updates with                Yin, Lunting Fan, Lingfei Wu, and Qingsong Wen. 2024. Rcagent: Cloud root cause
+     event-driven insights from large language models. arXiv preprint arXiv:2407.03689          analysis by autonomous agents with tool-augmented large language models.
+     (2024).                                                                                    In Proceedings of the 33rd ACM International Conference on Information and
+[29] Siqi Lai, Zhao Xu, Weijia Zhang, Hao Liu, and Hui Xiong. 2023. Large language              Knowledge Management. 4966–4974.
+     models as traffic signal control agents: Capacity and opportunity. arXiv preprint     [53] Yemane Wolde-Rufael. 2006. Electricity consumption and economic growth:
+     arXiv:2312.16044 (2023).                                                                   a time series experience for 17 African countries. Energy policy 34, 10 (2006),
+                                                                         Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan Pei
+
+
+     1106–1114.                                                                                  arXiv preprint arXiv:2401.13601 (2024).
+[54] Tianwei Xing, Luis Garcia, Federico Cerutti, Lance Kaplan, Alun Preece, and Mani       [63] Hang Zhang, Xin Li, and Lidong Bing. 2023. Video-llama: An instruction-
+     Srivastava. 2021. Deepsqa: Understanding sensor data via question answering.                tuned audio-visual language model for video understanding. arXiv preprint
+     In Proceedings of the International Conference on Internet-of-Things Design and             arXiv:2306.02858 (2023).
+     Implementation. 106–118.                                                               [64] Mengmei Zhang, Mingwei Sun, Peng Wang, Shen Fan, Yanhu Mo, Xiaoxiao Xu,
+[55] Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng,                         Hong Liu, Cheng Yang, and Chuan Shi. 2024. GraphTranslator: Aligning Graph
+     Chongyang Tao, and Daxin Jiang. 2023. Wizardlm: Empowering large language                   Model to Large Language Model for Open-ended Tasks. In Proceedings of the
+     models to follow complex instructions. arXiv preprint arXiv:2304.12244 (2023).              ACM on Web Conference 2024. 1003–1014.
+[56] An Yang, Baosong Yang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Zhou, Cheng-             [65] Yaowei Zheng, Richong Zhang, Junhao Zhang, Yanhan Ye, Zheyan Luo, Zhangchi
+     peng Li, Chengyuan Li, Dayiheng Liu, Fei Huang, et al. 2024. Qwen2 technical                Feng, and Yongqiang Ma. 2024. LlamaFactory: Unified Efficient Fine-Tuning
+     report. arXiv preprint arXiv:2407.10671 (2024).                                             of 100+ Language Models. In Proceedings of the 62nd Annual Meeting of the
+[57] Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan,               Association for Computational Linguistics (Volume 3: System Demonstrations).
+     and Yuan Cao. 2022. React: Synergizing reasoning and acting in language models.             Association for Computational Linguistics, Bangkok, Thailand. http://arxiv.org/
+     arXiv preprint arXiv:2210.03629 (2022).                                                     abs/2403.13372
+[58] Shukang Yin, Chaoyou Fu, Sirui Zhao, Ke Li, Xing Sun, Tong Xu, and Enhong              [66] Zhenyu Zhong, Qiliang Fan, Jiacheng Zhang, Minghua Ma, Shenglin Zhang,
+     Chen. 2024. A survey on multimodal large language models. National Science                  Yongqian Sun, Qingwei Lin, Yuzhi Zhang, and Dan Pei. 2023. A Survey of
+     Review (2024), nwae403.                                                                     Time Series Anomaly Detection Methods in the AIOps Domain. arXiv preprint
+[59] Luke Yoffe, Alfonso Amayuelas, and William Yang Wang. 2024. DebUnc: miti-                   arXiv:2308.00393 (2023).
+     gating hallucinations in large language model agent communication with uncer-          [67] Tian Zhou, Peisong Niu, Liang Sun, Rong Jin, et al. 2023. One fits all: Power
+     tainty estimations. arXiv preprint arXiv:2407.06426 (2024).                                 general time series analysis by pretrained lm. Advances in neural information
+[60] Han Yu, Peikun Guo, and Akane Sano. 2023. Zero-shot ECG diagnosis with large                processing systems 36 (2023), 43322–43355.
+     language models and retrieval-augmented generation. In Machine Learning for            [68] Xuanhe Zhou, Guoliang Li, Zhaoyan Sun, Zhiyuan Liu, Weize Chen, Jianming
+     Health (ML4H). PMLR, 650–663.                                                               Wu, Jiesi Liu, Ruohang Feng, and Guoyang Zeng. 2023. D-bot: Database diagnosis
+[61] Chi Zhang, Sanmukh R Kuppannagari, Rajgopal Kannan, and Viktor K Prasanna.                  system using large language models. arXiv preprint arXiv:2312.01454 (2023).
+     2018. Generative adversarial network for synthetic time series data generation         [69] Jiaxin Zhuang, Leon Yan, Zhenwei Zhang, Ruiqi Wang, Jiawei Zhang, and Yuan-
+     in smart grids. In 2018 IEEE international conference on communications, control,           tao Gu. 2024. See it, Think it, Sorted: Large Multimodal Models are Few-shot
+     and computing technologies for smart grids (SmartGridComm). IEEE, 1–6.                      Time Series Anomaly Analyzers. arXiv preprint arXiv:2411.02465 (2024).
+[62] Duzhen Zhang, Yahan Yu, Chenxing Li, Jiahua Dong, Dan Su, Chenhui Chu, and
+     Dong Yu. 2024. Mm-llms: Recent advances in multimodal large language models.
+

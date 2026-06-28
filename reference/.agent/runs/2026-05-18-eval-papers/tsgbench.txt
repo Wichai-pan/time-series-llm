@@ -1,0 +1,936 @@
+                       TSGBench: Time Series Generation Benchmark
+                     Yihao Ang                                              Qiang Huang∗                                          Yifan Bao
+     National University of Singapore                           National University of Singapore                     National University of Singapore
+    NUS Research Institute in Chongqing                            huangq@comp.nus.edu.sg                             yifan_bao@comp.nus.edu.sg
+       yihao_ang@comp.nus.edu.sg
+
+                                         Anthony K. H. Tung                                           Zhiyong Huang
+                                    National University of Singapore                      National University of Singapore
+                                        atung@comp.nus.edu.sg                            NUS Research Institute in Chongqing
+                                                                                             huangzy@comp.nus.edu.sg
+
+ABSTRACT                                                                                     1     INTRODUCTION
+Synthetic Time Series Generation (TSG) is crucial in a range of                              Within the myriad of tasks centered on time series, synthetic Time
+applications, including data augmentation, anomaly detection, and                            Series Generation (TSG) stands out as a burgeoning area of focus
+privacy preservation. Although significant strides have been made                            due to growing demands in data augmentation [68], anomaly de-
+in this field, existing methods exhibit three key limitations: (1) They                      tection [3, 8], privacy protection [40], and domain transfer [7]. TSG
+often benchmark against similar model types, constraining a holistic                         aims to produce time series akin to the original, preserving tempo-
+view of performance capabilities. (2) The use of specialized synthetic                       ral dependencies and dimensional correlations while ensuring the
+and private datasets introduces biases and hampers generalizability.                         generated time series remains useful for various downstream tasks
+(3) Ambiguous evaluation measures, often tied to custom networks                             like classification [16, 49] and forecasting [11, 84].
+or downstream tasks, hinder consistent and fair comparison.                                     Towards this end, numerous methods have emerged to generate
+   To overcome these limitations, we introduce TSGBench, the in-                             synthetic time series. Their overarching objective is to develop a
+augural Time Series Generation Benchmark, designed for a unified                             generative model that accurately captures the features and depen-
+and comprehensive assessment of TSG methods. It comprises three                              dencies inherent in the input time series, thereby generating new
+modules: (1) a curated collection of publicly available, real-world                          time series that maintain both utility and statistical characteris-
+datasets tailored for TSG, together with a standardized prepro-                              tics. For instance, many representative methods [20, 66, 74, 81, 87]
+cessing pipeline; (2) a comprehensive evaluation measures suite                              utilize the power of Generative Adversarial Networks (GANs), in-
+including vanilla measures, new distance-based assessments, and                              tegrating distinctive time series architectures to adeptly capture
+visualization tools; (3) a pioneering generalization test rooted in                          temporal and dimensional dependencies. Others harness Varia-
+Domain Adaptation (DA), compatible with all methods. We have                                 tional AutoEncoders (VAEs) [15, 48, 50] to strike a balance between
+conducted comprehensive experiments using TSGBench across a                                  data fidelity and the statistical consistency of latent space, thereby
+spectrum of ten real-world datasets from diverse domains, utilizing                          enhancing interpretability. Additionally, some recent approaches
+ten advanced TSG methods and twelve evaluation measures. The                                 employ flow-based models [2, 38] to provide explicit likelihood
+results highlight the reliability and efficacy of TSGBench in evaluat-                       modeling, facilitating effective optimization.
+ing TSG methods. Crucially, TSGBench delivers a statistical analysis
+of the performance rankings of these methods, illuminating their                             1.1    Motivations
+varying performance across different datasets and measures and                               Despite the strides made by these pioneering studies, TSG lags
+offering nuanced insights into the effectiveness of each method.                             relative to other time series tasks, with three primary limitations
+                                                                                             (L1–L3) emerging prominently:
+PVLDB Reference Format:
+Yihao Ang, Qiang Huang, Yifan Bao, Anthony K. H. Tung, and Zhiyong                           L1: A comprehensive taxonomy and comparative analysis of
+Huang. TSGBench: Time Series Generation Benchmark. PVLDB, 17(3): 305 -                       various methods are lacking, limiting a holistic view of per-
+318, 2023.                                                                                   formance capabilities. When selecting baselines for comparison,
+doi:10.14778/3632093.3632097                                                                 researchers often choose models from their methodological realm,
+                                                                                             missing a broad performance comparison across various methodolo-
+PVLDB Artifact Availability:                                                                 gies. For example, GT-GAN [38] and AEC-GAN [81] predominantly
+The source code, data, and other artifacts have been made available at                       consider advanced GAN-based methods, overlooking potential con-
+https://github.com/YihaoAng/TSGBench/.                                                       tenders like VAE-based approaches. Furthermore, some methods
+∗ Qiang Huang is the corresponding author.
+                                                                                             [37, 66, 89] mainly target specific downstream tasks such as missing
+This work is licensed under the Creative Commons BY-NC-ND 4.0 International
+                                                                                             value imputation or forecasting, hindering the application of the
+License. Visit https://creativecommons.org/licenses/by-nc-nd/4.0/ to view a copy of          generated time series to other tasks.
+this license. For any use beyond those covered by this license, obtain permission by
+emailing info@vldb.org. Copyright is held by the owner/author(s). Publication rights         L2: Inconsistent dataset selection and preprocessing intro-
+licensed to the VLDB Endowment.                                                              duce biases and curb generalizability. First, the dataset choice
+Proceedings of the VLDB Endowment, Vol. 17, No. 3 ISSN 2150-8097.
+doi:10.14778/3632093.3632097                                                                 greatly influences generation outcomes. Different from other time
+                                                                                             series tasks, the datasets for TSG are diverse due to their lack of
+
+
+
+
+                                                                                       305
+                                                                                                                            Methods
+label constraints, broadening data source possibilities. Yet, many                          MDD          FID                 RGAN                    Exchange           Stock Long
+                                                                                                                             TimeGAN
+studies resort to private and/or synthetic datasets for validation                 ACD                            PS         RTSGAN
+                                                                                                                                               Energy                           Stock
+                                                                                                                             COSCI-GAN
+[15, 74, 87]. Private datasets, while varied, hinder reproducibility                                                         AEC-GAN
+due to their inaccessibility. Moreover, synthetic datasets, albeit                                                           TimeVAE
+                                                                                  SD                                   DS    TimeVQVAE Energy Long                                   DLG
+straightforward, may oversimplify real-world complexities, risk-                                     1
+                                                                                                     2
+                                                                                                     3
+                                                                                                     4
+                                                                                                     5
+                                                                                                     6
+                                                                                                     7
+                                                                                                     8
+                                                                                                     9
+                                                                                                     10                      GT-GAN
+                                                                                                                                                                   1
+                                                                                                                                                                   2
+                                                                                                                                                                   3
+                                                                                                                                                                   4
+                                                                                                                                                                   5
+                                                                                                                                                                   6
+                                                                                                                                                                   7
+                                                                                                                                                                   8
+                                                                                                                                                                   9
+                                                                                                                                                                   10
+                                                                                                                             LS4
+ing biased performance evaluations [85, 87]. Second, preprocessing                                                           Fourier Flow
+                                                                                       KD                         Training Time                  EEG                            Boiler
+choices significantly impact generation results. For instance, many
+methods [35, 38, 87] use a fixed 24-unit sliding window to segment                            ED          DTW
+                                                                                            Evaluation Measures
+                                                                                                                                                        HAPT
+                                                                                                                                                                Datasets
+                                                                                                                                                                        Air
+
+time series, which often inadequately represent their full periods
+and temporal patterns. Practices like normalizing time series to a               Figure 1: Method ranking across ten evaluation measures
+range of [0, 1], either before or after applying the sliding window,             and ten datasets.
+can lead to discrepancies in results [87]. In addition, datasets such
+as MIMIC III [39] and PhysioNet 2012 [25], though public, are raw                of principle methods, establishing a foundational benchmark for
+and require meticulous preprocessing to address issues like missing              future investigations. The key contributions of TSGBench (C1–C4)
+values or anomalies, adding another layer of variability.                        are highlighted as follows:
+L3: Ambiguous evaluation measures hinder a uniform and                           C1: We provide a new taxonomy of various TSG methods
+fair comparison. Evaluating the generated time series hinges                     based on three foundational generative models. Regarding
+on three foundational principles: diversity, fidelity, and usefulness            L1, we establish a taxonomy for systematic comparison and cate-
+[87]. Diversity gauges how closely the generated series distribu-                gorization (§3). Specifically, we categorize TSG methods based on
+tion mirrors the original; fidelity examines the similarity between              three foundational generative models, offering a new perspective
+generated and real series; and usefulness assesses the generated                 for understanding existing research. On this basis, we compare
+series’ practical utility in predictive tasks. The choice of evaluation          and analyze the model they used, make connections if different
+measures crucially impacts method efficacy determination. Most                   methods use similar techniques, and elaborate upon the inheritance
+studies [15, 37, 87], however, choose just a subset of these mea-                and improvement of relative methods.
+sures, introducing biases in performance evaluation. In addition
+to quantitative evaluation for TSG, many methods [20, 40] utilize                C2: We introduce a standard pipeline for dataset selection
+downstream tasks, like classification and forecasting within the                 and preprocessing. In terms of L2, we incorporate ten publicly
+“Train on Synthetic, Test on Real” (TSTR) scheme, to showcase util-              available, real-world datasets from various application domains
+ity. These tasks, though popular, come with inherent challenges.                 into TSGBench to enhance reproducibility and mitigate biases or
+For example, some datasets lack classification labels, and short                 oversimplification in our evaluations. These datasets vary in terms
+sequences may be unsuitable for forecasting. To counter this, alter-             of training sample size, sequence length, and time series dimensions,
+native unsupervised approaches [20, 22, 89] like interpolation and               thereby contributing to a more comprehensive analysis. Moreover,
+clustering have emerged, eliminating the need for external labels.               we introduce a standardized pipeline for preprocessing raw time
+However, they may introduce biases due to their dependency on                    series datasets for TSG (§4.1).
+post-hoc models in time series data [38, 48].                                    C3: We design a suite of diverse yet robust measures to make
+   To address these limitations, a comprehensive benchmark for                   a comprehensive assessment of the TSG. For L3, we provide
+TSG is crucial. It is worth noting that the time series community                a suite of twelve evaluation measures tailored for TSG. This suite
+has introduced a plethora of benchmarks and surveys in areas like                encompasses five facets, i.e., model-based, feature-based, distance-
+databases [29, 41], classification [4, 13, 33], forecasting [5, 55, 56],         based measures, training efficiency, and visualization. This allows
+clustering [36, 69], and anomaly detection [34, 47, 63, 64]. These               for a standardized yet thorough comparison (§4.2). Further, we
+benchmarks have been pivotal in driving advancements in their                    introduce a novel generalization test based on Domain Adaptation
+respective fields. Nevertheless, there is a noticeable gap when it               (DA) to evaluate the generalization capabilities of TSG methods.
+comes to the field of TSG despite its growing significance. Some                 Notably, we define three scenarios (i.e., single DA, cross DA, and
+notable contributions include Yan et al. [86]’s framework for bench-             reference DA) that align with real-world applications (§4.3).
+marking electronic health record generation and Nikitin et al. [61]’s
+                                                                                 C4: We conduct systematic evaluations for TSG methods. As
+open-source tool aimed at enhancing time series and fostering the
+                                                                                 part of the benchmark development, we present TSGBench in detail
+use of generative models. A recent study [28] also provides an
+                                                                                 (§5) and have conducted preliminary yet systematic experiments
+overview of prevalent evaluation measures for TSG, complemented
+                                                                                 to assess the performance of ten representative TSG methods (§6).
+with an evaluation pipeline. Yet, to our knowledge, a holistic survey
+or benchmark dedicated to TSG is still absent.                                   The results demonstrate the ability of TSGBench to assess the
+                                                                                 efficacy of various TSG methods, illuminating their strengths and
+                                                                                 weaknesses from different perspectives. The generalization test
+1.2    Our Contributions                                                         using DA sheds light on domain shift scenarios in TSG. In addition,
+In light of these limitations and the evident gap for a dedicated                we provide statistical analysis of method ranking, examining the
+TSG standard, we introduce TSGBench, an open-sourced bench-                      consistency of different techniques across ten evaluation measures
+mark designed to standardize comparative assessments of emerging                 and ten datasets (Figure 1). Our findings underscore the reliability
+methodologies. It offers robust evaluations and in-depth analyses                and efficacy of TSGBench in evaluating TSG methods.
+
+
+
+
+                                                                           306
+2 PRELIMINARIES                                                                                          Table 1: List of frequently used notations.
+
+2.1 Problem Definition                                                                     Symbol                Description
+Suppose that a time series 𝑻 with 𝑁 (𝑁 ≥ 1) individual series of                           𝑻, 𝑁                  A time series 𝑻 with 𝑁 individual series
+length 𝐿 is denoted as a matrix, i.e., 𝑻 = (𝒔 1, · · · , 𝒔 𝑁 ) T , where each              𝒔𝑖 , 𝐿                An individual series 𝒔𝑖 of length 𝐿
+individual series 𝒔𝑖 can be represented as an 𝐿-dimensional vector,                        𝑙                     The sequence length for partitioning
+i.e., 𝒔𝑖 = (𝑥𝑖,1, · · · , 𝑥𝑖,𝐿 ), and each 𝑥𝑖,𝑗 corresponds to a single time               𝑅                     The number of sub-matrices, where 𝑅 = 𝐿 − 𝑙 + 1
+point 𝑡 𝑗 of 𝒔𝑖 . We denote 𝑝 (𝒔 1, · · · , 𝒔 𝑁 ) as the real distribution of a            𝑻𝑟                    A sub-matrix 𝑻𝑟 with 𝑁 individual series of length 𝑙
+given time series 𝑻 . The goal of Time Series Generation (TSG) is to                       𝑻𝑠𝑡𝑟 , 𝑻𝑠𝑡𝑒           The training (or historical) data and the test data from
+                                                  𝑔𝑒𝑛       𝑔𝑒𝑛
+create a synthetic time series 𝑻 𝑔𝑒𝑛 = (𝒔 1 , · · · , 𝒔 𝑁 ) such that its                                        a source time series
+                                                                                                    𝑔𝑒𝑛     𝑔𝑡
+                     𝑔𝑒𝑛           𝑔𝑒𝑛                                                     𝑻𝑡ℎ𝑖𝑠 ,𝑻𝑡      ,𝑻𝑡    The historical, generated, and ground truth data from
+distribution 𝑞(𝒔 1 , · · · , 𝒔 𝑁 ) is similar to 𝑝 (𝒔 1, · · · , 𝒔 𝑁 ), and 𝑻 𝑔𝑒𝑛
+                                                                                                                 a target time series
+and 𝑻 exhibit consistent statistical properties and patterns. Table 1
+summarizes the frequently used notations in this work.
+
+2.2     Scope Illustration                                                                models: GAN, VAE, and Flow-based models (§3.1). We then delve
+                                                                                          into notable TSG methods stemming from these models (§3.2).
+To ensure our initial benchmark is both focused and comprehensive,
+we employ specific constraints for TSGBench.
+                                                                                          3.1     Generative Models for TSG
+Scope of Methods. We restrict our attention to generation meth-
+                                                                                          Generative models are designed to learn the intricate patterns and
+ods designed for general-purpose time series. Although certain
+                                                                                          temporal dependencies in time series datasets, allowing for the gen-
+methods showcase efficacy in specific domains, they lack the flexi-
+                                                                                          eration of new time series that reflect the original data’s statistical
+bility and adaptability needed for broader applications. Thus, these
+                                                                                          properties. We next describe three foundational generative models
+specialized methods are excluded from our evaluation. Moreover,
+                                                                                          for TSG, with their architectural nuances visualized in Figure 2.
+while fine-tuning hyperparameters could yield superior results for
+each method, we opted not to engage in such optimization. This                            Generative Adversarial Networks (GANs). A typical GAN model
+decision was made to maintain consistency and fairness in compar-                         [26], as depicted in Figure 2(a), comprises a generator 𝐺 and a
+isons and to adhere to the resource and time constraints inherent                         discriminator 𝐷. During training, 𝐺 produces a synthetic time series
+in a comprehensive benchmarking study.                                                    that 𝐷 attempts to distinguish from real series. This adversarial
+                                                                                          cycle continues until 𝐷 cannot reliably differentiate between the
+Scope of Datasets. To make a holistic evaluation of different gen-
+                                                                                          two. For generation, only 𝐺 is used to create a new time series.
+eration methods, we select public time series datasets that are both
+                                                                                             Numerous algorithms employ GAN-based models for TSG. They
+diverse and representative across application domains. Moreover,
+                                                                                          often incorporate specialized neural networks like RNN, LSTM, and
+as we target the generation methods, we consider purely time series
+                                                                                          Transformer to capture the sequential and temporal intricacies of
+as the input. Thus, edge cases, such as those involving the input
+                                                                                          time series data [20, 51, 58, 66, 77, 87]. Some models utilize novel
+of a missing data-position matrix or the causality determined by
+                                                                                          metrics or loss functions for better alignment with specific temporal
+causal graphs, are not incorporated.
+                                                                                          patterns [59, 60]. Others enhance traditional GANs with additional
+Scope of Evaluation Measures. We mainly adhere to the widely                              modules, such as extra discriminators, classification layers, error
+accepted “Train on Synthetic, Test on Real” (TSTR) scheme [20,                            correction, and data augmentation to generate time series with
+35, 38, 40, 50, 66, 77, 87, 89]. It assesses the synthetic time series’                   specific temporal attributes [37, 74, 81]. While GAN-based models
+relevance for real-world applications. While alternative schemes                          are effective in generating time series, they can be challenging to
+like “Train on Real, Test on Synthetic” (TRTS) [74, 76] do exist, their                   train and are often resource and time-intensive [38].
+likeness to TSTR and infrequent use render them non-essential for
+                                                                                          Variational AutoEncoders (VAEs). A standard VAE model [44,
+our purposes. Our evaluation suite, illustrated in Figure 4, is meticu-
+                                                                                          45], as shown in Figure 2(b), contains an encoder and a decoder. The
+lously crafted using well-recognized measures from TSG literature.
+                                                                                          encoder 𝑞𝜃 (𝒛|𝒔) transforms input time series 𝒔 into a latent repre-
+We have omitted measures specific to some TSG studies, like cosine
+                                                                                          sentation 𝒛, capturing essential features and generating parameters
+similarity [51], due to their limited prevalence for extensive bench-
+                                                                                          (e.g., mean 𝜇 and variance 𝜎) that model the inherent uncertainty
+marking. Additionally, TSGBench does not use specific downstream
+                                                                                          and variability of the time series. The decoder 𝑝𝜃 (𝒔ˆ |𝒛) reconstructs
+tasks as separate evaluation metrics. This is because the included
+                                                                                          time series 𝒔ˆ from 𝒛, preserving the model’s capacity to regenerate
+measures, notably discriminative and predictive scores, cover the
+                                                                                          the temporal patterns. The training phase focuses on minimizing
+main goals of time series downstream tasks, such as classification
+                                                                                          reconstruction loss and the divergence between the learned and a
+and forecasting. Furthermore, some tasks, like anomaly detection,
+                                                                                          prior standard Gaussian distribution. For generation, the decoder
+require extra data and ground truth, which would complicate the
+                                                                                          draws from the latent space to create a synthetic time series.
+evaluation and surpass the designated scope of TSGBench.
+                                                                                             While there are fewer studies on VAE-based methods for TSG
+                                                                                          compared to GANs, they effectively leverage variational inference
+3     TSG OVERVIEW                                                                        to capture the complex temporal aspects of time series data [15,
+This section provides a taxonomy and comprehensive analysis                               48, 50]. The benefits of VAE models lie in their interpretability and
+of TSG methods. We first explore three foundational generative                            training efficiency. Additionally, the structured and informative
+
+
+
+
+                                                                                    307
+           Discriminator                           Generator
+                                                                  Encoder          Decoder                                                     Inverse
+                                                                                                                               Flow
+                              Real or
+                             Synthetic?
+
+
+
+
+                           (a) GAN-based models.               (b) VAE-based models.                                        (c) Flow-based models.
+
+ Figure 2: Three foundational generative models in popular TSG methods (solid arrow: training, dashed arrow: generation).
+
+
+latent representations from VAEs can be used for other time series                Table 2: Summary of popular TSG methods with their back-
+tasks, including representation learning [22] and imputation [21].                bone models and specialties (TS: Time Series).
+Flow-based Models. GANs and VAEs do not directly model the                         Time                Method          Model                     Specialty
+probability density function of time series due to the computational                2016           C-RNN-GAN [58]       GAN                      Music
+challenge of covering all possible latent representation 𝒛 values.                  2017              RGAN [20]         GAN             General (w/ Medical) TS
+Flow-based models [17, 18, 43], as shown in Figure 2(c), address this               2018             T-CGAN [68]        GAN                   Irregular TS
+by using invertible transformations 𝑓 ’s to explicitly learn data dis-              2019            WaveGAN [19]        GAN                      Audio
+                                                                                    2019            TimeGAN [87]        GAN                    General TS
+tributions. They have been increasingly employed in TSG, often uti-                 2020              TSGAN [76]        GAN                    General TS
+lizing explicit likelihood models or Ordinary Differential Equations                2020          DoppelGANger [53]     GAN                    General TS
+(ODEs) [2, 10, 38, 42, 73]. Their architectures, typically featuring                2020           SigCWGAN [60]        GAN                Long Financial TS
+coupling layers, allow for a computable Jacobian determinant and                    2020           Quant GANs [82]      GAN                Long Financial TS
+                                                                                    2020            COT-GAN [85]        GAN                  TS and Video
+reversibility. This is further enhanced by specific transformation                  2021            Sig-WGAN [59]       GAN                   Financial TS
+techniques crucial for modeling complex data distributions.                         2021             TimeGCI [35]       GAN                    General TS
+                                                                                    2021             RTSGAN [66]        GAN            General (w/ Incomplete) TS
+                                                                                    2022            PSA-GAN [37]        GAN            General (w/ Forecasting) TS
+3.2    Taxonomy of TSG Methods                                                      2022              CEGEN [70]        GAN                    General TS
+We detail ten representative TSG methods (A1–A10) grounded                          2022            TTS-GAN [51]        GAN                    General TS
+in the three foundational generative models. Table 2 provides a                     2022             TsT-GAN [77]       GAN                    General TS
+                                                                                    2022           COSCI-GAN [74]       GAN                    General TS
+summary of these methods, including their backbone models.                          2023            AEC-GAN [81]        GAN                     Long TS
+Pure GAN-based Methods. Early efforts [20, 58, 68] blended                          2023             TT-AAE [54]        GAN                    General TS
+vanilla GAN architectures from image generation with neural net-                    2021            TimeVAE [15]        VAE                    General TS
+                                                                                    2023             CRVAE [50]         VAE           Medical TS & Causal Discovery
+works like RNN and LSTM tailored for sequential data. Subsequent
+                                                                                    2023           TimeVQVAE [48]       VAE                    General TS
+studies have focused on pioneering techniques to adapt to time
+                                                                                    2018           Neural ODE [10]    ODE + RNN                General TS
+series data and boost performance.
+                                                                                    2019            ODE-RNN [73]      ODE + RNN               Irregular TS
+   • A1: RGAN [20]. RGAN is a pioneering work that utilizes the                     2021           Neural SDE [42]    ODE + GAN                General TS
+      GANs for TSG based on RNNs. It is inspired by the maximum                     2022            GT-GAN [38]       ODE + GAN         General (w/ Irregular) TS
+      mean discrepancy [27] and tries to measure the statistical                    2023              LS4 [89]        ODE + VAE        General (w/ Forecasting) TS
+                                                                                    2020             CTFP [14]          Flow                   General TS
+      difference between generated and practical time series.
+                                                                                    2021           Fourier Flow [2]     Flow                   General TS
+   • A2: TimeGAN [87]. TimeGAN considers temporal depen-                            2023             TSGM [52]          SGM                    General TS
+      dencies within GANs, by simultaneously learning to encode
+      features, generate representations, and iterate across time. It
+      delivers advanced performance and has become a benchmark
+      model for subsequent methods.                                                          • A6: TimeVAE [15]. TimeVAE extends VAEs to the general-
+   • A3: RTSGAN [66]. RTSGAN combines an autoencoder into                                      purpose TSG. It builds on convolution and enhances inter-
+      GANs and centers on generating time series with varying                                  pretability through time series decomposition.
+      lengths and handling missing data.                                                     • A7: TimeVQVAE [48]. It employs the STFT to decompose
+   • A4: COSCI-GAN [74]. COSCI-GAN is devised to explicitly                                    input time series into low-frequency and high-frequency com-
+      model the complex dynamical patterns across every series,                                ponents. Then, it integrates Vector Quantization with VAEs
+      which favors channel/feature relationship preservation.                                  [79] for enhanced modeling of these components, preserving
+   • A5: AEC-GAN [81]. AEC-GAN aims to generate long time                                      both the general shape and specific details of the time series.
+      series with distribution shifts and bias amplification via an               Mixed-Type Methods. Recent TSG advancements have explored
+      error correction module that corrects bias in previously gen-               mixed-type methods, merging flow-based models with techniques
+      erated data and introduces adversarial samples.                             like DFT or ODEs, or integrating them with GANs or VAEs.
+Pure VAE-based Methods. VAE-based methods often exploit vari-                        • A8: Fourier Flows [2]. It uses DFT [62] to analyze the time
+ational inference to capture the temporal features effectively. They                    series in the frequency domain and applies a sequence of
+are generally efficient and have the potential interpretability.                        data-dependent spectral filters to learn their distributions.
+
+
+
+
+                                                                            308
+    • A9: GT-GAN [38]. GT-GAN is tailored for dealing with both                           Table 3: The statistics of the ten datasets.
+      regular and irregular time series, employing Continuous Time
+                                                                                         Datasets           𝑅         𝑙     𝑁    Domain
+      Flow Processes (CTFP) [14] for its generator and GRU-ODE
+      for the discriminator;                                                             DLG [32]            246      14    20   Traffic
+    • A10: LS4 [89]. LS4 draws from deep-state space models and                          Stock [87]          3,294    24    6    Financial
+      incorporates stochastic latent variables to enhance the model’s                    Stock Long [87]     3,204    125   6    Financial
+                                                                                         Exchange [46]       6,715    125   8    Financial
+      capacity and leverage the training objectives from VAEs.
+                                                                                         Energy [9]          17,739   24    28   Appliances
+                                                                                         Energy Long [9]     17,649   125   28   Appliances
+4     TSGBENCH                                                                           EEG [72]            13,366   128   14   Medical
+To address the challenges and potential biases in dataset and evalu-                     HAPT [71]           1,514    128   6    Medical
+                                                                                         Air [88]            7,731    168   6    Sensor
+ation selection, we have distilled the best practices from pertinent
+                                                                                         Boiler [7]          80,935   192   11   Industrial
+research and established TSGBench, a benchmark tailored for sys-
+tematically assessing TSG methods. Its architecture is visualized in
+Figure 3, which encompasses three key modules: (1) a meticulous
+                                                                               Preprocessing Pipeline. While these ten datasets are publicly
+set of ten public, real-world time series datasets with a standardized
+                                                                               accessible, few TSG methods have evaluated a majority of them. To
+preprocessing pipeline (§4.1); (2) a comprehensive suite of twelve
+                                                                               circumvent these issues, we introduce a standardized pipeline for
+evaluation measures customized for TSG (§4.2); (3) an innovative
+                                                                               preprocessing the raw time series datasets tailored for TSG.
+generation test using Domain Adaption (DA) for TSG (§4.3).
+                                                                                  To generate time series in a brief span while preserving mean-
+                                                                               ingful structures, we first follow [35, 87] and segment the long time
+4.1     Dataset Selection and Preprocessing                                    series 𝑻 into shorter sub-matrices {𝑻1, 𝑻2, 𝑻3, · · · }. With a specified
+Dataset Selection. We use only publicly available, real-world                  sequence length 𝑙 and a stride of 1, we convert 𝑻 into 𝑅 overlapping
+datasets to ensure reproducibility and sidestep biases or oversimpli-          sub-matrices {𝑻𝑟 }1≤𝑟 ≤𝑅 , where 𝑅 = 𝐿 − 𝑙 + 1 and each 𝑻𝑟 has the
+fication in our evaluations. Importantly, our aim is not to amass an           same 𝑙. To determine the value of 𝑙, we employ autocorrelation
+exhaustive dataset collection but to curate a diverse set that spans           functions [65], ensuring that each 𝑻𝑟 encompasses at least one time
+multiple domains and features varied data statistics and distribu-             series period. The time series is then shuffled to approximate an i.i.d.
+tions. We identify and collect ten datasets (D1–D10) published over            sample distribution [87]. To assess the generalization capability of
+the past two decades. Table 3 summarizes their statistics. Below,              TSG methods, we divide the data into training and testing sets in a
+we provide a brief description of each dataset.                                9:1 ratio, allocating a larger portion for training and evaluation as
+   • D1: Dodgers Loop Game (DLG) [32]. It consists of loop sen-                is common in TSG methodology. Additionally, we normalize the
+      sor data from the Glendale on-ramp for the 101 North freeway             dataset to the range of [0, 1] to enhance efficiency and numerical
+      in Los Angeles.                                                          stability, resulting in a dataset shape of (𝑅, 𝑙, 𝑁 ).
+   • D2: Stock [87]. It comprises daily historical Google stock
+      data from 2004 to 2019, including volume and high, low, open-            4.2    Evaluation Measure Suite
+      ing, closing, and adjusted closing prices.                               Dozens of measures exist to gauge the quality of TSG methods,
+   • D3: Stock Long [87]. It is identical to the Stock dataset but             which typically adhere to principles like diversity, fidelity, and use-
+      with a sequence length of 125.                                           fulness, as outlined in §1.1. We next offer a suite of twelve prevalent
+   • D4: Exchange [46]. It contains the daily exchange rates of                measures (M1–M12), complemented by in-depth descriptions. A
+      eight countries (i.e., Australia, Britain, Canada, Switzerland,          summary of these measures used in TSG is depicted in Figure 4.
+      China, Japan, New Zealand, and Singapore) from 1990 to 2016.             Model-based Measures. These measures predominantly adhere to
+   • D5: Energy [9]. It includes information on appliance’s en-                the TSTR scheme [20, 40]. This scheme involves using the syntheti-
+      ergy use in a low-energy building.                                       cally generated series to train a post-hoc neural network, which is
+   • D6: Energy Long [9]. It is identical to the Energy dataset                subsequently tested on the original time series.
+      but with a sequence length of 125.                                          • M1: Discriminative Score (DS) [87]. This measure employs
+   • D7: EEG [72]. It is with the measurements derived from Elec-                    a post-hoc time-series classification model with 2-layer GRUs
+      troEncephaloGraphy (EEG) data captured by Emotiv EEG                           or LSTMs to differentiate between original and generated
+      Neuroheadset. It helps to understand brainwave patterns, es-                   series [87]. Each original series is labeled as real, while the
+      pecially those under specific cognitive conditions or stimuli.                 generated series is labeled synthetic. Using these labels, an
+   • D8: HAPT [71]. It comprises recordings of 30 subjects per-                      RNN classifier is trained. The classification error on a test set
+      forming activities of daily living captured via waist-mounted                  quantifies the generation model’s fidelity.
+      smartphones with embedded inertial sensors.                                 • M2: Predictive Score (PS) [87]. It involves training a post-
+   • D9: Air [88]. It has air quality, meteorological, and weather                   hoc time series prediction model on synthetic data [87]. Using
+      forecast data from 4 major Chinese cities: Beijing, Tianjin,                   GRUs or LSTMs, the model predicts either the temporal vec-
+      Guangzhou, and Shenzhen from 2014/05/01 to 2015/04/30.                         tors of each input series for the upcoming steps [35, 87] or the
+   • D10: Boiler [7]. It collects sensor data from three boilers                     entire vector [38]. The model’s performance is then evaluated
+      from 2014/03/24 to 2016/11/30 to monitor the operating states.                 on the original dataset using the mean absolute error.
+
+
+
+
+                                                                         309
+     Data Preprocessing         Time Series Generation            Generalization Test                                 Time Series Generation Evaluation Measures
+                                                                                                                                                 Distance-    Training
+                                                                                                      Model-based             Feature-based       based                   Visualization
+                                                                                                                                                             Efficiency
+
+                                                                                                     DS                      MDD        ACD         ED                       t-SNE
+                                                                                                                                                              Training
+                                                                                                              C-FID                                            Time
+                                      Source Domain                      Target Domain                                                                                        Distr.
+                                                                                                     PS                       SD        KD         DTW
+                                                                                                                                                                              Plot
+                                  Historical Time Series   Generated Time Series    Ground Truth
+
+
+
+                                                           Figure 3: Overall architecture of TSGBench.
+
+
+   • M3: Contextual-FID (C-FID) [37]. It extends the concept
+     of Frechet Inception Distance (FID) [30] from image genera-
+     tion to TSG. It quantifies how well the synthetic time series
+     conforms to the local context of the time series. Using the
+     time series embeddings from [23], it learns embeddings that
+     seamlessly blend with the local context.
+Feature-based Measures. These measures are designed to capture
+inter-series correlations and temporal dependencies, assessing how
+well the generated time series preserves original characteristics.
+A key advantage of feature-based measures is their capacity to
+yield clear and deterministic results, providing an unambiguous
+assessment of the quality of generated time series.
+   • M4: Marginal Distribution Difference (MDD) [59]. This
+      measure computes an empirical histogram for each dimension
+      and time step in the generated series, using the bin centers
+      and widths from the original series. It then calculates the
+      average absolute difference between this histogram and that
+      of the original series across bins, assessing how closely the
+      distributions of the original and generated series align.
+                                                                                                   Figure 4: Summary of evaluations in popular TSG methods.
+   • M5: AutoCorrelation Difference (ACD) [46]. It computes
+      the autocorrelation of both the original and generated time se-
+      ries, then determines their difference [46, 65]. By contrasting                                 • M8: Training Time. It refers to the wall clock time for train-
+      the autocorrelations, we could evaluate how well dependen-                                        ing a TSG method. It is a vital measure for evaluating and
+      cies are maintained in the generated time series.                                                 deploying TSG methods due to economic considerations.
+   • M6: Skewness Difference (SD). Beyond ACF, we also con-
+      sider the statistical measures [28, 81]. Skewness is vital for                               Visualization. Visualization offers an intuitive and visually inter-
+      the marginal distribution of a time series, quantifying its dis-                             pretive perspective to directly compare and contrast the structures
+      tribution asymmetry. Given the mean (standard deviation) of                                  and patterns between the original and generated time series.
+      the train time series 𝑻𝑠𝑡𝑟 as 𝝁𝑠𝑡𝑟 (𝝈𝑠𝑡𝑟 ) and the generated time                               • M9: t-SNE [80]. It is a prevalent technique for succinctly
+               𝑔𝑒𝑛       𝑔𝑒𝑛    𝑔𝑒𝑛
+      series 𝑻𝑠 as 𝝁𝑠 (𝝈𝑠 ), we evaluate the fidelity of 𝑻𝑠 by
+                                                                     𝑔𝑒𝑛                                 visualizing the distribution of generated time series compared
+      computing the skewness difference between them as:                                                 to the original one within a two-dimensional space.
+                  |︁                                            |︁                                    • M10: Distribution Plot [38]. It illuminates the difference
+                  |︁ E[(𝑻 𝑔𝑒𝑛 − 𝝁𝑔𝑒𝑛 ) 3 ] E[(𝑻 𝑡𝑟 − 𝝁 𝑡𝑟 ) 3 ] |︁
+                         𝑠         𝑠             𝑠        𝑠                                              between the input and generated time series in terms of den-
+           𝑆𝐷 = |︁                        −                              (1)
+                  |︁                                            |︁
+                             𝑔𝑒𝑛 3
+                                                                |︁ .
+                  |︁       𝝈𝑠                      𝝈𝑠𝑡𝑟 3       |︁                                       sity, spread, and central tendency to show how the generated
+                                                                                                         time series closely mirrors the original’s statistics.
+   • M7: Kurtosis Difference (KD). Like skewness, kurtosis as-
+     sesses the tail behavior of a distribution, revealing extreme                                 Challenges in DS and PS. As depicted in Figure 4, DS and PS are
+     deviations from the mean. Using notations from Equation 1,                                    frequently employed for evaluating TSG methods. However, they
+                                                 𝑔𝑒𝑛
+     the kurtosis difference between 𝑻𝑠𝑡𝑟 and 𝑻𝑠 is calculated as:                                 can yield unreliable evaluations for several reasons:
+               |︁                                            |︁                                       (1) DS and PS rely on the TSTR scheme, necessitating post-hoc
+               |︁ E[(𝑻 𝑔𝑒𝑛 − 𝝁𝑔𝑒𝑛 ) 4 ] E[(𝑻 𝑡𝑟 − 𝝁 𝑡𝑟 ) 4 ] |︁
+                      𝑠         𝑠           𝑠        𝑠                                                    model training. The inherent randomness in deep models,
+         𝐾𝐷 = |︁                       −                          (2)
+               |︁                                            |︁
+                                                             |︁ .
+               |︁       𝝈
+                          𝑔𝑒𝑛 4
+                            𝑠                 𝝈 𝑡𝑟 4        𝑠
+                                                             |︁                                           such as weight initialization, can cause inconsistent eval-
+                                                                                                          uations [38, 48]. While repeated training and averaging of
+Training Efficiency. Training efficiency is crucial, particularly                                         results can mitigate this issue, it is time-intensive.
+in cases that demand rapid TSG methods or where computational                                         (2) These measures often hinge on specific network architec-
+resources are scarce. However, only a few studies, such as [15, 38],                                      tures and configurations, which vary across studies [37, 87],
+have been employed for evaluation in this context.                                                        complicating the comparisons of different TSG methods.
+
+
+
+
+                                                                                             310
+   (3) They are sensitive to dataset sizes. With smaller datasets,                       while the differences come from the unique characteristics inherent
+       they may not converge effectively due to insufficient training                    to each scenario. To illustrate, we first present a motivating example
+       data, compromising their reliability [15, 48].                                    before offering a formal definition.
+   (4) The sequence length for TSG is typically short, often just                        Example 4.1: In a factory, a machine (source domain) equipped
+       24-time points, as seen in datasets like Stock and Energy                         with sensors generates operational data as a source time series
+       [87]. They may not contain enough periodic information to                         𝑻𝑠 . A TSG model 𝐺 is trained on this machine’s historical data
+       accurately assess the TSG efficacy in real-world scenarios.                       𝑻𝑠𝑡𝑟 and tested on its new data 𝑻𝑠𝑡𝑒 . When a new machine (target
+   In summary, while DS and PS offer specific insights into the                          domain) with identical sensors is installed, TSG models are used
+quality of generated time series, their lack of robustness, time-                        to synthesize sensor readings due to limited data availability. After
+intensive nature, and difficulty adapting to varying dataset sizes
+                                                                                         collecting a brief historical time series 𝑻𝑡ℎ𝑖𝑠 from this new machine,
+and sequence lengths make them less suitable for a comprehensive                                                                               𝑔𝑒𝑛
+                                                                                         the goal is to generate a synthetic time series 𝑻𝑡 reflecting its
+and reliable evaluation of TSG methods.
+                                                                                         expected performance and patterns. An effective TSG model should
+Distance-based Measures. To mitigate the challenges associated                           adapt to this new machine, producing realistic synthetic data. △
+with DS and PS, we propose the incorporation of two distance-based
+                                                                                            In Example 4.1, the time series available are 𝑻𝑠𝑡𝑟 , 𝑻𝑠𝑡𝑒 , and 𝑻𝑡ℎ𝑖𝑠 .
+measures to provide an efficient, deterministic evaluation.                                                                     𝑔𝑒𝑛
+   • M11: Euclidean Distance (ED). For each original series 𝒔𝑡𝑟 =                        To evaluate the generated time series 𝑻𝑡 , we use a comprehensive
+                                                                                                      𝑔𝑡
+      (𝑥 1, · · · , 𝑥𝑙 ) and its generated series 𝒔𝑔𝑒𝑛 = (𝑦1, · · · , 𝑦𝑙 ), 𝐸𝐷 =         time series 𝑻𝑡 from the target domain as the ground truth. Since
+      √︂
+         ∑︁𝑙                2
+                                                                                         we aim to benchmark TSG methods, we do not explore scenarios
+           𝑖=1 (𝑥𝑖 − 𝑦𝑖 ) . We take the mean of ED for all series and                    like modifying the model’s architectures or hyperparameter tuning.
+      all samples. Given that the input time series has been prepro-                     Accordingly, we focus on the following three DA cases.
+      cessed to fit within the range of [0, 1], ED deterministically
+      assesses the similarity between 𝒔𝑔𝑒𝑛 and 𝒔𝑡𝑟 . It provides a                       Definition 4.1 (Single DA): A TSG model 𝐺 is trained using the time
+      value-wise comparison between the time series.                                     series 𝑻𝑠𝑡𝑟 from the source domain. It then generates a new time series
+                                                                                           𝑔𝑒𝑛                                                               𝑔𝑡
+   • M12: Dynamic Time Warping (DTW) [6]. Given that ED                                  𝑻𝑡 in the target domain and evaluates the performance against 𝑻𝑡 .
+      overlooks alignment, we include DTW to capture the optimal                         Definition 4.2 (Cross DA): A TSG model 𝐺 is trained using the time
+      alignment between series regardless of their pace or timing.                       series 𝑻𝑠𝑡𝑟 from the source domain, alongside a small subset of time
+      The alignment facilitated by DTW offers insights into the pre-                     series from the target domain 𝑻𝑡ℎ𝑖𝑠 . It then generates a new time series
+      dictive quality of the generated series. Moreover, as shown by                       𝑔𝑒𝑛
+                                                                                         𝑻𝑡 in the target domain and assesses the performance against 𝑻𝑡 .
+                                                                                                                                                               𝑔𝑡
+      [75], multi-dimensional DTW [57] can enhance downstream
+      classification tasks, serving as a discriminative measure.                         Definition 4.3 (Reference DA): A TSG model 𝐺 is trained solely
+   Using ED and DTW, we can efficiently and effectively evaluate                         using a small subset of time series from the target domain 𝑻𝑡ℎ𝑖𝑠 . It then
+                                                                                                                       𝑔𝑒𝑛
+the quality of generated time series, offering streamlined alterna-                      generates a new time series 𝑻𝑡 in the target domain and gauges the
+                                                                                                                 𝑔𝑡
+tives to DS and PS with similar evaluation goals.                                        performance against 𝑻𝑡 .
+
+                                                                                         Datasets and Evaluations. We extend three datasets HAPT [71],
+4.3     Generalization Test
+                                                                                         Air [88], and Boiler [7] for generalization testing, as they include
+Motivation. The domain shift problem is a significant concern                            domain information in line with conventions in time series DA
+in the field of time series analysis [7, 31, 67]. For the task of TSG,                   tasks [7, 67]. Specifically, our dataset configurations are as follows:
+most methods usually require large datasets, and many GAN-based                             • HAPT [71]. The user is treated as the domain attribute. We
+methods (e.g., TimeGAN [87] and GT-GAN [38]) are time-intensive                                randomly select User 14 as the source domain and Users 0, 23,
+to train and fine-tune [15]. Nevertheless, many applications strug-                            18, 52, and 20 as the target domains. Our evaluation targets the
+gle to quickly accumulate sufficient data. Their efficacy may suffer                           time series for ‘walking’ as it provides a more concentrated
+in data-limited situations. Thus, evaluating the generalization ca-                            and comparable analysis of each user’s walking pattern.
+pabilities of these methods on small data becomes crucial.                                  • Air [88]. The city serves as the domain attribute. We ran-
+Domain Adaptation (DA). We introduce a novel generalization                                    domly chose Tianjin (TJ) as the source domain and selected
+test using DA [1] to assess the generalization capabilities of TSG                             Beijing (BJ), Guangzhou (GZ), and Shenzhen (SZ) as the target
+methods on small datasets. While DA has been widely applied in                                 domains. This setup enables us to investigate variations in air
+other time series tasks like classification and forecasting [7, 31, 83],                       quality patterns across different urban settings.
+its application in TSG remains underexplored. This is because typi-                         • Boiler [7]. We employ the boiler machine as the domain at-
+cal DA tasks necessitate labels (such as class labels for classification                       tribute. Boiler 1 is randomly chosen as the source domain,
+or future values for forecasting) and aim to minimize the distribu-                            with Boilers 2 and 3 serving as the target domains. This con-
+tion shift between source and target domains.                                                  figuration allows us to examine operational variations and
+    We follow the conventions in DA tasks for time series data [7,                             similarities across different boiler units.
+31, 67, 83], examining examples that range from monitoring patient                          We utilize the evaluation criteria outlined in §4.2 for assessment.
+mortality [71] to recording climate and air quality across cities [88],                  DA tasks serve as a valuable lens to scrutinize the generalization
+and assessing different machines in a factory [7]. The commonality                       capabilities of TSG methods across domains. It is pertinent to men-
+across these examples lies in the time-dependent nature of the data,                     tion that for the generalization test, efficient processing of data
+
+
+
+
+                                                                                   311
+from the target domain is essential, making the training efficiency              6 RESULTS ANALYSIS
+of a TSG method a pivotal consideration. Thus, the results from DA
+                                                                                 6.1 TSG Benchmarking
+can enhance other time series tasks by providing synthetic data for
+target domains with limited sample availability.                                 We first present the results of ten methods applied to ten real-world
+                                                                                 datasets in Figures 5 and 6.
+                                                                                 Model-based Evaluations. As evident from the first three rows of
+5    EXPERIMENTAL SETUP                                                          Figure 5, TimeVQVAE, TimeVAE, RTSGAN, and COSCI-GAN con-
+The primary goal of TSGBench is to establish a rigorous, standard-               sistently excel across the three model-based measures. In contrast,
+ized framework for evaluating various TSG methods. As such, we                   RGAN and TimeGAN underperform. The superior performance of
+will not conduct an exhaustive evaluation, given time and resource               VAE-based methods can be attributed to their adeptness at capturing
+constraints [15, 38]. Instead, we concentrate on assessing recent,               temporal dependencies, pivotal for forecasting and representation
+prevalent methods that come with publicly available code and have                learning tasks. Some methods like LS4, despite having high DS and
+exhibited state-of-the-art performance on selected datasets.                     PS, secure a relatively low C-FID. This indicates their satisfactory
+Algorithms. Our initial experiments evaluate the performance of                  performance in the representation learning tasks. Some outliers ap-
+ten pivotal TSG algorithms mentioned in §3.2. These algorithms,                  pear in Energy and Energy Long, where almost all methods achieve
+carefully selected from academic literature, include: (1) pure GAN-              DS around 0.5. This suggests while the generated time series might
+based methods: RGAN [20], TimeGAN [87], RTSGAN [66], COSCI-                      suffice for predictive tasks, they are easily distinguishable in classi-
+GAN [74], and AEC-GAN [81]; (2) pure VAE-based method: TimeVAE                   fication tasks. Additionally, the large standard deviation in DS is
+[15] and TimeVQVAE [48]; (3) mixed-type methods: GT-GAN [38],                    worth noting, which will be further analyzed in §6.3.
+LS4 [89], and Fourier Flow [2].                                                     Upon integrating observations from Table 3, we find that as 𝑙
+                                                                                 increases, PS will slightly drop, implying that shorter sequences
+Datasets. Our experiments draw on ten real-world datasets across                 present a greater challenge in generating time series. Furthermore, a
+diverse domains, as detailed in §4.1. Moreover, we extend HAPT,                  relatively strong correlation appears between 𝑁 and these measures,
+Air, and Boiler for generalization tests, as described in §4.3.                  suggesting that the generation of high-dimensional time series
+Evaluation Measures. We employ twelve evaluation measures                        presents a steeper challenge, leading to higher DS and PS.
+outlined in §4.2 to make a thorough and systematic assessment of                 Feature-based Evaluations. In Figure 5, when examining feature-
+the TSG algorithms. The lower value means the better performance.                based measures from rows 4 to 7, Fourier Flow delivers the best
+Specifically, for DS and PS, we adopt two layers of LSTM; for C-FID,             performance in ACD, while COSCI-GAN dominates in MDD and
+we adopt ts2vec [23] as the backbone. For all evaluation measures,               SD. This is likely due to their effectiveness in capturing the statisti-
+we repeat them five times and report their average results.                      cal properties of time series. Interestingly, within each dataset, the
+Experiments Environments. All experiments are conducted on                       performance ranking across all four measures appears to be con-
+a machine with Intel® Xeon® Gold 6342 CPU @ 2.80GHz, 64 GB                       sistent. This consistency implies a robust correlation among these
+memory, and NVIDIA GeForce RTX 3090.                                             feature-based measures, indicating that the overall performance of
+                                                                                 a method in capturing key features is likely consistent as well.
+Parameter Settings. For RGAN, the number of hidden units for
+                                                                                    Moreover, feature-based measures, which primarily assess the
+GANs is set to 4𝑛. For TimeGAN, we use the suggested settings
+                                                                                 statistical similarities between original and generated data, tend to
+[87] and adopt three-layer GRUs for the network architectures. For
+                                                                                 improve when 𝑁 > 10. This observation suggests that generated
+RTSGAN, we adhere to its complete time series generation [66]
+                                                                                 time series may better match the statistical properties of the original
+and set 𝛽 1 = 0.9 and 𝛽 2 = 0.999. For COSCI-GAN, we set 𝛾 = 5,
+                                                                                 one when dealing with high-dimensional datasets, potentially due
+employ MLP-based networks for the central discriminator, and
+                                                                                 to the rich features available for modeling.
+follow other hyper-parameters from [74]. For AEC-GAN, we set
+the context length 𝑙𝑐 = 4 if 𝑙 = 16, 𝑙𝑐 = 85 if 𝑙 = 24, 𝑙𝑐 = 25 if               Distance-based Evaluations. The patterns observed in the distance-
+𝑙 = 125, 𝑙𝑐 = 28 if 𝑙 = 128, 𝑙𝑐 = 56 if 𝑙 = 168, and 𝑙𝑐 = 64 if 𝑙 = 192,         based measures, shown in the 8th and 9th rows of Figure 5, differ
+and set the generation length 𝑙𝑞 = 𝑙 − 𝑙𝑐 . For TimeVAE, we set the              from those in earlier measures. This divergence arises because
+latent dimension to 8 and the hidden layer sizes to 50, 100, and 200.            distance-based measures direct quantification of dissimilarity be-
+For TimeVQVAE, we adopt settings from [48], with 𝑛_𝑓 𝑓 𝑡 = 8 and                 tween the generated and original time series. Regarding ED and
+varying 𝑚𝑎𝑥_𝑒𝑝𝑜𝑐ℎ𝑠 ∈ {2000, 10000} for two training stages. For                  DTW, VAE-based methods stand out. They effectively capture the
+GT-GAN, we use regular time series from [38] and set 𝑃𝑀𝐿𝐸 = 2.                   overall trend of the original time series, preserving both value prox-
+The absolute and relative tolerances for the generator are set to 0.001          imity (ED) and trend similarity (DTW).
+and 0.01 for Energy and Energy Long, respectively, and 0.01 and                     An intriguing finding is that the distances between generated
+0.001 for other datasets. For LS4, we set the latent space dimension             and authentic time series amplify as 𝑙 increases. This is likely be-
+to 5 and configured the batch size to 512 for Air and Boiler and 1024            cause longer sequences introduce more complex temporal depen-
+for the rest, optimizing GPU utilization. For Fourier Flow, which is             dencies, making them harder to model accurately, leading to larger
+primarily designed for individual series, we follow its guidelines [2]           divergence in values and alignment. Conversely, as 𝑁 grows, these
+and adapt it for time series with 𝑁 > 1 by using DFT [62] to each                distances decrease. The reason could be that a larger set of series
+dimension. We configure the hidden size to 50 and set the number                 provides a broader range of temporal patterns and inter-series cor-
+of flows to 3 for Stock and Stock Long and 5 for others.                         relations, benefiting the methods’ evaluation.
+
+
+
+
+                                                                           312
+                                                        Figure 5: TSG benchmarking.
+
+
+Training Efficiency. In the final row of Figure 5, we explore the               Visualization. At last, we look into the t-SNE visualization and
+training efficiency. For ease of interpretation, we categorize training         Distribution Plot of the generated time series in Figure 6. VAE-based
+times into four distinct segments: < 1 minute, < 1 hour, < 1 day,               methods, COSCI-GAN, and RTSGAN excel at generating time series
+and ≥ 1 day. Our findings highlight the exceptional efficiency of               that closely mirror the features and patterns of the original ones.
+TimeVAE and LS4, likely due to their VAE-based structure and effi-              Examining the subtleties among these leading methods reveals vari-
+cient training strategies that minimize computational demands and               ations in their generation capabilities for different distributions. For
+iterations needed for convergence. On the other hand, TimeVQVAE,                instance, the DLG dataset, characterized by its bimodal distribution,
+while effective in modeling, presents a more time-intensive train-              challenges COSCI-GAN, which struggles to capture both modes
+ing process. The complexity of TimeVQVAE arises primarily from                  accurately. Conversely, TimeVAE and LS4 perform well with the
+its STFT process, tokenization, and iterative decoding. Also, our               Exchange dataset with the multifaceted peak structure, indicating
+fairness-driven decision to maintain consistent hyper-parameters                their innate ability to grasp multifarious distributional patterns.
+across all datasets potentially escalates training times for those with            Some methods, such as RGAN and GT-GAN, which might fare
+larger 𝑅 values. In addition, GAN-based methods generally manifest              well on a single data distribution, cannot deal with the dramatic shift
+longer training times. For example, GT-GAN takes training time of               in the overall distributions (e.g., from Stock to HAPT). This suggests
+more than 1 day on all datasets except Stock, DLG, and Exchange.                limitations in their ability to adapt to significantly different data
+The inherent intricacy of GANs, requiring concurrent training of                distributions. We also find that some methods, e.g., RGAN, while
+generator and discriminator networks to reach equilibrium, leads                they successfully mimic the distribution of the original time series
+to a longer convergence period.                                                 in their generated output (e.g., Energy), stumble when it comes
+
+
+
+
+                                                                          313
+           Figure 6: Visualization for TSG benchmarking by t-SNE and Distribution Plot (blue as 𝑻 𝑡𝑟 , orange as 𝑻 𝑔𝑒𝑛 ).
+
+
+to the precise matching by t-SNE. This observation aligns with                (e.g., TimeVAE and COSCI-GAN) in cross DA outperforms that
+the quantitative results in Figure 5, underscoring the challenges             in reference DA. This indicates that they do not treat the smaller
+in replicating exact values of the original time series rather than           proportion of target domain time series 𝑻𝑡ℎ𝑖𝑠 as noise, even when
+overall distribution characteristics. Moreover, some methods, like            faced with multiple distributions as inputs. Conversely, methods
+TimeGAN, can partially fit the original time series but usually               like RTSGAN and LS4 excel in single DA, as they quickly converge
+contain extraneous information. They may struggle to handle the               when given a limited set of time series. In addition, for the target
+inherent noise present in real-world time series.                             domain User 20, TimeVAE’s performance in reference DA matches
+                                                                              the level achieved in cross DA. This may be due to User 20’s data dis-
+6.2    Generalization Test                                                    tribution being relatively simpler and less noisy, facilitating quicker
+In conjunction with benchmarking results, we delve deeper into                convergence for TimeVAE during training
+a select group of methods that showcased eminent performance,                    As 𝑅 and 𝑁 grow (from HAPT to Air and Boiler), we observe a
+with a pronounced emphasis on efficiency, especially when contem-             consistent pattern for the single DA task in Figures 7(b) and 7(c).
+plating generalization in the nascent stages of the target domain. In         In the case of the reference DA task, a larger 𝑅 facilitates model
+particular, we employ TimeGAN as the baseline and focus on four               convergence, yielding more competitive outcomes compared to the
+efficient methods with leading performance, i.e., TimeVAE, COSCI-             cross DA task. Another interesting observation is the inconsistent
+GAN, RTSGAN, and LS4. Quantitative results for the datasets HAPT,             performance of SD, KD, and DTW measures in evaluating DA for
+Air, and Boiler are displayed in Figure 7, where each measure is              the Boiler dataset compared to the HAPT and Air datasets. This
+partitioned into three parts by gray dashed lines, signifying the             discrepancy is due to the periodic trends present in HAPT and Air.
+single DA, cross DA, and reference DA, respectively.                          Since SD and KD gauge data distribution and DTW assesses align-
+   We first focus on the HAPT dataset, which consists of the most             ment, they are less effective for datasets lacking periodic trends.
+number of target domains. As depicted in Figure 7(a), certain meth-
+ods like TimeGAN show a little discrepancy in their performance               6.3    Robustness Test for Evaluation Measures
+across single DA, cross DA, and reference DA. This suggests that              In the course of TSG benchmarking (§6.1) and generalization testing
+these methods may struggle with generalization in many cases.                 (§6.2), we observed significant variability and inconsistency in DS
+For instance, TimeGAN may struggle to adapt effectively due to                and PS. Thus, we undertook additional analyses to evaluate the
+reasons inherent to its model design. Another noteworthy obser-               sensitivity and robustness of various evaluation measures.
+vation is the considerable standard deviation seen in DS and PS                  We randomly generated 10,000 synthetic time series with 𝑁 = 5
+under DA tasks, barring those that exhibit the worst score (0.5).             adhering to the sine function [87], expressed as 𝑥𝑖,𝑗 = sin(2𝜋𝜂 𝑗 +𝜃 ),
+This heightened variance undermines their reliability, which will             where 𝜂 ∼ U [0, 1], 𝜃 ∼ U [−𝜋, 𝜋], 𝑖 ∈ [1, 5], and 𝑗 ∈ [1, 𝑙]. We then
+be further analyzed in §6.3. When examining methods with strong               assessed these series using two sequence lengths, 𝑙 = 24 and 𝑙 = 125,
+generalization capabilities, the performance of some algorithms               employing the evaluation measures outlined in §4.2. The predictive
+
+
+
+
+                                                                        314
+                          (a) HAPT (Source: User 14).                                 (b) Air (Source: Tianjin, TJ).      (c) Boiler (Source: Boiler 1).
+
+               Figure 7: Generalization test: single DA, cross DA, and reference DA (left to right in each subfigure).
+
+
+score incorporated two configurations: next step forecasting [87]                  Across all evaluation measures and datasets, no single method
+(denoted as PS) and entire sequence forecasting (denoted as PS                  consistently dominates, but TimeVQVAE, TimeVAE, COSCI-GAN,
+(entire)) [38]. Table 4 considered two scenarios for input time series:         RTSGAN, and LS4 often outperform others. Specifically, TimeVAE
+(1) identical original and generated data, where ideal evaluation               and LS4 excel in distance-based measures and demonstrate impres-
+measures should be 0; and (2) time series sampled from the same                 sive training efficiency, while COSCI-GAN and RTSGAN lead in
+sine function but with different seeds.                                         model-based measures. In contrast, RGAN generally ranks lower in
+   In Table 4, it is evident that all feature-based, distance-based             performance. A dataset-centric analysis reveals a similar pattern,
+measures and C-FID demonstrate the robustness and accurate re-                  with the same group of TimeVQVAE, TimeVAE, COSCI-GAN, RTS-
+flection of the changes in input time series. Contrarily, DS and PS             GAN, and LS4 achieving high rankings across various datasets. This
+exhibit some inconsistencies. For instance, the scores for DS and PS            consistency across different evaluation aspects further validates
+from random sampling at 𝑙 = 125 manifest lower values than their                the robustness and reliability of TSGBench.
+identical counterparts, a result that tends to be counter-intuitive.
+                                                                                Statistical Validation. To statistically confirm the method ranking,
+Also, the standard deviation of DS is notably high relative to the
+                                                                                we employ the Friedman test [24] along with Conover’s test [12, 78]
+mean value, suggesting considerable variation. Moreover, DS ap-                 for ranking comparisons. Figure 8 presents the average rankings
+pears insensitive to the increase in 𝑙, limiting its effectiveness in
+                                                                                and the critical difference for each method.
+accurately evaluating the TSG methods’ performance on longer
+                                                                                    The ten TSG methods can be segregated into four tiers. TimeVQ-
+sequences. The above observations confirm that DS and PS may be                 VAE, TimeVAE, COSCI-GAN, LS4, and RTSGAN lead, followed by
+less robust than other measures, especially as input settings change.           Fourier Flow, AEC-GAN, and TimeGAN. GT-GAN forms the third
+This aligns with the challenges we discussed in §1.1.
+                                                                                cohort, while RGAN occupies the lowest tier. This aligns with the
+                                                                                observations from §6.1. The supremacy of the first-tier methods be-
+6.4    Ranking Analysis                                                         comes unambiguously clear as they stand statistically distinct from
+Selecting suitable TSG methods is vital for handling new time                   their counterparts spanning the other three tiers. Zooming into
+series datasets. Therefore, it is crucial to understand and analyze             this premier group, despite the noticeable lead of TimeVQVAE and
+the consistency in performance across various methods.                          TimeVAE, they do not statistically tower over their peers within the
+Method Ranking. We initially present the ranking of ten methods                 group. This statistical overlap is not confined to the elite group but
+under two specific scenarios. First, we evaluate their performance              is also exhibited in the second group. Such an overlap indicates that
+across all datasets for each individual measure, as depicted on the             the performance deltas between methods within these groups are
+left-hand side of Figure 1. Second, we examine their average ranking            not glaringly vast. Conversely, the third and fourth groups’ distinct
+across all measures but constricted to each dataset included in                 position underscores a pronounced performance chasm, setting it
+TSGBench, as showcased on the right-hand side of Figure 1.                      distinctly apart from others.
+
+
+
+
+                                                                          315
+                                           Table 4: Robustness test on ten evaluation measures.
+
+                                                           Model-based                                       Feature-based                Distance-based
+       Input         Shape (𝑅, 𝑙, 𝑁 )
+                                            DS            PS        PS (entire)         C-FID       MDD        ACD         SD     KD      ED      DTW
+                      (10,000, 24, 5)   0.006±0.003   0.094±0.000   0.072±0.005       0.000±0.000   0.001      0.000      0.000   0.000   0.000   0.000
+      Identical
+                     (10,000, 125, 5)   0.010±0.007   0.251±0.003   0.169±0.001       0.000±0.000   0.000      0.000      0.000   0.000   0.000   0.000
+                      (10,000, 24, 5)   0.009±0.005   0.094±0.000   0.071±0.005       0.003±0.000   0.222   0.131×10 −3   0.009   0.007   0.653   1.689
+ Random Sampling
+                     (10,000, 125, 5)   0.003±0.005   0.249±0.003   0.168±0.001       0.016±0.001   0.108      0.022      0.009   0.020   4.350   9.663
+
+
+                                                                                         Nevertheless, considering the robustness issues with DS and
+                                                                                         PS, we recommend starting with C-FID. Its prowess in gaug-
+                                                                                         ing fidelity based on representations bestows it with the
+                                                                                         capability to augment subsequent tasks.
+                                                                                     (2) When the goal is to emphasize the statistical attributes of
+   Figure 8: Critical difference diagram of TSG methods.                                 the dataset, feature-based measures emerge as the preferred
+                                                                                         option, offering precise insights into the statistical nuances.
+6.5    Recommendations                                                               (3) In projects focusing on time series clustering, distance-based
+                                                                                         metrics assume an elevated importance due to their ability to
+Finally, we provide guidelines to assist users in effectively using TS-                  discern subtle distinctions and similarities within the data.
+GBench. This benchmark is designed to be a beacon for navigating                     Thus, users can customize their choice of evaluation measures
+the intricate terrain of TSG.                                                     to align closely with their research goals, ensuring more robust
+Selection of TSG Methods. TSGBench serves as a toolkit to ef-                     results. Note that not all measures tend to yield uniform outcomes
+fectively discern the most appropriate TSG methods for different                  consistently. Users could continually calibrate their evaluations
+datasets. When confronted with a new dataset, an insightful strat-                and discern the trade-off between effectiveness and efficiency. This
+egy would be to juxtapose the statistical properties and distributions            ensures that the chosen measures are not only reflective of the
+of the new time series datasets against those cataloged in TSGBench.              desired outcomes but also optimized for performance.
+This strategy offers a navigational compass, pointing users towards
+relevant generation techniques.                                                   7     CONCLUSION AND FUTURE WORK
+    (1) As a foundational step, we advocate for users to commence                 In this paper, we propose TSGBench, a groundbreaking benchmark
+        with VAE-based methods (e.g., TimeVAE and LS4). Their                     specifically designed for TSG. This benchmark is comprehensive,
+        consistent leading performance and superior computational                 featuring datasets from diverse domains, a standardized data pre-
+        efficiency make them go-to choices for initial exploration.               processing pipeline, a holistic evaluation suite, and a novel general-
+    (2) In applications emphasizing autocorrelation or forecasting,               ization test grounded in DA. Extensive results validate its capability
+        such as predictive maintenance or stock market analysis,                  to offer a unified and equitable platform for assessing the efficacy
+        the ACD measure becomes crucial. Fourier Flow, which is                   and robustness of various TSG methods. Importantly, TSGBench
+        recognized for maintaining temporal dependencies, is highly               also sheds light on the potential of their generalization capabil-
+        suitable for these scenarios. On the other hand, for capturing            ities. As a collaborative resource, it promises to catalyze further
+        complex multi-variate relationships in datasets, COSCI-GAN                advancements within the time series community.
+        is the recommended choice.                                                    Looking forward, our aspirations for TSGBench are multifold.
+    (3) Subsequent considerations focus on dataset size and domain                We intend to continually integrate emerging TSG methods, en-
+        specificity. For small-sized datasets, RTSGAN and LS4, which              suring the benchmark remains at the vanguard of advancements.
+        excel in single DA, are strong choices. For heterogeneous                 Also, the addition of new datasets is on the horizon, aiming to en-
+        datasets, or when the goal is to generate time series for a               hance the diversity and complexity of the challenges the benchmark
+        new target domain, TimeVAE and COSCI-GAN stand out for                    addresses. Lastly, we are also contemplating introducing function-
+        their effectiveness in cross DA.                                          alities that facilitate automatic tuning, thereby streamlining the
+    (4) Users can further fine-tune their method selection based                  training process and making it even more friendly for users.
+        on specific real-world application needs, which involves
+        identifying the most relevant evaluation measures. In this                ACKNOWLEDGMENTS
+        case, Figure 1 serves as a valuable visual guide.
+                                                                                  This research is supported by the National Research Foundation,
+Selection of Evaluation Measures. When evaluating a new TSG                       Singapore under its Strategic Capability Research Centres Fund-
+method, a comprehensive assessment is essential. Leveraging the                   ing Initiative and the Ministry of Education, Singapore, under its
+features of TSGBench, we offer the following guidelines to facilitate             MOE AcRF TIER 3 Grant (MOE-MOET32022-0001). Any opinions,
+this process. This allows users to tailor their choice of evaluation              findings and conclusions or recommendations expressed in this
+measures to the specific application requirements.                                material are those of the author(s) and do not reflect the views
+   (1) For applications where generated series will be used in classi-            of National Research Foundation, Singapore and the Ministry of
+       fication or forecasting, model-based measures are advisable.               Education, Singapore.
+
+
+
+
+                                                                          316
+REFERENCES                                                                                           [28] Xin Dong Baoren Xiao Lei Jiang Hang Lou, Jiajie Tao and
+ [1] Ahmed Alaa, Boris Van Breugel, Evgeny S Saveliev, and Mihaela van der Schaar.                        Hao Ni. 2023.             Evaluation of Time Series Generative Models.
+     2022. How Faithful is your Synthetic Data? Sample-level Metrics for Evaluating                       https://github.com/DeepIntoStreams/Evaluation-of-Time-Series-Generative-
+     and Auditing Generative Models. In ICML. 290–306.                                                    Models.git.
+ [2] Ahmed M. Alaa, Alex James Chan, and Mihaela van der Schaar. 2021. Generative                    [29] Yuanzhe Hao, Xiongpai Qin, Yueguo Chen, Yaru Li, Xiaoguang Sun, Yu Tao, Xiao
+     Time-series Modeling with Fourier Flows. In ICLR.                                                    Zhang, and Xiaoyong Du. 2021. TS-Benchmark: A Benchmark for Time Series
+ [3] Yihao Ang, Qiang Huang, Anthony KH Tung, and Zhiyong Huang. 2023. A                                  Databases. In ICDE. 588–599.
+     Stitch in Time Saves Nine: Enabling Early Anomaly Detection with Correlation                    [30] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and
+     Analysis. In ICDE. 1832–1845.                                                                        Sepp Hochreiter. 2017. GANs Trained by a Two Time-Scale Update Rule Converge
+ [4] Anthony Bagnall, Hoang Anh Dau, Jason Lines, Michael Flynn, James Large,                             to a Local Nash Equilibrium. In NIPS. 6629–6640.
+     Aaron Bostrom, Paul Southam, and Eamonn Keogh. 2018. The UEA multivariate                       [31] Hailin Hu, MingJian Tang, and Chengcheng Bai. 2020. Datsing: Data augmented
+     time series classification archive, 2018. arXiv preprint arXiv:1811.00075 (2018).                    time series forecasting with adversarial domain adaptation. In CIKM. 2061–2064.
+ [5] André Bauer, Marwin Züfle, Simon Eismann, Johannes Grohmann, Nikolas                            [32] Jon Hutchins. 2006. Dodgers Loop Sensor. UCI Machine Learning Repository.
+     Herbst, and Samuel Kounev. 2021. Libra: A Benchmark for Time Series Forecast-                        DOI: https://doi.org/10.24432/C51P50.
+     ing Methods. In ICPE. 189–200.                                                                  [33] Hassan Ismail Fawaz, Germain Forestier, Jonathan Weber, Lhassane Idoumghar,
+ [6] Donald J Berndt and James Clifford. 1994. Using dynamic time warping to find                         and Pierre-Alain Muller. 2019. Deep learning for time series classification: a
+     patterns in time series. In KDD Workshop. 359–370.                                                   review. DMKD 33, 4 (2019), 917–963.
+ [7] Ruichu Cai, Jiawei Chen, Zijian Li, Wei Chen, Keli Zhang, Junjian Ye, Zhuozhang                 [34] Vincent Jacob, Fei Song, Arnaud Stiegler, Bijan Rad, Yanlei Diao, and Nesime
+     Li, Xiaoyan Yang, and Zhenjie Zhang. 2021. Time Series Domain Adaptation via                         Tatbul. 2021. Exathlon: A Benchmark for Explainable Anomaly Detection over
+     Sparse Associative Structure Alignment. In AAAI. 6859–6867.                                          Time Series. Proc. VLDB Endow. 14, 11 (2021), 2613–2626.
+ [8] David Campos, Tung Kieu, Chenjuan Guo, Feiteng Huang, Kai Zheng, Bin Yang,                      [35] Daniel Jarrett, Ioana Bica, and Mihaela van der Schaar. 2021. Time-series Gener-
+     and Christian S Jensen. 2021. Unsupervised Time Series Outlier Detection with                        ation by Contrastive Imitation. In NeurIPS. 28968–28982.
+     Diversity-Driven Convolutional Ensembles. Proc. VLDB Endow. 15, 3 (2021),                       [36] Ali Javed, Byung Suk Lee, and Donna M Rizzo. 2020. A Benchmark Study on
+     611–623.                                                                                             Time Series Clustering. Machine Learning with Applications 1 (2020), 100001.
+ [9] Luis Candanedo. 2017. Appliances energy prediction. UCI Machine Learning                        [37] Paul Jeha, Michael Bohlke-Schneider, Pedro Mercado, Shubham Kapoor, Ra-
+     Repository. DOI: https://doi.org/10.24432/C5VC8G.                                                    jbir Singh Nirwan, Valentin Flunkert, Jan Gasthaus, and Tim Januschowski. 2021.
+[10] Tian Qi Chen, Yulia Rubanova, Jesse Bettencourt, and David Duvenaud. 2018.                           PSA-GAN: Progressive self attention GANs for synthetic time series. In ICLR.
+     Neural Ordinary Differential Equations. In NeurIPS. 6572–6583.                                  [38] Jinsung Jeon, Jeonghak Kim, Haryong Song, Seunghyeon Cho, and Noseong
+[11] Razvan-Gabriel Cirstea, Bin Yang, Chenjuan Guo, Tung Kieu, and Shirui Pan.                           Park. 2022. GT-GAN: General Purpose Time Series Synthesis with Generative
+     2022. Towards Spatio- Temporal Aware Traffic Time Series Forecasting. In ICDE.                       Adversarial Networks. In NeurIPS. 36999–37010.
+     2900–2913.                                                                                      [39] Alistair EW Johnson, Tom J Pollard, Lu Shen, Li-wei H Lehman, Mengling Feng,
+[12] William Jay Conover and Ronald L Iman. 1979. On multiple-comparisons proce-                          Mohammad Ghassemi, Benjamin Moody, Peter Szolovits, Leo Anthony Celi,
+     dures. Los Alamos Sci. Lab. Tech. Rep. LA-7677-MS 1 (1979), 14.                                      and Roger G Mark. 2016. MIMIC-III, a freely accessible critical care database.
+[13] Hoang Anh Dau, Anthony Bagnall, Kaveh Kamgar, Chin-Chia Michael Yeh, Yan                             Scientific Data 3, 1 (2016), 1–9.
+     Zhu, Shaghayegh Gharghabi, Chotirat Ann Ratanamahatana, and Eamonn Keogh.                       [40] James Jordon, Jinsung Yoon, and Mihaela Van Der Schaar. 2018. PATE-GAN:
+     2019. The UCR Time Series Archive. IEEE/CAA Journal of Automatica Sinica 6, 6                        Generating synthetic data with differential privacy guarantees. In ICLR.
+     (2019), 1293–1305.                                                                              [41] Eamonn Keogh and Shruti Kasetty. 2002. On the need for time series data mining
+[14] Ruizhi Deng, Bo Chang, Marcus A. Brubaker, Greg Mori, and Andreas M.                                 benchmarks: a survey and empirical demonstration. In KDD. 102–111.
+     Lehrmann. 2020. Modeling Continuous Stochastic Processes with Dynamic                           [42] Patrick Kidger, James Foster, Xuechen Li, and Terry J Lyons. 2021. Neural SDEs
+     Normalizing Flows. In NeurIPS. 7805–7815.                                                            as Infinite-Dimensional GANs. In ICML. 5453–5463.
+[15] Abhyuday Desai, Cynthia Freeman, Zuhui Wang, and Ian Beaver. 2021. TimeVAE:                     [43] Diederik P. Kingma and Prafulla Dhariwal. 2018. Glow: Generative Flow with
+     A Variational Auto-Encoder for Multivariate Time Series Generation. arXiv                            Invertible 1x1 Convolutions. In NeurIPS. 10236–10245.
+     preprint arXiv:2111.08095 (2021).                                                               [44] Diederik P Kingma, Danilo J Rezende, Shakir Mohamed, and Max Welling. 2014.
+[16] Daizong Ding, Mi Zhang, Yuanmin Huang, Xudong Pan, Fuli Feng, Erling Jiang,                          Semi-supervised learning with deep generative models. In NIPS. 3581–3589.
+     and Min Yang. 2022. Towards backdoor attack on deep learning based time series                  [45] Diederik P Kingma and Max Welling. 2013. Auto-encoding variational bayes.
+     classification. In ICDE. 1274–1287.                                                                  arXiv preprint arXiv:1312.6114 (2013).
+[17] Laurent Dinh, David Krueger, and Yoshua Bengio. 2014. Nice: Non-linear inde-                    [46] Guokun Lai, Wei-Cheng Chang, Yiming Yang, and Hanxiao Liu. 2018. Modeling
+     pendent components estimation. arXiv preprint arXiv:1410.8516 (2014).                                Long-and Short-Term Temporal Patterns with Deep Neural Networks. In SIGIR.
+[18] Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio. 2016. Density estimation                       95–104.
+     using Real NVP. In ICLR.                                                                        [47] Kwei-Herng Lai, Daochen Zha, Junjie Xu, Yue Zhao, Guanchu Wang, and Xia
+[19] Chris Donahue, Julian J. McAuley, and Miller S. Puckette. 2019. Adversarial                          Hu. 2021. Revisiting Time Series Outlier Detection: Definitions and Benchmarks.
+     Audio Synthesis. In ICLR.                                                                            In NeurIPS datasets and benchmarks track (round 1).
+[20] Cristóbal Esteban, Stephanie L Hyland, and Gunnar Rätsch. 2017. Real-valued                     [48] Daesoo Lee, Sara Malacarne, and Erlend Aune. 2023. Vector Quantized Time
+     (medical) time series generation with recurrent conditional gans. arXiv preprint                     Series Generation with a Bidirectional Prior Model. In AISTATS. 7665–7693.
+     arXiv:1706.02633 (2017).                                                                        [49] Guozhong Li, Byron Choi, Jianliang Xu, Sourav S Bhowmick, Daphne Ngar-yin
+[21] Vincent Fortuin, Dmitry Baranchuk, Gunnar Rätsch, and Stephan Mandt. 2020.                           Mah, and Grace LH Wong. 2022. IPS: Instance Profile for Shapelet Discovery for
+     GP-VAE: Deep Probabilistic Multivariate Time Series Imputation. In AISTATS.                          Time Series Classification. In ICDE. 1781–1793.
+     1651–1661.                                                                                      [50] Hongming Li, Shujian Yu, and Jose Principe. 2023. Causal Recurrent Variational
+[22] Vincent Fortuin, Matthias Hüser, Francesco Locatello, Heiko Strathmann, and                          Autoencoder for Medical Time Series Generation. In AAAI. 8562–8570.
+     Gunnar Rätsch. 2019. SOM-VAE: Interpretable Discrete Representation Learning                    [51] Xiaomin Li, Vangelis Metsis, Huangyingrui Wang, and Anne Hee Hiong Ngu.
+     on Time Series. In ICLR.                                                                             2022. Tts-gan: A transformer-based time-series generative adversarial network.
+[23] Jean-Yves Franceschi, Aymeric Dieuleveut, and Martin Jaggi. 2019. Unsupervised                       In AIME. 133–143.
+     Scalable Representation Learning for Multivariate Time Series. In NeurIPS. 4652–                [52] Haksoo Lim, Minjung Kim, Sewon Park, and Noseong Park. 2023. Regular
+     4663.                                                                                                Time-series Generation using SGM. arXiv preprint arXiv:2301.08518 (2023).
+[24] Milton Friedman. 1937. The use of ranks to avoid the assumption of normality                    [53] Zinan Lin, Alankar Jain, Chen Wang, Giulia Fanti, and Vyas Sekar. 2020. Using
+     implicit in the analysis of variance. J. Amer. Statist. Assoc. 32, 200 (1937), 675–701.              GANs for Sharing Networked Time Series Data: Challenges, Initial Promise, and
+[25] Ary L Goldberger, Luis AN Amaral, Leon Glass, Jeffrey M Hausdorff, Plamen Ch                         Open Questions. In IMC. 464–483.
+     Ivanov, Roger G Mark, Joseph E Mietus, George B Moody, Chung-Kang Peng, and                     [54] Yuansan Liu, Sudanthi Wijewickrema, Ang Li, and James Bailey. 2022. Time-
+     H Eugene Stanley. 2000. PhysioBank, PhysioToolkit, and PhysioNet: components                         Transformer AAE: Connecting Temporal Convolutional Networks and Trans-
+     of a new research resource for complex physiologic signals. Circulation 101, 23                      former for Time Series Generation. (2022).
+     (2000), e215–e220.                                                                              [55] Spyros Makridakis, Evangelos Spiliotis, et al. 2021. The M5 competition and the
+[26] Ian J Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-                             future of human expertise in forecasting. Foresight: The International Journal of
+     Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. 2014. Generative                          Applied Forecasting 60 (2021), 33–37.
+     adversarial nets. In NIPS. 2672–2680.                                                           [56] Spyros Makridakis, Evangelos Spiliotis, and Vassilios Assimakopoulos. 2018. The
+[27] Arthur Gretton, Karsten M. Borgwardt, Malte J. Rasch, Bernhard Schölkopf, and                        M4 Competition: Results, findings, conclusion and way forward. International
+     Alexander J. Smola. 2006. A Kernel Method for the Two-Sample-Problem. In                             Journal of Forecasting 34, 4 (2018), 802–808.
+     NIPS. 513–520.                                                                                  [57] Wannes Meert, Kilian Hendrickx, Toon Van Craenendonck, Pieter Robberechts,
+                                                                                                          Hendrik Blockeel, and Jesse Davis. 2020. DTAIDistance.
+
+
+
+
+                                                                                               317
+[58] Olof Mogren. 2016. C-RNN-GAN: A continuous recurrent neural network with                   [73] Yulia Rubanova, Ricky T. Q. Chen, and David K Duvenaud. 2019. Latent Ordinary
+     adversarial training. In Constructive Machine Learning Workshop (CML) at NIPS                   Differential Equations for Irregularly-Sampled Time Series. In NeurIPS. 5320–
+     2016. 1.                                                                                        5330.
+[59] Hao Ni, Lukasz Szpruch, Marc Sabate-Vidales, Baoren Xiao, Magnus Wiese,                    [74] Ali Seyfi, Jean-François Rajotte, and Raymond T. Ng. 2022. Generating multi-
+     and Shujian Liao. 2021. Sig-Wasserstein GANs for time series generation. In                     variate time series with COmmon Source CoordInated GAN (COSCI-GAN). In
+     Proceedings of the Second ACM International Conference on AI in Finance. 1–8.                   NeurIPS. 32777–32788.
+[60] Hao Ni, Lukasz Szpruch, Magnus Wiese, Shujian Liao, and Baoren Xiao. 2020.                 [75] Mohammad Shokoohi-Yekta, Bing Hu, Hongxia Jin, Jun Wang, and Eamonn
+     Conditional Sig-Wasserstein GANs for Time Series Generation. arXiv preprint                     Keogh. 2017. Generalizing DTW to the multi-dimensional case requires an
+     arXiv:2006.05421 (2020).                                                                        adaptive approach. DMKD 31 (2017), 1–31.
+[61] Alexander Nikitin, Letizia Iannucci, and Samuel Kaski. 2023. TSGM: A Flexible              [76] Kaleb E Smith and Anthony O Smith. 2020. Conditional GAN for timeseries
+     Framework for Generative Modeling of Synthetic Time Series. arXiv preprint                      generation. arXiv preprint arXiv:2006.16477 (2020).
+     arXiv:2305.11567 (2023).                                                                   [77] Padmanaba Srinivasan and William J Knottenbelt. 2022. Time-series Transformer
+[62] Alan V Oppenheim. 1999. Discrete-time signal processing. Pearson Education                      Generative Adversarial Networks. arXiv preprint arXiv:2205.11164 (2022).
+     India.                                                                                     [78] Maksim Terpilowski. 2019. scikit-posthocs: Pairwise multiple comparison tests
+[63] John Paparrizos, Paul Boniol, Themis Palpanas, Ruey S Tsay, Aaron Elmore, and                   in Python. The Journal of Open Source Software 4, 36 (2019), 1169.
+     Michael J Franklin. 2022. Volume under the surface: a new accuracy evaluation              [79] Aäron van den Oord, Oriol Vinyals, and Koray Kavukcuoglu. 2017. Neural
+     measure for time-series anomaly detection. Proc. VLDB Endow. 15, 11 (2022),                     Discrete Representation Learning. In NIPS. 6306–6315.
+     2774–2787.                                                                                 [80] Laurens Van der Maaten and Geoffrey Hinton. 2008. Visualizing Data using
+[64] John Paparrizos, Yuhao Kang, Paul Boniol, Ruey S Tsay, Themis Palpanas, and                     t-SNE. JMLR 9, 11 (2008).
+     Michael J Franklin. 2022. TSB-UAD: an end-to-end benchmark suite for univariate            [81] Lei Wang, Liang Zeng, and Jian Li. 2023. AEC-GAN: Adversarial Error Correction
+     time-series anomaly detection. Proc. VLDB Endow. 15, 8 (2022), 1697–1711.                       GANs for Auto-Regressive Long Time-Series Generation. In AAAI. 10140–10148.
+[65] Emanuel Parzen. 1963. On spectral analysis with missing observations and                   [82] Magnus Wiese, Robert Knobloch, Ralf Korn, and Peter Kretschmer. 2020. Quant
+     amplitude modulation. Sankhyā: The Indian Journal of Statistics, Series A (1963),              GANs: deep generation of financial time series. Quantitative Finance 20, 9 (2020),
+     383–392.                                                                                        1419–1440.
+[66] Hengzhi Pei, Kan Ren, Yuqing Yang, Chang Liu, Tao Qin, and Dongsheng Li.                   [83] Garrett Wilson, Janardhan Rao Doppa, and Diane J Cook. 2020. Multi-source
+     2021. Towards generating real-world time series data. In ICDM. 469–478.                         deep domain adaptation with weak supervision for time-series sensor data. In
+[67] Mohamed Ragab, Emadeldeen Eldele, Wee Ling Tan, Chuan-Sheng Foo,                                KDD. 1768–1778.
+     Zhenghua Chen, Min Wu, Chee-Keong Kwoh, and Xiaoli Li. 2023. ADATIME: A                    [84] Xinle Wu, Dalin Zhang, Chenjuan Guo, Chaoyang He, Bin Yang, and Christian S
+     Benchmarking Suite for Domain Adaptation on Time Series Data. TKDD (2023),                      Jensen. 2021. AutoCTS: Automated correlated time series forecasting. Proc. VLDB
+     1–18.                                                                                           Endow. 15, 4 (2021), 971–983.
+[68] Giorgia Ramponi, Pavlos Protopapas, Marco Brambilla, and Ryan Janssen. 2018.               [85] Tianlin Xu, Li Kevin Wenliang, Michael Munn, and Beatrice Acciaio. 2020. COT-
+     T-CGAN: Conditional Generative Adversarial Network for Data Augmentation                        GAN: Generating Sequential Data via Causal Optimal Transport. In NeurIPS.
+     in Noisy Time Series with Irregular Sampling. arXiv preprint arXiv:1811.08295                   8798–8809.
+     (2018).                                                                                    [86] Chao Yan, Yao Yan, Zhiyu Wan, Ziqi Zhang, Larsson Omberg, Justin Guinney,
+[69] Sangeeta Rani and Geeta Sikka. 2012. Recent Techniques of Clustering of Time                    Sean D Mooney, and Bradley A Malin. 2022. A Multifaceted benchmarking of
+     Series Data: A Survey. International Journal of Computer Applications 52, 15                    synthetic electronic health record generation models. Nature Communications
+     (2012).                                                                                         13, 1 (2022), 7609.
+[70] Carl Remlinger, Joseph Mikael, and Romuald Elie. 2022. Conditional Loss and                [87] Jinsung Yoon, Daniel Jarrett, and Mihaela van der Schaar. 2019. Time-series
+     Deep Euler Scheme for Time Series Generation. In AAAI, Vol. 36. 8098–8105.                      Generative Adversarial Networks. In NeurIPS. 5509–5519.
+[71] Jorge Reyes-Ortiz, Davide Anguita, Alessandro Ghio, Luca Oneto, and Xavier                 [88] Yu Zheng, Xiuwen Yi, Ming Li, Ruiyuan Li, Zhangqing Shan, Eric Chang, and
+     Parra. 2012. Human Activity Recognition Using Smartphones. UCI Machine                          Tianrui Li. 2015. Forecasting fine-grained air quality based on big data. In KDD.
+     Learning Repository. DOI: https://doi.org/10.24432/C54S4K.                                      2267–2276.
+[72] Oliver Roesler. 2013. EEG Eye State. UCI Machine Learning Repository. DOI:                 [89] Linqi Zhou, Michael Poli, Winnie Xu, Stefano Massaroli, and Stefano Ermon.
+     https://doi.org/10.24432/C57G7J.                                                                2023. Deep Latent State Space Models for Time-Series Generation. In ICML.
+                                                                                                     42625–42643.
+
+
+
+
+                                                                                          318
+

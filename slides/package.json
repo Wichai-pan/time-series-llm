@@ -1,0 +1,19 @@
+{
+  "name": "sdforger-pamap2-slides",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "slidev --remote local --bind 127.0.0.1",
+    "dev:postmeeting": "slidev decks/2026-06-08-advisor-postmeeting-update.md --remote local --bind 127.0.0.1",
+    "build:postmeeting": "slidev build decks/2026-06-08-advisor-postmeeting-update.md --out dist/2026-06-08-advisor-postmeeting-update",
+    "export:postmeeting": "slidev export decks/2026-06-08-advisor-postmeeting-update.md --output decks/2026-06-08-advisor-postmeeting-update.pdf",
+    "build:pptx:postmeeting": "node scripts/build-postmeeting-pptx.mjs"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.2.0",
+    "@slidev/theme-default": "^0.25.0"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.44.0"
+  }
+}

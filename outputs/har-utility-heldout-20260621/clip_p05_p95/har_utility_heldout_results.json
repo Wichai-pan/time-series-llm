@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "channel": "hand_acc16_x",
+    "test_subjects": "106/108 (held-out)",
+    "train_subjects": "101/102/105",
+    "walking_train": 54,
+    "running_train": 62,
+    "walking_test": 33,
+    "running_test": 33,
+    "walking_synth": 51,
+    "running_synth": 58
+  },
+  "results": [
+    {
+      "condition": "majority",
+      "train_samples": 116,
+      "test_samples": 66,
+      "accuracy": 0.5,
+      "balanced_accuracy": 0.5,
+      "macro_f1": 0.3333333333333333,
+      "confusion_matrix": [
+        [
+          0,
+          33
+        ],
+        [
+          0,
+          33
+        ]
+      ]
+    },
+    {
+      "condition": "real-only",
+      "train_samples": 116,
+      "test_samples": 66,
+      "accuracy": 0.7424242424242424,
+      "balanced_accuracy": 0.7424242424242424,
+      "macro_f1": 0.728395061728395,
+      "confusion_matrix": [
+        [
+          32,
+          1
+        ],
+        [
+          16,
+          17
+        ]
+      ]
+    },
+    {
+      "condition": "synthetic-only",
+      "train_samples": 109,
+      "test_samples": 66,
+      "accuracy": 0.7121212121212122,
+      "balanced_accuracy": 0.7121212121212122,
+      "macro_f1": 0.6964415395787944,
+      "confusion_matrix": [
+        [
+          31,
+          2
+        ],
+        [
+          17,
+          16
+        ]
+      ]
+    },
+    {
+      "condition": "real+synthetic",
+      "train_samples": 225,
+      "test_samples": 66,
+      "accuracy": 0.7575757575757576,
+      "balanced_accuracy": 0.7575757575757576,
+      "macro_f1": 0.7461538461538462,
+      "confusion_matrix": [
+        [
+          32,
+          1
+        ],
+        [
+          15,
+          18
+        ]
+      ]
+    }
+  ]
+}

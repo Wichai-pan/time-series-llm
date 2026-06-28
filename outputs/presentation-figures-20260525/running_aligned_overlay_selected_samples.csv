@@ -1,0 +1,4 @@
+setting,sample_index,circular_shift,shape_corr_after_alignment,raw_abs_max
+clean baseline,40,40,0.7457979500286267,1.627966618653267
+raw unified,73,57,0.5074817734369546,1572.0930726990139
+clip_p05_p95,2,41,0.755460111073797,1.8926373640245144
