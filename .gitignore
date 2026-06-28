@@ -3,7 +3,15 @@
 # Python / notebook caches
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 .ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+envs/
 
 # Node / Slidev
 node_modules/
@@ -19,6 +27,16 @@ slides/dist/
 # Logs and temporary files
 *.log
 *.tmp
+*.out
+*.err
+logs/
+exp/
+mlruns/
+
+# Secrets (NEVER commit)
+api_key.txt
+.env
+.env.*
 
 # Nested git repos (would break the parent repo) + old / external / teammate artifacts
 legacy/
@@ -33,3 +51,4 @@ reference/papers/
 *.faiss
 *.pptx
 *.npy
+*.pkl
