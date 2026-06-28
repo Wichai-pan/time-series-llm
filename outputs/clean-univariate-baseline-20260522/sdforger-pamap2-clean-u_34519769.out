@@ -1,0 +1,196 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) csc-tools
+/users/panh/.local/lib/python3.12/site-packages/transformers/utils/hub.py:105: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+[2026-05-22 14:40:06,156] [INFO] [real_accelerator.py:239:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+2026-05-22:14:40:43,757 INFO     [generate.py:81] ===================================================================================================
+2026-05-22:14:40:43,758 INFO     [generate.py:82] 		Task: "time_series/pamap2_subject101_walking_hand_acc16_x_univariate_baseline"
+2026-05-22:14:40:43,758 INFO     [generate.py:83] ===================================================================================================
+2026-05-22:14:40:43,799 INFO     [generate.py:124] ----------------------------------------------------------------
+2026-05-22:14:40:43,799 INFO     [generate.py:125] 		PREPROCESS CHANNELS
+2026-05-22:14:40:43,799 INFO     [generate.py:126] ----------------------------------------------------------------
+2026-05-22:14:40:43,803 INFO     [utils.py:73] CHANNEL: hand_acc16_x
+2026-05-22:14:40:43,805 INFO     [utils.py:296]   - Max possible period: 162
+2026-05-22:14:40:43,805 INFO     [utils.py:297]   - First ACF periods (ranked): [58]
+2026-05-22:14:40:43,805 INFO     [utils.py:298]   - Selected period: 58 (Source: ACF)
+2026-05-22:14:40:43,805 INFO     [utils.py:78] Chosen period 58 for channel (hand_acc16_x)
+2026-05-22:14:40:43,805 INFO     [utils.py:83] Overall chosen period: 58
+2026-05-22:14:40:43,805 INFO     [utils.py:395] Period: 58
+2026-05-22:14:40:43,805 INFO     [utils.py:396] Number of windows: 31
+2026-05-22:14:40:43,805 INFO     [utils.py:397] Points in each window: 300
+2026-05-22:14:40:43,805 INFO     [utils.py:398] Periods in a window: 5
+2026-05-22:14:40:43,805 INFO     [utils.py:399] Overlapping points: 184
+2026-05-22:14:40:43,805 INFO     [utils.py:400] Overlapping periods: 3
+2026-05-22:14:40:43,806 INFO     [utils.py:402] Extra window overlapping points: -1034
+2026-05-22:14:40:43,806 INFO     [utils.py:403] Extra window overlapping periods: -18
+2026-05-22:14:40:43,806 INFO     [utils.py:404] Total coverage: 4998
+
+2026-05-22:14:40:43,808 INFO     [utils.py:211] Channel 0 train data standardized. Shape: (31, 300)
+2026-05-22:14:40:43,808 INFO     [generate.py:136] ----------------------------------------------------------------
+2026-05-22:14:40:43,808 INFO     [generate.py:137] 		FROM PREPROCESSED DATA TO TABULAR DATA
+2026-05-22:14:40:43,808 INFO     [generate.py:138] ----------------------------------------------------------------
+2026-05-22:14:40:43,842 INFO     [utils.py:525] Latent dimension channel 0: 4
+2026-05-22:14:40:43,845 INFO     [utils.py:538] 
+Variance retained for channel 0: 0.8306
+2026-05-22:14:40:43,846 INFO     [generate.py:173] ----------------------------------------------------------------
+2026-05-22:14:40:43,846 INFO     [generate.py:174] 		FINETUNING LLM
+2026-05-22:14:40:43,846 INFO     [generate.py:175] ----------------------------------------------------------------
+Generating text from embeddings:   0%|          | 0/31 [00:00<?, ?it/s]Generating text from embeddings: 100%|██████████| 31/31 [00:00<00:00, 9668.61it/s]
+Map:   0%|          | 0/31 [00:00<?, ? examples/s]Map: 100%|██████████| 31/31 [00:00<00:00, 2142.38 examples/s]
+Detected kernel version 4.18.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+  0%|          | 0/100 [00:00<?, ?it/s]`loss_type=None` was set in the config but it is unrecognised.Using the default loss: `ForCausalLMLoss`.
+  1%|          | 1/100 [00:04<07:59,  4.84s/it]  2%|▏         | 2/100 [00:04<03:23,  2.08s/it]  3%|▎         | 3/100 [00:05<01:56,  1.20s/it]  4%|▍         | 4/100 [00:05<01:14,  1.28it/s]  5%|▌         | 5/100 [00:05<00:52,  1.82it/s]
+  0%|          | 0/1 [00:00<?, ?it/s][A                                               
+                                     [A  5%|▌         | 5/100 [00:05<00:52,  1.82it/s]
+100%|██████████| 1/1 [00:00<00:00, 266.58it/s][A
+                                              [A  6%|▌         | 6/100 [00:05<00:39,  2.36it/s]  7%|▋         | 7/100 [00:05<00:30,  3.03it/s]  8%|▊         | 8/100 [00:05<00:24,  3.73it/s]  9%|▉         | 9/100 [00:06<00:20,  4.40it/s] 10%|█         | 10/100 [00:06<00:17,  5.02it/s]                                                 10%|█         | 10/100 [00:06<00:17,  5.02it/s]{'eval_loss': 2.1172544956207275, 'eval_runtime': 0.0441, 'eval_samples_per_second': 158.79, 'eval_steps_per_second': 22.684, 'epoch': 5.0}
+{'loss': 2.3969, 'grad_norm': 9.689080238342285, 'learning_rate': 7.280000000000001e-05, 'epoch': 10.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 10%|█         | 10/100 [00:06<00:17,  5.02it/s]
+100%|██████████| 1/1 [00:00<00:00, 115.35it/s][A
+                                              [A 11%|█         | 11/100 [00:06<00:16,  5.28it/s] 12%|█▏        | 12/100 [00:06<00:15,  5.77it/s] 13%|█▎        | 13/100 [00:06<00:14,  6.16it/s] 14%|█▍        | 14/100 [00:06<00:13,  6.47it/s] 15%|█▌        | 15/100 [00:06<00:12,  6.71it/s]{'eval_loss': 1.5363149642944336, 'eval_runtime': 0.0184, 'eval_samples_per_second': 379.663, 'eval_steps_per_second': 54.238, 'epoch': 10.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 15%|█▌        | 15/100 [00:06<00:12,  6.71it/s]
+100%|██████████| 1/1 [00:00<00:00, 105.80it/s][A
+                                              [A 16%|█▌        | 16/100 [00:07<00:12,  6.57it/s] 17%|█▋        | 17/100 [00:07<00:12,  6.77it/s] 18%|█▊        | 18/100 [00:07<00:11,  6.92it/s] 19%|█▉        | 19/100 [00:07<00:11,  7.04it/s] 20%|██        | 20/100 [00:07<00:11,  7.11it/s]                                                 20%|██        | 20/100 [00:07<00:11,  7.11it/s]{'eval_loss': 1.0500203371047974, 'eval_runtime': 0.0226, 'eval_samples_per_second': 310.374, 'eval_steps_per_second': 44.339, 'epoch': 15.0}
+{'loss': 1.1787, 'grad_norm': 5.104662895202637, 'learning_rate': 6.48e-05, 'epoch': 20.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 20%|██        | 20/100 [00:07<00:11,  7.11it/s]
+100%|██████████| 1/1 [00:00<00:00, 117.54it/s][A
+                                              [A 21%|██        | 21/100 [00:07<00:11,  6.72it/s] 22%|██▏       | 22/100 [00:07<00:11,  6.89it/s] 23%|██▎       | 23/100 [00:08<00:11,  7.00it/s] 24%|██▍       | 24/100 [00:08<00:10,  7.08it/s] 25%|██▌       | 25/100 [00:08<00:10,  7.14it/s]{'eval_loss': 0.8301464319229126, 'eval_runtime': 0.0185, 'eval_samples_per_second': 377.928, 'eval_steps_per_second': 53.99, 'epoch': 20.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 25%|██▌       | 25/100 [00:08<00:10,  7.14it/s]
+100%|██████████| 1/1 [00:00<00:00, 98.68it/s][A
+                                             [A 26%|██▌       | 26/100 [00:08<00:10,  6.84it/s] 27%|██▋       | 27/100 [00:08<00:10,  6.97it/s] 28%|██▊       | 28/100 [00:08<00:10,  7.07it/s] 29%|██▉       | 29/100 [00:08<00:09,  7.14it/s] 30%|███       | 30/100 [00:08<00:09,  7.18it/s]                                                 30%|███       | 30/100 [00:09<00:09,  7.18it/s]{'eval_loss': 0.7988080382347107, 'eval_runtime': 0.0226, 'eval_samples_per_second': 309.481, 'eval_steps_per_second': 44.212, 'epoch': 25.0}
+{'loss': 0.7256, 'grad_norm': 2.0205252170562744, 'learning_rate': 5.6800000000000005e-05, 'epoch': 30.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 30%|███       | 30/100 [00:09<00:09,  7.18it/s]
+100%|██████████| 1/1 [00:00<00:00, 113.97it/s][A
+                                              [A 31%|███       | 31/100 [00:09<00:10,  6.75it/s] 32%|███▏      | 32/100 [00:09<00:09,  6.91it/s] 33%|███▎      | 33/100 [00:09<00:09,  7.03it/s] 34%|███▍      | 34/100 [00:09<00:09,  7.11it/s] 35%|███▌      | 35/100 [00:09<00:09,  7.17it/s]{'eval_loss': 0.792262077331543, 'eval_runtime': 0.0185, 'eval_samples_per_second': 378.708, 'eval_steps_per_second': 54.101, 'epoch': 30.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 35%|███▌      | 35/100 [00:09<00:09,  7.17it/s]
+100%|██████████| 1/1 [00:00<00:00, 106.58it/s][A
+                                              [A 36%|███▌      | 36/100 [00:09<00:09,  6.87it/s] 37%|███▋      | 37/100 [00:10<00:08,  7.00it/s] 38%|███▊      | 38/100 [00:10<00:08,  7.09it/s] 39%|███▉      | 39/100 [00:10<00:08,  7.15it/s] 40%|████      | 40/100 [00:10<00:08,  7.20it/s]                                                 40%|████      | 40/100 [00:10<00:08,  7.20it/s]{'eval_loss': 0.8110470175743103, 'eval_runtime': 0.0226, 'eval_samples_per_second': 309.716, 'eval_steps_per_second': 44.245, 'epoch': 35.0}
+{'loss': 0.6378, 'grad_norm': 2.198564291000366, 'learning_rate': 4.88e-05, 'epoch': 40.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 40%|████      | 40/100 [00:10<00:08,  7.20it/s]
+100%|██████████| 1/1 [00:00<00:00, 118.44it/s][A
+                                              [A 41%|████      | 41/100 [00:10<00:08,  6.78it/s] 42%|████▏     | 42/100 [00:10<00:08,  6.93it/s] 43%|████▎     | 43/100 [00:10<00:08,  7.04it/s] 44%|████▍     | 44/100 [00:10<00:07,  7.12it/s] 45%|████▌     | 45/100 [00:11<00:07,  7.18it/s]{'eval_loss': 0.8339885473251343, 'eval_runtime': 0.0183, 'eval_samples_per_second': 382.01, 'eval_steps_per_second': 54.573, 'epoch': 40.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 45%|████▌     | 45/100 [00:11<00:07,  7.18it/s]
+100%|██████████| 1/1 [00:00<00:00, 106.70it/s][A
+                                              [A 46%|████▌     | 46/100 [00:11<00:07,  6.88it/s] 47%|████▋     | 47/100 [00:11<00:07,  7.00it/s] 48%|████▊     | 48/100 [00:11<00:07,  7.09it/s] 49%|████▉     | 49/100 [00:11<00:07,  7.15it/s] 50%|█████     | 50/100 [00:11<00:06,  7.19it/s]                                                 50%|█████     | 50/100 [00:11<00:06,  7.19it/s]{'eval_loss': 0.8035693764686584, 'eval_runtime': 0.0226, 'eval_samples_per_second': 309.843, 'eval_steps_per_second': 44.263, 'epoch': 45.0}
+{'loss': 0.5959, 'grad_norm': 1.6741280555725098, 'learning_rate': 4.08e-05, 'epoch': 50.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 50%|█████     | 50/100 [00:11<00:06,  7.19it/s]
+100%|██████████| 1/1 [00:00<00:00, 105.34it/s][A
+                                              [A 51%|█████     | 51/100 [00:12<00:07,  6.75it/s] 52%|█████▏    | 52/100 [00:12<00:06,  6.90it/s] 53%|█████▎    | 53/100 [00:12<00:06,  7.01it/s] 54%|█████▍    | 54/100 [00:12<00:06,  7.09it/s] 55%|█████▌    | 55/100 [00:12<00:06,  7.16it/s]{'eval_loss': 0.821471631526947, 'eval_runtime': 0.0187, 'eval_samples_per_second': 374.922, 'eval_steps_per_second': 53.56, 'epoch': 50.0}
+
+  0%|          | 0/1 [00:00<?, ?it/s][A                                                
+                                     [A 55%|█████▌    | 55/100 [00:12<00:06,  7.16it/s]
+100%|██████████| 1/1 [00:00<00:00, 100.60it/s][A
+                                              [A                                                 55%|█████▌    | 55/100 [00:12<00:06,  7.16it/s] 55%|█████▌    | 55/100 [00:13<00:11,  4.05it/s]
+2026-05-22:14:42:48,961 INFO     [generate.py:191] ----------------------------------------------------------------
+2026-05-22:14:42:48,961 INFO     [generate.py:192] 		GENERATING DATA USING FINE TUNED LLM
+2026-05-22:14:42:48,961 INFO     [generate.py:193] ----------------------------------------------------------------
+{'eval_loss': 0.8060055375099182, 'eval_runtime': 0.0226, 'eval_samples_per_second': 310.387, 'eval_steps_per_second': 44.341, 'epoch': 55.0}
+{'train_runtime': 22.2067, 'train_samples_per_second': 108.076, 'train_steps_per_second': 4.503, 'train_loss': 1.058503835851496, 'epoch': 55.0}
+INFO 05-22 14:42:51 [__init__.py:239] Automatically detected platform cuda.
+INFO 05-22 14:43:09 [config.py:600] This model supports multiple tasks: {'embed', 'score', 'classify', 'generate', 'reward'}. Defaulting to 'generate'.
+WARNING 05-22 14:43:09 [arg_utils.py:1708] Compute Capability < 8.0 is not supported by the V1 Engine. Falling back to V0. 
+INFO 05-22 14:43:09 [llm_engine.py:242] Initializing a V0 LLM engine (v0.8.3) with config: model='output/time_series/pamap2_subject101_walking_hand_acc16_x_univariate_baseline/model_iter-1/best', speculative_config=None, tokenizer='output/time_series/pamap2_subject101_walking_hand_acc16_x_univariate_baseline/model_iter-1/best', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.float32, max_seq_len=1024, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='xgrammar', reasoning_backend=None), observability_config=ObservabilityConfig(show_hidden_metrics=False, otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=None, served_model_name=output/time_series/pamap2_subject101_walking_hand_acc16_x_univariate_baseline/model_iter-1/best, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=None, chunked_prefill_enabled=False, use_async_output_proc=True, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":[],"compile_sizes":[],"cudagraph_capture_sizes":[256,248,240,232,224,216,208,200,192,184,176,168,160,152,144,136,128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8,4,2,1],"max_capture_size":256}, use_cached_outputs=False, 
+INFO 05-22 14:43:10 [cuda.py:240] Cannot use FlashAttention-2 backend for Volta and Turing GPUs.
+INFO 05-22 14:43:10 [cuda.py:289] Using XFormers backend.
+[W522 14:43:12.459732428 socket.cpp:759] [c10d] The client socket cannot be initialized to connect to [r18g07.bullx]:53811 (errno: 97 - Address family not supported by protocol).
+INFO 05-22 14:43:12 [parallel_state.py:957] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0
+INFO 05-22 14:43:12 [model_runner.py:1110] Starting to load model output/time_series/pamap2_subject101_walking_hand_acc16_x_univariate_baseline/model_iter-1/best...
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  1.40it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  1.40it/s]
+
+INFO 05-22 14:43:12 [loader.py:447] Loading weights took 0.72 seconds
+INFO 05-22 14:43:13 [model_runner.py:1146] Model loading took 0.4650 GiB and 0.758467 seconds
+INFO 05-22 14:43:14 [worker.py:267] Memory profiling takes 0.49 seconds
+INFO 05-22 14:43:14 [worker.py:267] the current vLLM instance can use total_gpu_memory (31.74GiB) x gpu_memory_utilization (0.90) = 28.57GiB
+INFO 05-22 14:43:14 [worker.py:267] model weights take 0.46GiB; non_torch_memory takes 0.00GiB; PyTorch activation peak memory takes 0.49GiB; the rest of the memory reserved for KV Cache is 27.61GiB.
+INFO 05-22 14:43:14 [executor_base.py:112] # cuda blocks: 25132, # CPU blocks: 3640
+INFO 05-22 14:43:14 [executor_base.py:117] Maximum concurrency for 1024 tokens per request: 392.69x
+INFO 05-22 14:43:16 [model_runner.py:1456] Capturing cudagraphs for decoding. This may lead to unexpected consequences if the model is not static. To run the model in eager mode, set 'enforce_eager=True' or use '--enforce-eager' in the CLI. If out-of-memory error occurs during cudagraph capture, consider decreasing `gpu_memory_utilization` or switching to eager mode. You can also reduce the `max_num_seqs` as needed to decrease memory usage.
+Capturing CUDA graph shapes:   0%|          | 0/35 [00:00<?, ?it/s]Capturing CUDA graph shapes:   3%|▎         | 1/35 [00:00<00:26,  1.28it/s]Capturing CUDA graph shapes:   6%|▌         | 2/35 [00:01<00:23,  1.38it/s]Capturing CUDA graph shapes:   9%|▊         | 3/35 [00:02<00:22,  1.41it/s]Capturing CUDA graph shapes:  11%|█▏        | 4/35 [00:02<00:21,  1.42it/s]Capturing CUDA graph shapes:  14%|█▍        | 5/35 [00:03<00:20,  1.43it/s]Capturing CUDA graph shapes:  17%|█▋        | 6/35 [00:04<00:20,  1.44it/s]Capturing CUDA graph shapes:  20%|██        | 7/35 [00:04<00:19,  1.44it/s]Capturing CUDA graph shapes:  23%|██▎       | 8/35 [00:05<00:18,  1.44it/s]Capturing CUDA graph shapes:  26%|██▌       | 9/35 [00:06<00:18,  1.44it/s]Capturing CUDA graph shapes:  29%|██▊       | 10/35 [00:06<00:17,  1.45it/s]Capturing CUDA graph shapes:  31%|███▏      | 11/35 [00:07<00:16,  1.45it/s]Capturing CUDA graph shapes:  34%|███▍      | 12/35 [00:08<00:15,  1.45it/s]Capturing CUDA graph shapes:  37%|███▋      | 13/35 [00:09<00:15,  1.45it/s]Capturing CUDA graph shapes:  40%|████      | 14/35 [00:09<00:14,  1.45it/s]Capturing CUDA graph shapes:  43%|████▎     | 15/35 [00:10<00:13,  1.46it/s]Capturing CUDA graph shapes:  46%|████▌     | 16/35 [00:11<00:13,  1.46it/s]Capturing CUDA graph shapes:  49%|████▊     | 17/35 [00:11<00:12,  1.45it/s]Capturing CUDA graph shapes:  51%|█████▏    | 18/35 [00:12<00:11,  1.45it/s]Capturing CUDA graph shapes:  54%|█████▍    | 19/35 [00:13<00:11,  1.45it/s]Capturing CUDA graph shapes:  57%|█████▋    | 20/35 [00:13<00:10,  1.46it/s]Capturing CUDA graph shapes:  60%|██████    | 21/35 [00:14<00:09,  1.45it/s]Capturing CUDA graph shapes:  63%|██████▎   | 22/35 [00:15<00:08,  1.45it/s]Capturing CUDA graph shapes:  66%|██████▌   | 23/35 [00:15<00:08,  1.43it/s]Capturing CUDA graph shapes:  69%|██████▊   | 24/35 [00:16<00:07,  1.44it/s]Capturing CUDA graph shapes:  71%|███████▏  | 25/35 [00:17<00:06,  1.44it/s]Capturing CUDA graph shapes:  74%|███████▍  | 26/35 [00:18<00:06,  1.44it/s]Capturing CUDA graph shapes:  77%|███████▋  | 27/35 [00:18<00:05,  1.46it/s]Capturing CUDA graph shapes:  80%|████████  | 28/35 [00:19<00:04,  1.43it/s]Capturing CUDA graph shapes:  83%|████████▎ | 29/35 [00:20<00:04,  1.48it/s]Capturing CUDA graph shapes:  86%|████████▌ | 30/35 [00:20<00:03,  1.51it/s]Capturing CUDA graph shapes:  89%|████████▊ | 31/35 [00:21<00:02,  1.53it/s]Capturing CUDA graph shapes:  91%|█████████▏| 32/35 [00:21<00:01,  1.53it/s]Capturing CUDA graph shapes:  94%|█████████▍| 33/35 [00:22<00:01,  1.55it/s]Capturing CUDA graph shapes:  97%|█████████▋| 34/35 [00:23<00:00,  1.56it/s]Capturing CUDA graph shapes: 100%|██████████| 35/35 [00:23<00:00,  1.56it/s]Capturing CUDA graph shapes: 100%|██████████| 35/35 [00:23<00:00,  1.47it/s]
+INFO 05-22 14:43:40 [model_runner.py:1598] Graph capturing finished in 24 secs, took 0.42 GiB
+INFO 05-22 14:43:40 [llm_engine.py:448] init engine (profile, create kv cache, warmup model) took 27.28 seconds
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:00<00:44,  1.42it/s]Running completion requests: 100%|██████████| 64/64 [00:00<00:00, 91.00it/s]
+2026-05-22:14:43:41,689 INFO     [generate.py:465] No. of samples generated: 64
+2026-05-22:14:43:41,692 INFO     [generate.py:474] No. of samples after dropping NaN: 64 -> 45
+2026-05-22:14:43:41,700 INFO     [generate.py:493] No. of samples after dropping duplicates: 45 -> 45
+2026-05-22:14:43:41,701 INFO     [generate.py:534] Var 1 Discarded Norms: [1.09292974e+01 2.03530163e+02 1.12331291e+01 7.80998432e+02
+ 5.72171583e+02 6.35493766e+02 2.22324598e+01 3.32725330e+01
+ 5.81545716e+00 2.48011083e+02 4.34843897e+01 7.27019174e+00
+ 2.16244503e+01 2.44267315e+03 2.03635121e+02 1.50353922e+04
+ 5.91264738e+00 2.66266598e+02 1.08004297e+02]
+2026-05-22:14:43:41,701 INFO     [generate.py:548] No. of samples after norm-check drop: 45 -> 26
+2026-05-22:14:43:41,702 INFO     [generate.py:557] Samples generated (26) in attempt 1. [Total samples generated: 26]
+2026-05-22:14:43:41,702 INFO     [generate.py:572] Norms diversity: [[1.0]]
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:00<00:43,  1.44it/s]Running completion requests: 100%|██████████| 64/64 [00:00<00:00, 92.00it/s]
+2026-05-22:14:43:42,432 INFO     [generate.py:465] No. of samples generated: 64
+2026-05-22:14:43:42,433 INFO     [generate.py:474] No. of samples after dropping NaN: 64 -> 48
+2026-05-22:14:43:42,436 INFO     [generate.py:493] No. of samples after dropping duplicates: 48 -> 48
+2026-05-22:14:43:42,437 INFO     [generate.py:534] Var 1 Discarded Norms: [ 500.23090716 1158.25430404   33.24930515  150.02523353  194.91084817
+  137.17017646    8.32609398   39.05251699 5857.54020505   13.23103711]
+2026-05-22:14:43:42,438 INFO     [generate.py:548] No. of samples after norm-check drop: 48 -> 38
+2026-05-22:14:43:42,438 INFO     [generate.py:557] Samples generated (38) in attempt 1. [Total samples generated: 64]
+2026-05-22:14:43:42,438 INFO     [generate.py:572] Norms diversity: [[1.0, 1.0]]
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:00<00:42,  1.48it/s]Running completion requests: 100%|██████████| 64/64 [00:00<00:00, 94.29it/s]
+2026-05-22:14:43:43,150 INFO     [generate.py:465] No. of samples generated: 63
+2026-05-22:14:43:43,152 INFO     [generate.py:474] No. of samples after dropping NaN: 63 -> 51
+2026-05-22:14:43:43,155 INFO     [generate.py:493] No. of samples after dropping duplicates: 51 -> 51
+2026-05-22:14:43:43,155 INFO     [generate.py:534] Var 1 Discarded Norms: [   9.4809036    73.12375819   11.80623856   43.9294338  6570.00020661
+  207.99375596    8.64403372  490.31254689    8.23649719 1193.71727379
+  518.00066889   78.35643823  561.16366062  640.06618821    7.52730815
+   25.35717727  222.00165773    7.28317486]
+2026-05-22:14:43:43,156 INFO     [generate.py:548] No. of samples after norm-check drop: 51 -> 33
+2026-05-22:14:43:43,156 INFO     [generate.py:557] Samples generated (33) in attempt 1. [Total samples generated: 97]
+2026-05-22:14:43:43,156 INFO     [generate.py:572] Norms diversity: [[1.0, 1.0, 1.0]]
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:00<00:53,  1.18it/s]Running completion requests: 100%|██████████| 64/64 [00:00<00:00, 75.58it/s]
+2026-05-22:14:43:44,035 INFO     [generate.py:465] No. of samples generated: 63
+2026-05-22:14:43:44,037 INFO     [generate.py:474] No. of samples after dropping NaN: 63 -> 46
+2026-05-22:14:43:44,040 INFO     [generate.py:493] No. of samples after dropping duplicates: 46 -> 46
+2026-05-22:14:43:44,041 INFO     [generate.py:534] Var 1 Discarded Norms: [ 48.37694337 383.31483537  38.92184743 101.43571854 267.47578552
+ 280.19492782  97.32652275 355.44149387  59.99083717  66.6676997
+  25.72330195 512.48150077  49.63760169]
+2026-05-22:14:43:44,041 INFO     [generate.py:548] No. of samples after norm-check drop: 46 -> 33
+2026-05-22:14:43:44,041 INFO     [generate.py:557] Samples generated (33) in attempt 1. [Total samples generated: 130]
+2026-05-22:14:43:44,041 INFO     [generate.py:572] Norms diversity: [[1.0, 1.0, 1.0, 0.9875776397515528]]
+2026-05-22:14:43:44,041 INFO     [generate.py:595] The generation process has been halted due to the stopping criterion. - norms_diversity_threshold: 1
+2026-05-22:14:43:44,042 INFO     [utils.py:844] Generated data shape is: (130, 4)
+2026-05-22:14:43:44,042 INFO     [utils.py:851] Reshaping for var_1 which uses 4 basis components
+2026-05-22:14:43:44,042 INFO     [utils.py:853] Generated data shape has been reshaped to: [(130, 4)]
+2026-05-22:14:43:48,817 INFO     [generate.py:95] ===================================================================================================
+2026-05-22:14:43:48,917 INFO     [databuilder.py:747] ***************************************************************************************************
+2026-05-22:14:43:48,917 INFO     [databuilder.py:748]                                         		Total
+2026-05-22:14:43:48,918 INFO     [databuilder.py:754] time_series/pamap2_subject101_walking...		        130         
+2026-05-22:14:43:48,918 INFO     [databuilder.py:756] ***************************************************************************************************
+2026-05-22:14:43:48,918 INFO     [databuilder.py:759] Launch postprocessing
+2026-05-22:14:43:48,918 INFO     [databuilder.py:761] Postprocessing completed
+2026-05-22:14:43:48,918 INFO     [task.py:418] Saving final data to output/time_series/pamap2_subject101_walking_hand_acc16_x_univariate_baseline/final_data.jsonl
+2026-05-22:14:43:48,961 INFO     [databuilder.py:768] Transformation took 185.20s
+2026-05-22:14:43:48,961 INFO     [databuilder.py:288] ***************************************************************************************************
+2026-05-22:14:43:48,961 INFO     [databuilder.py:289] 		EXECUTION PROFILER FOR DATABUILDER "time_series"
+2026-05-22:14:43:48,961 INFO     [databuilder.py:290] ***************************************************************************************************
+2026-05-22:14:43:48,962 INFO     [databuilder.py:291] Block               	Time (mean ± std)	Peak Memory (mean ± std)	Tokens (Completion)	Tokens (Prompt)
+2026-05-22:14:43:48,962 INFO     [databuilder.py:270] trainer             	-                	-                       	         -         	         -         
+2026-05-22:14:43:48,962 INFO     [databuilder.py:298] ***************************************************************************************************
+[rank0]:[W522 14:43:50.384831727 ProcessGroupNCCL.cpp:1496] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+command "rpm --eval %{_libdir}" was killed after 1m0s timeout
+FATAL:   context deadline exceeded

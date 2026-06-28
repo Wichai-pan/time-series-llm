@@ -1,0 +1,3 @@
+requested_label,samples,predicted_walking,predicted_running,requested_label_accuracy
+walking,72,72,0,1.0
+running,79,2,77,0.9746835443037974

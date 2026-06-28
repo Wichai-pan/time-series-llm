@@ -1,0 +1,35 @@
+.DS_Store
+
+# Python / notebook caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Node / Slidev
+node_modules/
+slides/node_modules/
+slides/decks/dist/
+slides/dist/
+
+# Local editor and Office lock files
+*.swp
+*.swo
+~$*
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Nested git repos (would break the parent repo) + old / external / teammate artifacts
+legacy/
+teamate/mmfit-inference/
+reviews/teammate-repos/
+
+# Large external reference PDFs (retrievable, keep repo lean)
+reference/papers/
+
+# Large binary artifacts
+*.tar.gz
+*.faiss
+*.pptx
+*.npy

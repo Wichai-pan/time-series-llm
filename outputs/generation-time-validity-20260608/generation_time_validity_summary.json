@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "channel": "hand_acc16_x",
+    "embedding_dims": [
+      8
+    ],
+    "train_windows": 116,
+    "walking_train_windows": 54,
+    "running_train_windows": 62,
+    "value_space": "standardized_sdforger_window_space",
+    "scope_note": "This applies validity rules to parser-accepted generated latent rows. Raw malformed text generations are already filtered upstream by SDForger parsing."
+  },
+  "summary": [
+    {
+      "variant": "strict_reject_p05_p95",
+      "label": "walking",
+      "input_rows": 51,
+      "clean_accept_rows": 14,
+      "repaired_rows": 0,
+      "rejected_rows": 37,
+      "output_rows": 14,
+      "latent_abs_max": 2.026,
+      "decoded_abs_max": 1.9584216129620517,
+      "decoded_std_mean": 0.4580796142589708,
+      "hard_rule": "all latent dims inside train p05-p95",
+      "repair_rule": "none"
+    },
+    {
+      "variant": "soft_repair_p05_p95_minmax",
+      "label": "walking",
+      "input_rows": 51,
+      "clean_accept_rows": 14,
+      "repaired_rows": 13,
+      "rejected_rows": 24,
+      "output_rows": 27,
+      "latent_abs_max": 2.368978638712268,
+      "decoded_abs_max": 2.8473954073120833,
+      "decoded_std_mean": 0.6235501928136176,
+      "hard_rule": "reject if any latent dim outside train min-max",
+      "repair_rule": "clip remaining p05-p95 violations to p05-p95"
+    },
+    {
+      "variant": "strict_reject_p05_p95",
+      "label": "running",
+      "input_rows": 58,
+      "clean_accept_rows": 10,
+      "repaired_rows": 0,
+      "rejected_rows": 48,
+      "output_rows": 10,
+      "latent_abs_max": 1.485,
+      "decoded_abs_max": 1.6928990119936294,
+      "decoded_std_mean": 0.4955416325912224,
+      "hard_rule": "all latent dims inside train p05-p95",
+      "repair_rule": "none"
+    },
+    {
+      "variant": "soft_repair_p05_p95_minmax",
+      "label": "running",
+      "input_rows": 58,
+      "clean_accept_rows": 10,
+      "repaired_rows": 24,
+      "rejected_rows": 24,
+      "output_rows": 34,
+      "latent_abs_max": 2.368978638712268,
+      "decoded_abs_max": 2.4936672208501496,
+      "decoded_std_mean": 0.5577661120069282,
+      "hard_rule": "reject if any latent dim outside train min-max",
+      "repair_rule": "clip remaining p05-p95 violations to p05-p95"
+    }
+  ]
+}

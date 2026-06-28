@@ -1,0 +1,23 @@
+{
+  "activity": "running",
+  "channel": "hand_acc16_x",
+  "real_windows": 31,
+  "synthetic_windows": 79,
+  "window_length": 300,
+  "sampling_rate_hz": 100.0,
+  "expected_period": 82,
+  "real_mean_acf_peak_lag": 81.0,
+  "real_mean_acf_peak_score": 0.7628805980490069,
+  "synthetic_mean_acf_peak_lag": 80.0,
+  "synthetic_mean_acf_peak_score": 0.40570331820087074,
+  "acf_peak_lag_abs_diff": 1.0,
+  "real_mean_psd_peak_hz": 1.3333333333333333,
+  "real_mean_psd_peak_power": 0.7494561040456995,
+  "synthetic_mean_psd_peak_hz": 2.333333333333333,
+  "synthetic_mean_psd_peak_power": 8680.467050752039,
+  "psd_peak_hz_abs_diff": 0.9999999999999998,
+  "real_window_std_mean": 0.8679148956541327,
+  "synthetic_window_std_mean": 15.197218581908567,
+  "synthetic_abs_max": 1572.0930726990139,
+  "real_abs_max": 4.1306915283203125
+}

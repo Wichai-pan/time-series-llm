@@ -1,0 +1,20 @@
+{
+  "protocol_dir": "/scratch/project_2016517/panh/datasets/pamap2/PAMAP2_Dataset/Protocol",
+  "subjects": [
+    "subject106",
+    "subject108"
+  ],
+  "activity_id": 5,
+  "columns": [
+    "hand_acc16_x"
+  ],
+  "rows_per_subject": 5000,
+  "per_subject_rows": {
+    "subject106": 5000,
+    "subject108": 5000
+  },
+  "total_rows": 10000,
+  "output": "data/public/time_series/pamap2_subject106_108_running_hand_acc16_x.parquet",
+  "value_space": "raw_pamap2_sensor_units",
+  "note": "Each subject/activity contributes the first rows_per_subject rows after filtering and interpolation."
+}

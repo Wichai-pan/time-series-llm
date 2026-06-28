@@ -1,0 +1,29 @@
+{
+  "scale": 3.0,
+  "temperature": 1.3,
+  "train_rows": 124,
+  "generation_stats": {
+    "walking|a0": {
+      "raw": 64,
+      "accepted": 48,
+      "attempts": 1
+    },
+    "walking|a1": {
+      "raw": 64,
+      "accepted": 53,
+      "attempts": 1
+    },
+    "running|a0": {
+      "raw": 64,
+      "accepted": 49,
+      "attempts": 1
+    },
+    "running|a1": {
+      "raw": 64,
+      "accepted": 50,
+      "attempts": 1
+    }
+  },
+  "generated_rows": 200,
+  "note": "synthetic x1(a0)/x3(a1) amplitude control; balanced per-amp requests"
+}

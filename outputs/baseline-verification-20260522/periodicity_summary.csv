@@ -1,0 +1,7 @@
+subject,activity_id,activity,channel,available_rows,segment_rows_used,acf_peak_lag,acf_peak_score,dominant_frequency_hz,dominant_frequency_power,dominant_period_samples,periodicity_label,plot
+101,4,walking,hand_acc16_x,22253,5000,58,0.7725385363806236,1.7578125,67.59517325721951,56.888888888888886,strong,subject101_walking_hand_acc16_x_periodicity.png
+101,4,walking,ankle_acc16_x,22253,5000,116,0.7973474550251918,1.7578125,62.287522551741745,56.888888888888886,strong,subject101_walking_ankle_acc16_x_periodicity.png
+101,5,running,hand_acc16_x,21265,5000,82,0.9286744454926562,2.44140625,225.46350047988466,40.96,strong,subject101_running_hand_acc16_x_periodicity.png
+101,5,running,ankle_acc16_x,21265,5000,82,0.6306680004676595,4.8828125,77.18950203981956,20.48,strong,subject101_running_ankle_acc16_x_periodicity.png
+101,6,cycling,hand_acc16_x,23575,5000,7,0.4018699434334491,11.81640625,1.2122039992439047,8.462809917355372,strong,subject101_cycling_hand_acc16_x_periodicity.png
+101,6,cycling,ankle_acc16_x,23575,5000,3,0.8148040061094436,0.78125,40.12191190236405,128.0,strong,subject101_cycling_ankle_acc16_x_periodicity.png

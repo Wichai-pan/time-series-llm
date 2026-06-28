@@ -1,0 +1,23 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) csc-tools
+2026-05-22:14:50:54,475 INFO     [utils.py:73] CHANNEL: hand_acc16_x
+2026-05-22:14:50:54,478 INFO     [utils.py:296]   - Max possible period: 162
+2026-05-22:14:50:54,479 INFO     [utils.py:297]   - First ACF periods (ranked): [58]
+2026-05-22:14:50:54,479 INFO     [utils.py:298]   - Selected period: 58 (Source: ACF)
+2026-05-22:14:50:54,479 INFO     [utils.py:78] Chosen period 58 for channel (hand_acc16_x)
+2026-05-22:14:50:54,479 INFO     [utils.py:83] Overall chosen period: 58
+2026-05-22:14:50:54,479 INFO     [utils.py:395] Period: 58
+2026-05-22:14:50:54,479 INFO     [utils.py:396] Number of windows: 31
+2026-05-22:14:50:54,479 INFO     [utils.py:397] Points in each window: 300
+2026-05-22:14:50:54,479 INFO     [utils.py:398] Periods in a window: 5
+2026-05-22:14:50:54,479 INFO     [utils.py:399] Overlapping points: 184
+2026-05-22:14:50:54,479 INFO     [utils.py:400] Overlapping periods: 3
+2026-05-22:14:50:54,479 INFO     [utils.py:402] Extra window overlapping points: -1034
+2026-05-22:14:50:54,479 INFO     [utils.py:403] Extra window overlapping periods: -18
+2026-05-22:14:50:54,479 INFO     [utils.py:404] Total coverage: 4998
+
+2026-05-22:14:50:54,481 INFO     [utils.py:211] Channel 0 train data standardized. Shape: (31, 300)
+-rw-rw---- 1 panh project_2016517  790 May 22 14:51 reports/baseline_verification_20260522/pamap2_subject101_walking_hand_acc16_x_univariate_baseline_tsgbench_metrics.json
+-rw-rw---- 1 panh project_2016517 1221 May 22 14:51 reports/baseline_verification_20260522/pamap2_subject101_walking_hand_acc16_x_univariate_baseline_tsgbench_metrics.md

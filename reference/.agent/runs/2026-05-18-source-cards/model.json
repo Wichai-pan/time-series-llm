@@ -1,0 +1,8 @@
+{
+  "run_id": "2026-05-18-source-cards",
+  "skill": "reference-reading-summarizer",
+  "reading_modes": ["extract-method", "extract-baseline", "extract-benchmark", "extract-risk"],
+  "model_tier": "main",
+  "date": "2026-05-18",
+  "confidence": "medium"
+}

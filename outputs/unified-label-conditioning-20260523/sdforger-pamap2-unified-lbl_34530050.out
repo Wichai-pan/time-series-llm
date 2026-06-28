@@ -1,0 +1,216 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) csc-tools
+/users/panh/.local/lib/python3.12/site-packages/transformers/utils/hub.py:105: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+INFO 05-23 07:43:46 [__init__.py:239] Automatically detected platform cuda.
+[2026-05-23 07:43:48,605] [INFO] [real_accelerator.py:239:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+2026-05-23:07:43:52,409 INFO     [utils.py:73] CHANNEL: hand_acc16_x
+2026-05-23:07:43:52,412 INFO     [utils.py:296]   - Max possible period: 162
+2026-05-23:07:43:52,412 INFO     [utils.py:297]   - First ACF periods (ranked): [58]
+2026-05-23:07:43:52,412 INFO     [utils.py:298]   - Selected period: 58 (Source: ACF)
+2026-05-23:07:43:52,412 INFO     [utils.py:78] Chosen period 58 for channel (hand_acc16_x)
+2026-05-23:07:43:52,412 INFO     [utils.py:83] Overall chosen period: 58
+2026-05-23:07:43:52,413 INFO     [utils.py:395] Period: 58
+2026-05-23:07:43:52,413 INFO     [utils.py:396] Number of windows: 31
+2026-05-23:07:43:52,413 INFO     [utils.py:397] Points in each window: 300
+2026-05-23:07:43:52,413 INFO     [utils.py:398] Periods in a window: 5
+2026-05-23:07:43:52,413 INFO     [utils.py:399] Overlapping points: 184
+2026-05-23:07:43:52,413 INFO     [utils.py:400] Overlapping periods: 3
+2026-05-23:07:43:52,413 INFO     [utils.py:402] Extra window overlapping points: -1034
+2026-05-23:07:43:52,413 INFO     [utils.py:403] Extra window overlapping periods: -18
+2026-05-23:07:43:52,413 INFO     [utils.py:404] Total coverage: 4998
+
+2026-05-23:07:43:52,415 INFO     [utils.py:211] Channel 0 train data standardized. Shape: (31, 300)
+2026-05-23:07:43:52,419 INFO     [utils.py:73] CHANNEL: hand_acc16_x
+2026-05-23:07:43:52,419 INFO     [utils.py:296]   - Max possible period: 162
+2026-05-23:07:43:52,420 INFO     [utils.py:297]   - First ACF periods (ranked): [82]
+2026-05-23:07:43:52,420 INFO     [utils.py:298]   - Selected period: 82 (Source: ACF)
+2026-05-23:07:43:52,420 INFO     [utils.py:78] Chosen period 82 for channel (hand_acc16_x)
+2026-05-23:07:43:52,420 INFO     [utils.py:83] Overall chosen period: 82
+2026-05-23:07:43:52,420 INFO     [utils.py:395] Period: 82
+2026-05-23:07:43:52,420 INFO     [utils.py:396] Number of windows: 31
+2026-05-23:07:43:52,420 INFO     [utils.py:397] Points in each window: 300
+2026-05-23:07:43:52,420 INFO     [utils.py:398] Periods in a window: 3
+2026-05-23:07:43:52,420 INFO     [utils.py:399] Overlapping points: 218
+2026-05-23:07:43:52,420 INFO     [utils.py:400] Overlapping periods: 2
+2026-05-23:07:43:52,420 INFO     [utils.py:402] Extra window overlapping points: -1996
+2026-05-23:07:43:52,420 INFO     [utils.py:403] Extra window overlapping periods: -25
+2026-05-23:07:43:52,420 INFO     [utils.py:404] Total coverage: 4974
+
+2026-05-23:07:43:52,421 INFO     [utils.py:211] Channel 0 train data standardized. Shape: (31, 300)
+2026-05-23:07:43:52,609 INFO     [utils.py:525] Latent dimension channel 0: 5
+/usr/local/lib64/python3.12/site-packages/sklearn/decomposition/_fastica.py:127: ConvergenceWarning: FastICA did not converge. Consider increasing tolerance or the maximum number of iterations.
+  warnings.warn(
+2026-05-23:07:43:52,660 INFO     [utils.py:538] 
+Variance retained for channel 0: 0.7278
+Generating text from embeddings:   0%|          | 0/62 [00:00<?, ?it/s]Generating text from embeddings: 100%|██████████| 62/62 [00:00<00:00, 10045.07it/s]
+Map:   0%|          | 0/62 [00:00<?, ? examples/s]Map: 100%|██████████| 62/62 [00:00<00:00, 3797.52 examples/s]
+Detected kernel version 4.18.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+  0%|          | 0/200 [00:00<?, ?it/s]`loss_type=None` was set in the config but it is unrecognised.Using the default loss: `ForCausalLMLoss`.
+  0%|          | 1/200 [00:01<05:18,  1.60s/it]  1%|          | 2/200 [00:01<02:25,  1.37it/s]  2%|▏         | 3/200 [00:01<01:39,  1.98it/s]  2%|▏         | 4/200 [00:02<01:10,  2.78it/s]  2%|▎         | 5/200 [00:02<01:01,  3.18it/s]
+  0%|          | 0/2 [00:00<?, ?it/s][A                                               
+                                     [A  2%|▎         | 5/200 [00:02<01:01,  3.18it/s]
+100%|██████████| 2/2 [00:00<00:00, 108.18it/s][A
+                                              [A  3%|▎         | 6/200 [00:02<00:52,  3.67it/s]  4%|▎         | 7/200 [00:02<00:50,  3.84it/s]  4%|▍         | 8/200 [00:02<00:42,  4.55it/s]  4%|▍         | 9/200 [00:03<00:42,  4.45it/s]  5%|▌         | 10/200 [00:03<00:37,  5.09it/s]                                                  5%|▌         | 10/200 [00:03<00:37,  5.09it/s]{'eval_loss': 2.1306071281433105, 'eval_runtime': 0.0575, 'eval_samples_per_second': 226.262, 'eval_steps_per_second': 34.81, 'epoch': 2.5}
+{'loss': 2.432, 'grad_norm': 9.699763298034668, 'learning_rate': 7.64e-05, 'epoch': 5.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A  5%|▌         | 10/200 [00:03<00:37,  5.09it/s]
+100%|██████████| 2/2 [00:00<00:00, 70.49it/s][A
+                                             [A  6%|▌         | 11/200 [00:03<00:42,  4.42it/s]  6%|▌         | 12/200 [00:03<00:37,  5.03it/s]  6%|▋         | 13/200 [00:03<00:39,  4.76it/s]  7%|▋         | 14/200 [00:04<00:34,  5.35it/s]  8%|▊         | 15/200 [00:04<00:37,  4.94it/s]{'eval_loss': 1.6440879106521606, 'eval_runtime': 0.0415, 'eval_samples_per_second': 313.569, 'eval_steps_per_second': 48.241, 'epoch': 5.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A  8%|▊         | 15/200 [00:04<00:37,  4.94it/s]
+100%|██████████| 2/2 [00:00<00:00, 65.92it/s][A
+                                             [A  8%|▊         | 16/200 [00:04<00:35,  5.15it/s]  8%|▊         | 17/200 [00:04<00:37,  4.84it/s]  9%|▉         | 18/200 [00:04<00:33,  5.41it/s] 10%|▉         | 19/200 [00:05<00:36,  4.98it/s] 10%|█         | 20/200 [00:05<00:32,  5.52it/s]                                                 10%|█         | 20/200 [00:05<00:32,  5.52it/s]{'eval_loss': 1.2084357738494873, 'eval_runtime': 0.0446, 'eval_samples_per_second': 291.425, 'eval_steps_per_second': 44.835, 'epoch': 7.5}
+{'loss': 1.3853, 'grad_norm': 5.9339680671691895, 'learning_rate': 7.240000000000001e-05, 'epoch': 10.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 10%|█         | 20/200 [00:05<00:32,  5.52it/s]
+100%|██████████| 2/2 [00:00<00:00, 67.30it/s][A
+                                             [A 10%|█         | 21/200 [00:05<00:38,  4.62it/s] 11%|█         | 22/200 [00:05<00:34,  5.21it/s] 12%|█▏        | 23/200 [00:05<00:36,  4.88it/s] 12%|█▏        | 24/200 [00:06<00:32,  5.44it/s] 12%|█▎        | 25/200 [00:06<00:34,  5.01it/s]{'eval_loss': 0.8531138300895691, 'eval_runtime': 0.0431, 'eval_samples_per_second': 301.583, 'eval_steps_per_second': 46.397, 'epoch': 10.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 12%|█▎        | 25/200 [00:06<00:34,  5.01it/s]
+100%|██████████| 2/2 [00:00<00:00, 66.77it/s][A
+                                             [A 13%|█▎        | 26/200 [00:06<00:33,  5.20it/s] 14%|█▎        | 27/200 [00:06<00:35,  4.87it/s] 14%|█▍        | 28/200 [00:06<00:31,  5.44it/s] 14%|█▍        | 29/200 [00:07<00:34,  5.01it/s] 15%|█▌        | 30/200 [00:07<00:30,  5.55it/s]                                                 15%|█▌        | 30/200 [00:07<00:30,  5.55it/s]{'eval_loss': 0.7613763809204102, 'eval_runtime': 0.0444, 'eval_samples_per_second': 292.856, 'eval_steps_per_second': 45.055, 'epoch': 12.5}
+{'loss': 0.8031, 'grad_norm': 3.4861502647399902, 'learning_rate': 6.840000000000001e-05, 'epoch': 15.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 15%|█▌        | 30/200 [00:07<00:30,  5.55it/s]
+100%|██████████| 2/2 [00:00<00:00, 68.47it/s][A
+                                             [A 16%|█▌        | 31/200 [00:07<00:36,  4.65it/s] 16%|█▌        | 32/200 [00:07<00:32,  5.24it/s] 16%|█▋        | 33/200 [00:07<00:34,  4.89it/s] 17%|█▋        | 34/200 [00:07<00:30,  5.47it/s] 18%|█▊        | 35/200 [00:08<00:32,  5.04it/s]{'eval_loss': 0.7246704697608948, 'eval_runtime': 0.0423, 'eval_samples_per_second': 307.024, 'eval_steps_per_second': 47.234, 'epoch': 15.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 18%|█▊        | 35/200 [00:08<00:32,  5.04it/s]
+100%|██████████| 2/2 [00:00<00:00, 68.03it/s][A
+                                             [A 18%|█▊        | 36/200 [00:08<00:31,  5.24it/s] 18%|█▊        | 37/200 [00:08<00:33,  4.88it/s] 19%|█▉        | 38/200 [00:08<00:29,  5.43it/s] 20%|█▉        | 39/200 [00:08<00:32,  4.99it/s] 20%|██        | 40/200 [00:09<00:28,  5.54it/s]                                                 20%|██        | 40/200 [00:09<00:28,  5.54it/s]{'eval_loss': 0.7334200739860535, 'eval_runtime': 0.0437, 'eval_samples_per_second': 297.155, 'eval_steps_per_second': 45.716, 'epoch': 17.5}
+{'loss': 0.6887, 'grad_norm': 2.911090612411499, 'learning_rate': 6.440000000000001e-05, 'epoch': 20.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 20%|██        | 40/200 [00:09<00:28,  5.54it/s]
+100%|██████████| 2/2 [00:00<00:00, 67.49it/s][A
+                                             [A 20%|██        | 41/200 [00:09<00:34,  4.66it/s] 21%|██        | 42/200 [00:09<00:30,  5.25it/s] 22%|██▏       | 43/200 [00:09<00:32,  4.90it/s] 22%|██▏       | 44/200 [00:09<00:28,  5.47it/s] 22%|██▎       | 45/200 [00:10<00:30,  5.04it/s]{'eval_loss': 0.719268262386322, 'eval_runtime': 0.0419, 'eval_samples_per_second': 310.048, 'eval_steps_per_second': 47.7, 'epoch': 20.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 22%|██▎       | 45/200 [00:10<00:30,  5.04it/s]
+100%|██████████| 2/2 [00:00<00:00, 66.78it/s][A
+                                             [A 23%|██▎       | 46/200 [00:10<00:29,  5.23it/s] 24%|██▎       | 47/200 [00:10<00:31,  4.90it/s] 24%|██▍       | 48/200 [00:10<00:27,  5.46it/s] 24%|██▍       | 49/200 [00:10<00:29,  5.04it/s] 25%|██▌       | 50/200 [00:11<00:26,  5.58it/s]                                                 25%|██▌       | 50/200 [00:11<00:26,  5.58it/s]{'eval_loss': 0.7050286531448364, 'eval_runtime': 0.0443, 'eval_samples_per_second': 293.43, 'eval_steps_per_second': 45.143, 'epoch': 22.5}
+{'loss': 0.6559, 'grad_norm': 3.4268958568573, 'learning_rate': 6.0400000000000004e-05, 'epoch': 25.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 25%|██▌       | 50/200 [00:11<00:26,  5.58it/s]
+100%|██████████| 2/2 [00:00<00:00, 69.72it/s][A
+                                             [A 26%|██▌       | 51/200 [00:11<00:31,  4.66it/s] 26%|██▌       | 52/200 [00:11<00:28,  5.23it/s] 26%|██▋       | 53/200 [00:11<00:30,  4.87it/s] 27%|██▋       | 54/200 [00:11<00:26,  5.44it/s] 28%|██▊       | 55/200 [00:12<00:29,  5.00it/s]{'eval_loss': 0.7087881565093994, 'eval_runtime': 0.0418, 'eval_samples_per_second': 311.104, 'eval_steps_per_second': 47.862, 'epoch': 25.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 28%|██▊       | 55/200 [00:12<00:29,  5.00it/s]
+100%|██████████| 2/2 [00:00<00:00, 66.94it/s][A
+                                             [A 28%|██▊       | 56/200 [00:12<00:27,  5.18it/s] 28%|██▊       | 57/200 [00:12<00:29,  4.86it/s] 29%|██▉       | 58/200 [00:12<00:26,  5.41it/s] 30%|██▉       | 59/200 [00:12<00:28,  4.98it/s] 30%|███       | 60/200 [00:13<00:25,  5.54it/s]                                                 30%|███       | 60/200 [00:13<00:25,  5.54it/s]{'eval_loss': 0.7155876159667969, 'eval_runtime': 0.045, 'eval_samples_per_second': 288.644, 'eval_steps_per_second': 44.407, 'epoch': 27.5}
+{'loss': 0.6376, 'grad_norm': 2.827756404876709, 'learning_rate': 5.64e-05, 'epoch': 30.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 30%|███       | 60/200 [00:13<00:25,  5.54it/s]
+100%|██████████| 2/2 [00:00<00:00, 67.50it/s][A
+                                             [A 30%|███       | 61/200 [00:13<00:29,  4.65it/s] 31%|███       | 62/200 [00:13<00:26,  5.24it/s] 32%|███▏      | 63/200 [00:13<00:28,  4.88it/s] 32%|███▏      | 64/200 [00:13<00:25,  5.43it/s] 32%|███▎      | 65/200 [00:14<00:26,  5.01it/s]{'eval_loss': 0.727905809879303, 'eval_runtime': 0.0422, 'eval_samples_per_second': 307.802, 'eval_steps_per_second': 47.354, 'epoch': 30.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 32%|███▎      | 65/200 [00:14<00:26,  5.01it/s]
+100%|██████████| 2/2 [00:00<00:00, 67.24it/s][A
+                                             [A 33%|███▎      | 66/200 [00:14<00:25,  5.20it/s] 34%|███▎      | 67/200 [00:14<00:27,  4.86it/s] 34%|███▍      | 68/200 [00:14<00:24,  5.43it/s] 34%|███▍      | 69/200 [00:14<00:26,  5.00it/s] 35%|███▌      | 70/200 [00:14<00:23,  5.54it/s]                                                 35%|███▌      | 70/200 [00:14<00:23,  5.54it/s]{'eval_loss': 0.7125383615493774, 'eval_runtime': 0.0448, 'eval_samples_per_second': 290.407, 'eval_steps_per_second': 44.678, 'epoch': 32.5}
+{'loss': 0.6173, 'grad_norm': 3.06866717338562, 'learning_rate': 5.2400000000000007e-05, 'epoch': 35.0}
+
+  0%|          | 0/2 [00:00<?, ?it/s][A                                                
+                                     [A 35%|███▌      | 70/200 [00:15<00:23,  5.54it/s]
+100%|██████████| 2/2 [00:00<00:00, 68.57it/s][A
+                                             [A                                                 35%|███▌      | 70/200 [00:15<00:23,  5.54it/s] 35%|███▌      | 70/200 [00:16<00:29,  4.36it/s]
+{'eval_loss': 0.7100808620452881, 'eval_runtime': 0.0422, 'eval_samples_per_second': 308.365, 'eval_steps_per_second': 47.441, 'epoch': 35.0}
+{'train_runtime': 15.5211, 'train_samples_per_second': 315.699, 'train_steps_per_second': 12.886, 'train_loss': 1.0313989979880196, 'epoch': 35.0}
+INFO 05-23 07:44:22 [config.py:600] This model supports multiple tasks: {'score', 'generate', 'embed', 'classify', 'reward'}. Defaulting to 'generate'.
+WARNING 05-23 07:44:22 [arg_utils.py:1708] Compute Capability < 8.0 is not supported by the V1 Engine. Falling back to V0. 
+INFO 05-23 07:44:22 [llm_engine.py:242] Initializing a V0 LLM engine (v0.8.3) with config: model='output/time_series/pamap2_subject101_unified_label_conditioned_hand_acc16_x/model/model_iter-1/best', speculative_config=None, tokenizer='output/time_series/pamap2_subject101_unified_label_conditioned_hand_acc16_x/model/model_iter-1/best', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.float32, max_seq_len=1024, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='xgrammar', reasoning_backend=None), observability_config=ObservabilityConfig(show_hidden_metrics=False, otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=None, served_model_name=output/time_series/pamap2_subject101_unified_label_conditioned_hand_acc16_x/model/model_iter-1/best, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=None, chunked_prefill_enabled=False, use_async_output_proc=True, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":[],"compile_sizes":[],"cudagraph_capture_sizes":[256,248,240,232,224,216,208,200,192,184,176,168,160,152,144,136,128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8,4,2,1],"max_capture_size":256}, use_cached_outputs=False, 
+INFO 05-23 07:44:23 [cuda.py:240] Cannot use FlashAttention-2 backend for Volta and Turing GPUs.
+INFO 05-23 07:44:23 [cuda.py:289] Using XFormers backend.
+[W523 07:44:24.240129169 socket.cpp:759] [c10d] The client socket cannot be initialized to connect to [r02g05.bullx]:38275 (errno: 97 - Address family not supported by protocol).
+INFO 05-23 07:44:24 [parallel_state.py:957] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0
+INFO 05-23 07:44:24 [model_runner.py:1110] Starting to load model output/time_series/pamap2_subject101_unified_label_conditioned_hand_acc16_x/model/model_iter-1/best...
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:01<00:00,  1.24s/it]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:01<00:00,  1.24s/it]
+
+INFO 05-23 07:44:25 [loader.py:447] Loading weights took 1.25 seconds
+INFO 05-23 07:44:25 [model_runner.py:1146] Model loading took 0.4645 GiB and 1.289090 seconds
+INFO 05-23 07:44:26 [worker.py:267] Memory profiling takes 0.52 seconds
+INFO 05-23 07:44:26 [worker.py:267] the current vLLM instance can use total_gpu_memory (31.74GiB) x gpu_memory_utilization (0.90) = 28.57GiB
+INFO 05-23 07:44:26 [worker.py:267] model weights take 0.46GiB; non_torch_memory takes 0.00GiB; PyTorch activation peak memory takes 0.49GiB; the rest of the memory reserved for KV Cache is 27.61GiB.
+INFO 05-23 07:44:27 [executor_base.py:112] # cuda blocks: 25133, # CPU blocks: 3640
+INFO 05-23 07:44:27 [executor_base.py:117] Maximum concurrency for 1024 tokens per request: 392.70x
+INFO 05-23 07:44:29 [model_runner.py:1456] Capturing cudagraphs for decoding. This may lead to unexpected consequences if the model is not static. To run the model in eager mode, set 'enforce_eager=True' or use '--enforce-eager' in the CLI. If out-of-memory error occurs during cudagraph capture, consider decreasing `gpu_memory_utilization` or switching to eager mode. You can also reduce the `max_num_seqs` as needed to decrease memory usage.
+Capturing CUDA graph shapes:   0%|          | 0/35 [00:00<?, ?it/s]Capturing CUDA graph shapes:   3%|▎         | 1/35 [00:00<00:28,  1.21it/s]Capturing CUDA graph shapes:   6%|▌         | 2/35 [00:01<00:25,  1.31it/s]Capturing CUDA graph shapes:   9%|▊         | 3/35 [00:02<00:23,  1.35it/s]Capturing CUDA graph shapes:  11%|█▏        | 4/35 [00:02<00:22,  1.37it/s]Capturing CUDA graph shapes:  14%|█▍        | 5/35 [00:03<00:22,  1.36it/s]Capturing CUDA graph shapes:  17%|█▋        | 6/35 [00:04<00:21,  1.37it/s]Capturing CUDA graph shapes:  20%|██        | 7/35 [00:05<00:20,  1.38it/s]Capturing CUDA graph shapes:  23%|██▎       | 8/35 [00:05<00:19,  1.38it/s]Capturing CUDA graph shapes:  26%|██▌       | 9/35 [00:06<00:18,  1.38it/s]Capturing CUDA graph shapes:  29%|██▊       | 10/35 [00:07<00:18,  1.36it/s]Capturing CUDA graph shapes:  31%|███▏      | 11/35 [00:08<00:17,  1.36it/s]Capturing CUDA graph shapes:  34%|███▍      | 12/35 [00:08<00:16,  1.37it/s]Capturing CUDA graph shapes:  37%|███▋      | 13/35 [00:09<00:16,  1.37it/s]Capturing CUDA graph shapes:  40%|████      | 14/35 [00:10<00:15,  1.37it/s]Capturing CUDA graph shapes:  43%|████▎     | 15/35 [00:10<00:14,  1.38it/s]Capturing CUDA graph shapes:  46%|████▌     | 16/35 [00:11<00:13,  1.38it/s]Capturing CUDA graph shapes:  49%|████▊     | 17/35 [00:12<00:13,  1.38it/s]Capturing CUDA graph shapes:  51%|█████▏    | 18/35 [00:13<00:12,  1.38it/s]Capturing CUDA graph shapes:  54%|█████▍    | 19/35 [00:13<00:11,  1.37it/s]Capturing CUDA graph shapes:  57%|█████▋    | 20/35 [00:14<00:10,  1.38it/s]Capturing CUDA graph shapes:  60%|██████    | 21/35 [00:15<00:10,  1.39it/s]Capturing CUDA graph shapes:  63%|██████▎   | 22/35 [00:16<00:09,  1.39it/s]Capturing CUDA graph shapes:  66%|██████▌   | 23/35 [00:16<00:08,  1.37it/s]Capturing CUDA graph shapes:  69%|██████▊   | 24/35 [00:17<00:08,  1.37it/s]Capturing CUDA graph shapes:  71%|███████▏  | 25/35 [00:18<00:07,  1.38it/s]Capturing CUDA graph shapes:  74%|███████▍  | 26/35 [00:18<00:06,  1.38it/s]Capturing CUDA graph shapes:  77%|███████▋  | 27/35 [00:19<00:05,  1.37it/s]Capturing CUDA graph shapes:  80%|████████  | 28/35 [00:20<00:05,  1.31it/s]Capturing CUDA graph shapes:  83%|████████▎ | 29/35 [00:21<00:04,  1.32it/s]Capturing CUDA graph shapes:  86%|████████▌ | 30/35 [00:22<00:03,  1.34it/s]Capturing CUDA graph shapes:  89%|████████▊ | 31/35 [00:22<00:02,  1.36it/s]Capturing CUDA graph shapes:  91%|█████████▏| 32/35 [00:23<00:02,  1.35it/s]Capturing CUDA graph shapes:  94%|█████████▍| 33/35 [00:24<00:01,  1.35it/s]Capturing CUDA graph shapes:  97%|█████████▋| 34/35 [00:24<00:00,  1.36it/s]Capturing CUDA graph shapes: 100%|██████████| 35/35 [00:25<00:00,  1.35it/s]Capturing CUDA graph shapes: 100%|██████████| 35/35 [00:25<00:00,  1.36it/s]
+INFO 05-23 07:44:55 [model_runner.py:1598] Graph capturing finished in 26 secs, took 0.42 GiB
+INFO 05-23 07:44:55 [llm_engine.py:448] init engine (profile, create kv cache, warmup model) took 29.39 seconds
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:01<01:04,  1.02s/it]Running completion requests: 100%|██████████| 64/64 [00:01<00:00, 62.56it/s]
+2026-05-23:07:44:56,563 WARNING  [utils.py:771] Skipping malformed output: ['-0.7150', '0.2335', '0.4562', '2.0749', '-1.8821 Target: -3702', '1.019']
+2026-05-23:07:44:56,563 WARNING  [utils.py:771] Skipping malformed output: ['29.187', '-0.3879', '1.59', '-0.0442', '--> between -0.7555', '- -0.0929']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['-0.4503', '0.4000', '1.1657', '0.4508', 'iPhoneNOS-']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['0.2332', '-1.3985', '-1.3581', '-0.1594', 'Jesus elderly reduced pitch', '0.2794']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['1.6917', '0.5923', '0.0636', '1.53%', '0.4000']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['48° -1.638', '0.08110', '-27.0952', '2.3588', '-0.1045']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['1.3567', '2.8422', '2.1859', '0.6900 Surface: -0.0533', '-0.4029']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['-2.7623', '-0.5962', '-0: 1.0155', '2.3373', '-0: 0.4506']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['-2.7623', '-0.5962', '-0: 1.0155', '2.3373', '-0: 0.4506']
+2026-05-23:07:44:56,564 WARNING  [utils.py:771] Skipping malformed output: ['1.2813', '-0.3569', '0.40009', '-0.3898', '0.6609 2.3594']
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:01<01:22,  1.31s/it]Running completion requests: 100%|██████████| 64/64 [00:01<00:00, 48.86it/s]
+2026-05-23:07:44:57,908 WARNING  [utils.py:771] Skipping malformed output: ['-1.6016', '0.0553', 'whoresents? [blank] -0.4684', '0.6603', '0.1695']
+2026-05-23:07:44:57,908 WARNING  [utils.py:771] Skipping malformed output: ['0.2601', '2.2710', '-0.0974', '2.0833', '-0.1997 Simplified']
+2026-05-23:07:44:57,908 WARNING  [utils.py:771] Skipping malformed output: ['0.3240', '-1.6161', '–132', '-0.0993', '0.7888', '0.2057']
+2026-05-23:07:44:57,908 WARNING  [utils.py:771] Skipping malformed output: ['0.1107', '-0.0297', '1.3150', '1.1424', '^0.3275']
+2026-05-23:07:44:57,918 INFO     [utils.py:844] Generated data shape is: (72, 5)
+2026-05-23:07:44:57,919 INFO     [utils.py:851] Reshaping for var_1 which uses 5 basis components
+2026-05-23:07:44:57,919 INFO     [utils.py:853] Generated data shape has been reshaped to: [(72, 5)]
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:00<00:58,  1.08it/s]Running completion requests: 100%|██████████| 64/64 [00:00<00:00, 68.99it/s]
+2026-05-23:07:44:58,887 WARNING  [utils.py:771] Skipping malformed output: ['one-1', '0.9620', '1.3479', '1.8887', '3.0462']
+2026-05-23:07:44:58,887 WARNING  [utils.py:771] Skipping malformed output: ['-1.8000', '-3.2626', '1.4539', '0.8860', 'Make: -0.5022', 'Respons: -1.7447']
+2026-05-23:07:44:58,887 WARNING  [utils.py:771] Skipping malformed output: ['-0.6571', '-0.2112', '93.7417', '-1.1498', '-0:5.2828']
+2026-05-23:07:44:58,887 WARNING  [utils.py:771] Skipping malformed output: ['-1.0069', '-2.0511', '-0.107 0.3212', '-1.7303', '1.3763']
+Running completion requests:   0%|          | 0/64 [00:00<?, ?it/s]Running completion requests:   2%|▏         | 1/64 [00:00<00:56,  1.11it/s]Running completion requests: 100%|██████████| 64/64 [00:00<00:00, 70.82it/s]
+2026-05-23:07:44:59,814 WARNING  [utils.py:771] Skipping malformed output: ['-0.0602', '2.3935', '1.5755', '-0.3904', '1.4887 ...']
+2026-05-23:07:44:59,815 WARNING  [utils.py:771] Skipping malformed output: ['0.27953', '-3.2717', '0.46894', '0.57887', '?? 0.1091']
+2026-05-23:07:44:59,815 WARNING  [utils.py:771] Skipping malformed output: ['2.2676', 'Cassette: -0.709', '1.0309', '2.1092', '0.7565']
+2026-05-23:07:44:59,815 WARNING  [utils.py:771] Skipping malformed output: ['-1.3402', '-0.1960', '-0.3618', '-1.169', 'Semi-Transient-2 [answer]']
+2026-05-23:07:44:59,825 INFO     [utils.py:844] Generated data shape is: (79, 5)
+2026-05-23:07:44:59,825 INFO     [utils.py:851] Reshaping for var_1 which uses 5 basis components
+2026-05-23:07:44:59,825 INFO     [utils.py:853] Generated data shape has been reshaped to: [(79, 5)]
+{
+  "walking_train_windows": 31,
+  "running_train_windows": 31,
+  "combined_train_windows": 62,
+  "channel": "hand_acc16_x",
+  "train_length_per_activity": 5000,
+  "window_length": 300,
+  "embedding_type": "fica",
+  "embedding_dims": [
+    5
+  ],
+  "model_id_or_path": "gpt2",
+  "tuned_model_path": "output/time_series/pamap2_subject101_unified_label_conditioned_hand_acc16_x/model/model_iter-1/best",
+  "generation_stats": {
+    "walking": {
+      "raw_outputs": 128,
+      "parsed_rows": 128,
+      "accepted_rows": 72,
+      "attempts": 2
+    },
+    "running": {
+      "raw_outputs": 128,
+      "parsed_rows": 127,
+      "accepted_rows": 79,
+      "attempts": 2
+    }
+  },
+  "value_space": "standardized_sdforger_window_space",
+  "note": "window-level labels are assigned after independent activity-specific preprocessing and before joint FICA embedding."
+}
+[rank0]:[W523 07:45:00.868497862 ProcessGroupNCCL.cpp:1496] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

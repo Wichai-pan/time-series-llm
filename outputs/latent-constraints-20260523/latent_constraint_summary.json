@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "channel": "hand_acc16_x",
+    "embedding_dims": [
+      5
+    ],
+    "train_windows": 62,
+    "walking_train_windows": 31,
+    "running_train_windows": 31,
+    "value_space": "standardized_sdforger_window_space"
+  },
+  "summary": [
+    {
+      "variant": "clip_minmax",
+      "label": "walking",
+      "input_rows": 72,
+      "output_rows": 72,
+      "latent_abs_max": 5.413216890901588,
+      "decoded_abs_max": 7.498086443388703,
+      "decoded_std_mean": 0.8039092232152056
+    },
+    {
+      "variant": "clip_p05_p95",
+      "label": "walking",
+      "input_rows": 72,
+      "output_rows": 72,
+      "latent_abs_max": 2.1196791423254924,
+      "decoded_abs_max": 3.2371779551721347,
+      "decoded_std_mean": 0.6178545242772473
+    },
+    {
+      "variant": "reject_iqr3",
+      "label": "walking",
+      "input_rows": 72,
+      "output_rows": 35,
+      "latent_abs_max": 2.617,
+      "decoded_abs_max": 2.5004434480321973,
+      "decoded_std_mean": 0.5374019482699112
+    },
+    {
+      "variant": "clip_minmax",
+      "label": "running",
+      "input_rows": 79,
+      "output_rows": 79,
+      "latent_abs_max": 5.413216890901588,
+      "decoded_abs_max": 4.582769744018974,
+      "decoded_std_mean": 0.8019295554464372
+    },
+    {
+      "variant": "clip_p05_p95",
+      "label": "running",
+      "input_rows": 79,
+      "output_rows": 79,
+      "latent_abs_max": 2.1196791423254924,
+      "decoded_abs_max": 2.6524251192115287,
+      "decoded_std_mean": 0.6381638332360847
+    },
+    {
+      "variant": "reject_iqr3",
+      "label": "running",
+      "input_rows": 79,
+      "output_rows": 43,
+      "latent_abs_max": 3.126,
+      "decoded_abs_max": 3.123017397787883,
+      "decoded_std_mean": 0.6952417579289986
+    }
+  ]
+}

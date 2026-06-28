@@ -1,0 +1,36 @@
+# paper-note-added: SDForger 任务配置文件，集中配置论文 Sec3.2.2(LLM微调) 与 Sec3.2.1/推理 的超参数。
+name: time_series
+
+blocks:
+  # paper-note-added: trainer block 对应论文步骤(4) LLM 微调阶段（Sec3.2.2），用文本编码后的系数序列微调语言模型。
+  - name: trainer
+    type: public/trainers/sdforger-tuning
+
+    # General training args
+    # paper-note-added: 默认骨干 LLM = GPT-2，与论文 Sec3.2.2 一致（注释里也给出 granite-3.0-2b-base 作为可选大模型）。
+    model_id_or_path: gpt2 #ibm-granite/granite-3.0-2b-base
+    # paper-note-added: 学习率 8e-5，对应论文 Sec3.2.2 微调设置（Adam, lr=8e-5）。
+    learning_rate: 0.00008
+    # paper-note-added: 训练轮数上限 100（论文上限到 200 epoch，并配早停：每5步验证、patience=5、20%作验证集）。
+    num_train_epochs: 100
+    # paper-note-added: 每设备 batch size = 32，对应论文 Sec3.2.2 的 batch 32（注释提示按显存调整）。
+    per_device_train_batch_size: 32 # update this value as per your system memory
+    # paper-note-added: 随机种子 42，控制可复现性（框架设置，论文未特别指定数值）。
+    seed: 42
+
+# paper-note-added: target block 对应论文步骤(4)的推理阶段：加载上面微调好的 checkpoint，自回归填充 [answer] 系数以生成新样本。
+# Target inference model will be loaded from the fine-tuned checkpoint above
+target:
+  type: vllm # Use only vllm as the lm provider type
+  # paper-note-added: float32 精度推理（框架/数值稳定性设置，论文未特别强调精度位宽）。
+  dtype: float32
+  trust_remote_code: true
+  ignore_mismatched_sizes: true
+  # paper-note-added: temperature=1.3，对应论文 Sec3.2.2 推理用“多项式/温度采样”提升生成多样性（>1 增大随机性）。
+  temperature: 1.3
+  # paper-note-added: 单次生成最大 token 数=1000，需足够容纳被随机置换的 K 个特征对应的 [answer] 系数序列（Sec3.2.1 模板长度上限）。
+  max_tokens: 1000
+
+# paper-note-added: 元信息（框架版本号，无论文映射）。
+metadata:
+  version: 1.0

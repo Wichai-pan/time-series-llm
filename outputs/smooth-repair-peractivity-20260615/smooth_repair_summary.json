@@ -1,0 +1,120 @@
+{
+  "metadata": {
+    "channel": "hand_acc16_x",
+    "embedding_dims": [
+      5
+    ],
+    "train_windows": 62,
+    "walking_train_windows": 31,
+    "running_train_windows": 31,
+    "generated_dir": "output/time_series/pamap2_subject101_unified_label_conditioned_hand_acc16_x",
+    "band": "minmax",
+    "reject_frac": 0.5,
+    "per_activity_bounds": true,
+    "value_space": "standardized_sdforger_window_space"
+  },
+  "summary": [
+    {
+      "variant": "clip_p05_p95",
+      "label": "walking",
+      "input_rows": 72,
+      "output_rows": 72,
+      "clean_accept_rows": 72,
+      "repaired_rows": 0,
+      "rejected_rows": 0,
+      "decoded_abs_max": 2.897657236214357,
+      "decoded_std_mean": 0.4844195411444119
+    },
+    {
+      "variant": "shrink_p05_p95",
+      "label": "walking",
+      "input_rows": 72,
+      "output_rows": 72,
+      "clean_accept_rows": 3,
+      "repaired_rows": 69,
+      "rejected_rows": 0,
+      "shrink_factor_mean": 0.3406909178299568,
+      "shrink_factor_min": 6.189447143456424e-05,
+      "decoded_abs_max": 1.6885571577177145,
+      "decoded_std_mean": 0.27068531009564345
+    },
+    {
+      "variant": "shrink_minmax",
+      "label": "walking",
+      "input_rows": 72,
+      "output_rows": 72,
+      "clean_accept_rows": 12,
+      "repaired_rows": 60,
+      "rejected_rows": 0,
+      "shrink_factor_mean": 0.480759782755299,
+      "shrink_factor_min": 0.00010443475545829665,
+      "decoded_abs_max": 3.175731366779759,
+      "decoded_std_mean": 0.41800343021433367
+    },
+    {
+      "variant": "waveform_interp",
+      "label": "walking",
+      "input_rows": 72,
+      "output_rows": 56,
+      "clean_accept_rows": 50,
+      "repaired_rows": 6,
+      "rejected_rows": 16,
+      "band": "minmax",
+      "band_low": -4.51534366607666,
+      "band_high": 3.2430179119110107,
+      "decoded_abs_max": 4.490867826344975,
+      "decoded_std_mean": 0.7792112150770192
+    },
+    {
+      "variant": "clip_p05_p95",
+      "label": "running",
+      "input_rows": 79,
+      "output_rows": 79,
+      "clean_accept_rows": 79,
+      "repaired_rows": 0,
+      "rejected_rows": 0,
+      "decoded_abs_max": 2.3859080969460478,
+      "decoded_std_mean": 0.5880193981842537
+    },
+    {
+      "variant": "shrink_p05_p95",
+      "label": "running",
+      "input_rows": 79,
+      "output_rows": 79,
+      "clean_accept_rows": 8,
+      "repaired_rows": 71,
+      "rejected_rows": 0,
+      "shrink_factor_mean": 0.45090347783019785,
+      "shrink_factor_min": 0.00048026546406809413,
+      "decoded_abs_max": 1.8298429540326206,
+      "decoded_std_mean": 0.38319407881062767
+    },
+    {
+      "variant": "shrink_minmax",
+      "label": "running",
+      "input_rows": 79,
+      "output_rows": 79,
+      "clean_accept_rows": 13,
+      "repaired_rows": 66,
+      "rejected_rows": 0,
+      "shrink_factor_mean": 0.5442706739572382,
+      "shrink_factor_min": 0.0004867211903180974,
+      "decoded_abs_max": 3.4846749170378186,
+      "decoded_std_mean": 0.481413809225549
+    },
+    {
+      "variant": "waveform_interp",
+      "label": "running",
+      "input_rows": 79,
+      "output_rows": 67,
+      "clean_accept_rows": 54,
+      "repaired_rows": 13,
+      "rejected_rows": 12,
+      "band": "minmax",
+      "band_low": -4.1306915283203125,
+      "band_high": 2.5181884765625,
+      "decoded_abs_max": 4.127465742069651,
+      "decoded_std_mean": 0.8645397883376874
+    }
+  ]
+}
