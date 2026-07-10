@@ -1,0 +1,23 @@
+# LaTeX build artifacts — don't commit these
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*.bcf
+*.pdf
+# template zip / extraction leftovers
+*.zip
+_extracted/
+__MACOSX/
+.DS_Store

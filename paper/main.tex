@@ -1,0 +1,118 @@
+\documentclass{article}
+
+
+% NeurIPS 2026 style, FINAL mode (non-anonymous: shows author names).
+\usepackage[final]{neurips_2026}
+
+
+\usepackage[utf8]{inputenc}   % allow utf-8 input
+\usepackage[T1]{fontenc}      % use 8-bit T1 fonts
+\usepackage{hyperref}         % hyperlinks
+\usepackage{url}              % simple URL typesetting
+\usepackage{booktabs}         % professional-quality tables
+\usepackage{amsfonts}         % blackboard math symbols
+\usepackage{amsmath}
+\usepackage{nicefrac}         % compact symbols for 1/2, etc.
+\usepackage{microtype}        % microtypography
+\usepackage{xcolor}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+
+
+% ==== Working title (team can change) ====
+\title{Prompt-Controllable Synthetic HAR Time Series with LLMs:\\
+Capabilities and Representation Limits of SDForger on PAMAP2}
+
+
+% ==== Authors (TODO: fill exact names / order / emails) ====
+\author{%
+  Huatai (Wichai) Pan \\
+  Aalto University \\
+  \texttt{firstname.lastname@aalto.fi} \\
+  \And
+  Teammate~2 \\ Aalto University \\
+  \And
+  Teammate~3 \\ Aalto University \\
+  % ELEC-E7633 Project Course. Advisor: Si Zuo.
+}
+
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{abstract}
+% TODO: 150-200 words. Problem (LLM-based synthetic HAR time series, SDForger on
+% PAMAP2), what we did (prompt/stat conditioning, gpt2->Qwen, per-activity repair),
+% and the headline finding: prompt controls amplitude but NOT cadence/frequency,
+% which is a *representation* limit of the fixed linear FICA basis (empirically:
+% run reconstructed through a walk-fit basis collapses to walking's cadence).
+\end{abstract}
+
+
+\section{Introduction}
+\label{sec:intro}
+% TODO: research question. Synthetic HAR data for privacy / data scarcity.
+% SDForger = FICA embedding + LLM over serialized coefficients. Our theme = prompt
+% design / controllability. State the contribution up front:
+% (1) dual-layer controllability characterization (amplitude vs frequency);
+% (2) activity-level cadence collapse; (3) linear representation ceiling + a
+% nonlinear-embedding direction (validated PoC / future work).
+
+
+\section{Related Work}
+\label{sec:related}
+% TODO: SDForger (linear FICA/FPC + LLM); time-series generation (TimeVAE,
+% TimeVQVAE, TimeGAN, diffusion); TSGBench metrics; audio codec+LM analogy
+% (EnCodec/AudioLM) as the nonlinear-tokenizer precedent. PAMAP2 dataset.
+
+
+\section{Methods}
+\label{sec:methods}
+% TODO: SDForger pipeline (periodicity segmentation -> FastICA ~8 coeffs ->
+% text serialization -> LLM next-token -> linear decode window=coeffs@mixing.T+mean).
+% Our additions: prompt/stat conditioning; gpt2 vs Qwen2.5-1.5B (HF backend);
+% per-activity clip repair. Metrics: TSGBench (MDD/ACD/SD/KD/ED/DTW); adherence
+% = Spearman(requested level, realized stat); HAR downstream accuracy.
+
+
+\section{Experiments}
+\label{sec:experiments}
+% TODO (advisor: list models tried, params tuned, ALL results):
+% - gpt2 vs Qwen (explosion vs stable); multi-subject; normalization ablation.
+% - Best config (Qwen + multi-subject + clip repair): train/held-out ACD.
+% - Prompt controllability: max/std/range/period adherence (+ per-descriptor TSG).
+% - Trimming lead-in (clean ACF-distance metric); activity discriminability.
+% - Honest baselines (Gaussian-coeff, naive jitter, conditional Gaussian, NN memo).
+% - Representation-ceiling PoC (run through walk-fit FICA vs AE; R^2 + period).
+
+
+\section{Result Analysis}
+\label{sec:analysis}
+% TODO (advisor: WHY good / WHY bad, not just numbers). This is the heart.
+% - Dual-layer controllability: amplitude in coefficients (controllable ~0.40);
+%   frequency welded in the fixed linear basis (uncontrollable ~0). Training layer:
+%   ~50-epoch sweet spot, over-training rigidifies.
+% - Activity-level consequence: generated walk/run collapse to the same cadence
+%   (~62/63 vs real 55/77) -> not distinguishable downstream (~chance).
+% - Representation ceiling (proven): linear affine decode cannot represent an
+%   out-of-basis fundamental; nonlinear is NECESSARY but not sufficient.
+% - Methodology note: TSGBench ACD is unreliable for cross-model (differently
+%   normalized) comparison; use scale-invariant raw-space measures.
+
+
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+% TODO: summary of the capability/limit story. Future: nonlinear embedding
+% (VQ-VAE) + conditioning to break the cadence ceiling; multichannel generation
+% (SDForger's signature gap); more subjects.
+
+
+% \nocite{*}  % uncomment to list all refs.bib entries even if not cited
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+
+\end{document}
